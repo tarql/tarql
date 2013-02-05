@@ -21,7 +21,7 @@ is equivalent to executing the following over an empty graph:
       ...
     }
 
-In other words, the CSV file's contents are input into the query as a table of bindings. This allows manipulation of CSV data using SPARQL syntax, and in particular the generation of RDF using `CONSTRUCT` queries. See below for more examples.
+In other words, the CSV file's contents are input into the query as a table of bindings. This allows manipulation of CSV data using the full power of SPARQL 1.1 syntax, and in particular the generation of RDF using `CONSTRUCT` queries. See below for more examples.
 
 
 ## Command line
@@ -37,11 +37,14 @@ Column headings are `?a`, `?b`, `?c` and so on. If the CSV file already contains
 
 The input CSV file can be specified using `FROM` or on the command line.
 
+Tarql auto-detects the input CSV file's encoding. This is a guess and may fail sometimes.
+
 
 ## Building
 
-* Maven
-* `mvn package appassembler:assembly` creates executable scripts for Windows and Unix in `/target/appassembler/bin/tarql`.
+Tarql uses Maven. To create executable scripts for Windows and Unix in `/target/appassembler/bin/tarql`:
+
+    mvn package appassembler:assembly
 
 
 ## Design patterns
