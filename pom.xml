@@ -39,7 +39,7 @@
         <configuration>
           <programs>
             <program>
-              <mainClass>org.deri.tarql.CommandLine</mainClass>
+              <mainClass>org.deri.tarql.tarql</mainClass>
               <name>tarql</name>
             </program>
           </programs>

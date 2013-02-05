@@ -2,12 +2,13 @@
 
 Tarql is a command-line tool for converting CSV files to RDF using SPARQL 1.1 syntax.
 
-# Introduction
+
+## Introduction
 
 In Tarql, the following SPARQL query:
 
     SELECT *
-    FROM <file.csv>
+    FROM <file:table.csv>
     WHERE {
       ...
     }
@@ -22,18 +23,28 @@ is equivalent to executing the following over an empty graph:
 
 In other words, the CSV file's contents are input into the query as a table of bindings.
 
-# Details
+
+## Command line
+
+* `tarql --help`
+* `tarql my_mapping.sparql input1.csv input2.csv
+* `tarql my_mapping.sparql` (if CSV file is defined in `FROM` clause in query)
+
+
+## Details
 
 Column headings are ?a, ?b, ?c and so on. If the CSV file already contains column headings, then they will show up in the data as a binding, and probably should be skipped by appending OFFSET 1 to the query.
 
 The input CSV file can be specified using FROM or on the command line.
 
-# Building
+
+## Building
 
 * Maven
-* `mvn package appassembler:assembly` creates an executable script in `/target/appassembler/bin/tarql`.
+* `mvn package appassembler:assembly` creates executable scripts for Windows and Unix in `/target/appassembler/bin/tarql`.
 
-# Design patterns
+
+## Design patterns
 
 Delete header row:
 
@@ -63,21 +74,22 @@ CONSTRUCT an RDF graph:
           ex:LEI ?c;
           ex:ticker ?d;
     }
-    FROM <companies.csv>
+    FROM <file:companies.csv>
     WHERE {
       BIND (URI(CONCAT('companies/', ?d)) AS ?uri)
       BIND (STRLANG(?a, "en") AS ?name)
     }
     OFFSET 1
 
-# TODO
+## TODO
 
-* Better command line tool
 * Use first row as column names if OFFSET 1 is specified
 * Allow specification of column name behaviour on command line
 * Allow multiple CONSTRUCT/FROM/WHERE blocks in one file
+* Choice of output format, writing to file, etc.
 * Package a proper distribution
 * Experiment with input files in TSV, different quoting styles, etc.
 * Allow overriding of encoding on command line
+* Read CSV from stdin?
 * Web service?
 * Get this into ARQ!?
