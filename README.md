@@ -1,6 +1,6 @@
 # Tarql: SPARQL for Tables
 
-Tarql is a command-line tool for converting CSV files to RDF using SPARQL 1.1 syntax.
+Tarql is a command-line tool for converting CSV files to RDF using SPARQL 1.1 syntax. It's written in Java and based on Apache ARQ.
 
 
 ## Introduction
@@ -21,7 +21,7 @@ is equivalent to executing the following over an empty graph:
       ...
     }
 
-In other words, the CSV file's contents are input into the query as a table of bindings.
+In other words, the CSV file's contents are input into the query as a table of bindings. This allows manipulation of CSV data using SPARQL syntax, and in particular the generation of RDF using `CONSTRUCT` queries. See below for more examples.
 
 
 ## Command line
@@ -80,6 +80,7 @@ CONSTRUCT an RDF graph:
       BIND (STRLANG(?a, "en") AS ?name)
     }
     OFFSET 1
+
 
 ## TODO
 
