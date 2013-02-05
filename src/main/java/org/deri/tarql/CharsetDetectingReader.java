@@ -36,6 +36,7 @@ public class CharsetDetectingReader extends Reader {
 	}
 
 	public CharsetDetectingReader(InputStream in, int bufferSize) {
+		if (in == null) throw new NullPointerException();
 		this.in = in;
 		buffer = new byte[bufferSize];
 		detector.Init(new nsICharsetDetectionObserver() {
