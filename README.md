@@ -27,15 +27,15 @@ In other words, the CSV file's contents are input into the query as a table of b
 ## Command line
 
 * `tarql --help`
-* `tarql my_mapping.sparql input1.csv input2.csv
+* `tarql my_mapping.sparql input1.csv input2.csv`
 * `tarql my_mapping.sparql` (if CSV file is defined in `FROM` clause in query)
 
 
 ## Details
 
-Column headings are ?a, ?b, ?c and so on. If the CSV file already contains column headings, then they will show up in the data as a binding, and probably should be skipped by appending OFFSET 1 to the query.
+Column headings are `?a`, `?b`, `?c` and so on. If the CSV file already contains column headings, then they will show up in the data as a binding, and probably should be skipped by appending `OFFSET 1` to the query.
 
-The input CSV file can be specified using FROM or on the command line.
+The input CSV file can be specified using `FROM` or on the command line.
 
 
 ## Building
@@ -46,18 +46,18 @@ The input CSV file can be specified using FROM or on the command line.
 
 ## Design patterns
 
-Delete header row:
+### Delete header row
 
     SELECT ...
     WHERE { ... }
     OFFSET 1
 
-Skip bad rows:
+### Skip bad rows
 
     SELECT ...
     WHERE { FILTER (BOUND(?d)) }
 
-Compute additional columns:
+### Compute additional columns
 
     SELECT ...
     WHERE {
@@ -65,7 +65,7 @@ Compute additional columns:
       BIND (STRLANG(?a, 'en') AS ?with_language_tag)
     }
 
-CONSTRUCT an RDF graph:
+### CONSTRUCT an RDF graph
 
     CONSTRUCT {
       ?uri a ex:Organization;
