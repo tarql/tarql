@@ -24,6 +24,13 @@ is equivalent to executing the following over an empty graph:
 In other words, the CSV file's contents are input into the query as a table of bindings. This allows manipulation of CSV data using the full power of SPARQL 1.1 syntax, and in particular the generation of RDF using `CONSTRUCT` queries. See below for more examples.
 
 
+## Building
+
+Tarql uses Maven. To create executable scripts for Windows and Unix in `/target/appassembler/bin/tarql`:
+
+    mvn package appassembler:assemble
+
+
 ## Command line
 
 * `tarql --help`
@@ -33,22 +40,15 @@ In other words, the CSV file's contents are input into the query as a table of b
 
 ## Details
 
-The input CSV file can be specified using `FROM` or on the command line.
+The input CSV file can be specified using `FROM` or on the command line. Use `FROM <file:filename.csv>` to load a file from the current directory.
 
 Tarql auto-detects the input CSV file's encoding. This is a guess and may fail sometimes.
 
 By default, variable `?a` will contain values from the first column, `?b` from the second, and so on.
 
-If the CSV file already has column headings in the first row, Tarql can be instructed to use the column headings as variable names by appending `OFFSET 1` to the SPARQL query. In standard SPARQL, this has the effect of skipping the first row. Tarql will take it as a sign to use the first row as variable names. In the variable names, spaces will be replaced with underscores. If any column doesn't contain a valid variable name, then the default name (`?a`, `?b`, etc.) will be used for the column.
+If the CSV file already has **column headings** in the first row, Tarql can be instructed to use the column headings as variable names by appending `OFFSET 1` to the SPARQL query. In standard SPARQL, this has the effect of skipping the first row. Tarql will take it as a sign to use the first row as variable names. In the variable names, spaces will be replaced with underscores. If any column doesn't contain a valid variable name, then the default name (`?a`, `?b`, etc.) will be used for the column.
 
 All-empty rows are skipped automatically.
-
-
-## Building
-
-Tarql uses Maven. To create executable scripts for Windows and Unix in `/target/appassembler/bin/tarql`:
-
-    mvn package appassembler:assemble
 
 
 ## Design patterns
