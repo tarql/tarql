@@ -74,7 +74,8 @@ public class CSVQueryExecutionFactory {
 	}
 	
 	private static QueryExecution makeExecution(Reader reader, Query query) {
-		modifyQuery(query, new CSVToValues(reader).read());
+		boolean useColumnHeadersAsVars = modifyQueryForColumnHeaders(query);
+		modifyQuery(query, new CSVToValues(reader, useColumnHeadersAsVars).read());
 		return QueryExecutionFactory.create(query, EMPTY_MODEL);
 	}
 	private final static Model EMPTY_MODEL = ModelFactory.createDefaultModel();
@@ -92,6 +93,20 @@ public class CSVQueryExecutionFactory {
 			throw new JenaException("Too many input files: " + query.getGraphURIs());
 		}
 		return query.getGraphURIs().get(0);
+	}
+	
+	/**
+	 * Detects whether column headers should be used as variable names
+	 * (indicated in the query by use of OFFSET 1), and modify the query
+	 * to make it work (setting OFFSET to 0, because the CSV reader will
+	 * already remove the header row from the data)
+	 * @param query Query to be analyzed and modified
+	 * @return True if header row is to be used for variable names
+	 */
+	private static boolean modifyQueryForColumnHeaders(Query query) {
+		if (query.getOffset() != 1) return false;
+		query.setOffset(0);
+		return true;
 	}
 	
 	/**

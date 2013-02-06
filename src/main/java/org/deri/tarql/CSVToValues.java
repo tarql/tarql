@@ -28,46 +28,88 @@ public class CSVToValues {
 	private final static String alphabet = "abcdefghijklmnopqrstuvwxyz";
 	
 	private final Reader reader;
+	private final boolean varsFromHeader;
+	private final List<Var> vars = new ArrayList<Var>();
 	
-	public CSVToValues(Reader reader) {
+	/**
+	 * @param reader Reader over the contents of a CSV file
+	 * @param varsFromHeader If true, use values of first row as column names
+	 */
+	public CSVToValues(Reader reader, boolean varsFromHeader) {
 		this.reader = reader;
+		this.varsFromHeader = varsFromHeader;
 	}
 	
 	public TableData read() {
 		List<Binding> bindings = new ArrayList<Binding>();
 		try {
 			CSVReader csv = new CSVReader(reader);
-			int maxCols = 0;
 			String[] row;
 			try {
-				while ((row = csv.readNext()) != null) {
-					if (row.length > maxCols) maxCols = row.length;
-					Binding binding = toBinding(row);
-					if (binding.size() > 0) {
-						// Skip rows without data
-						bindings.add(binding);
+				if (varsFromHeader) {
+					while ((row = csv.readNext()) != null) {
+						boolean foundValidColumnName = false;
+						for (int i = 0; i < row.length; i++) {
+							if (toVar(row[i]) == null) continue;
+							foundValidColumnName = true;
+						}
+						// If row was empty or didn't contain anything usable
+						// as column name, then try next row
+						if (!foundValidColumnName) continue;
+						for (int i = 0; i < row.length; i++) {
+							Var var = toVar(row[i]);
+							if (var == null || vars.contains(var)) {
+								getVar(i);
+							} else {
+								vars.add(var);
+							}
+						}
+						break;
 					}
 				}
-				List<Var> variables = new ArrayList<Var>(maxCols);
-				for (int i = 0; i < maxCols; i++) {
-					variables.add(Var.alloc(getColumnName(i)));
+				while ((row = csv.readNext()) != null) {
+					Binding binding = toBinding(row);
+					// Skip rows without data
+					if (binding.size() == 0) continue;
+					bindings.add(binding);
 				}
-				return new TableData(variables, bindings);
+				return new TableData(vars, bindings);
 			} finally {
 				csv.close();
 			}
 		} catch (IOException ex) {
 			throw new JenaException(ex);
 		}
-		
 	}
 	
-	private static Binding toBinding(String[] row) {
+	private Var toVar(String s) {
+		if (s == null) return null;
+		s = s.trim().replace(" ", "_");
+		if ("".equals(s)) return null;
+		// FIXME: Handle other characters not allowed in Vars
+		return Var.alloc(s);
+	}
+	
+	private Binding toBinding(String[] row) {
 		BindingHashMap result = new BindingHashMap();
 		for (int i = 0; i < row.length; i++) {
 			if (row[i] == null || "".equals(row[i])) continue;
-			result.add(Var.alloc(getColumnName(i)), Node.createLiteral(row[i]));
+			result.add(getVar(i), Node.createLiteral(row[i]));
 		}
 		return result;
+	}
+	
+	private Var getVar(int column) {
+		while (vars.size() <= column) {
+			vars.add(null);
+		}
+		if (vars.get(column) == null) {
+			Var var = Var.alloc(getColumnName(column));
+			while (vars.contains(var)) {
+				var = Var.alloc("_" + var.getName());
+			}
+			vars.set(column, var);
+		}
+		return vars.get(column);
 	}
 }

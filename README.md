@@ -33,27 +33,33 @@ In other words, the CSV file's contents are input into the query as a table of b
 
 ## Details
 
-Column headings are `?a`, `?b`, `?c` and so on. If the CSV file already contains column headings, then they will show up in the data as a binding, and probably should be skipped by appending `OFFSET 1` to the query.
-
 The input CSV file can be specified using `FROM` or on the command line.
 
 Tarql auto-detects the input CSV file's encoding. This is a guess and may fail sometimes.
+
+By default, variable `?a` will contain values from the first column, `?b` from the second, and so on.
+
+If the CSV file already has column headings in the first row, Tarql can be instructed to use the column headings as variable names by appending `OFFSET 1` to the SPARQL query. In standard SPARQL, this has the effect of skipping the first row. Tarql will take it as a sign to use the first row as variable names. In the variable names, spaces will be replaced with underscores. If any column doesn't contain a valid variable name, then the default name (`?a`, `?b`, etc.) will be used for the column.
+
+All-empty rows are skipped automatically.
 
 
 ## Building
 
 Tarql uses Maven. To create executable scripts for Windows and Unix in `/target/appassembler/bin/tarql`:
 
-    mvn package appassembler:assembly
+    mvn package appassembler:assemble
 
 
 ## Design patterns
 
-### Delete header row
+### Use column headings in first row as variable names
 
-    SELECT ...
+    SELECT ?First_name ?Last_name ?Phone_number
     WHERE { ... }
     OFFSET 1
+
+The `OFFSET 1` indicates that the first row is to be used to provide variable names.
 
 ### Skip bad rows
 
@@ -71,23 +77,22 @@ Tarql uses Maven. To create executable scripts for Windows and Unix in `/target/
 ### CONSTRUCT an RDF graph
 
     CONSTRUCT {
-      ?uri a ex:Organization;
-          ex:name ?name;
-          ex:CIK ?b;
-          ex:LEI ?c;
-          ex:ticker ?d;
+      ?URI a ex:Organization;
+          ex:name ?NameWithLang;
+          ex:CIK ?CIK;
+          ex:LEI ?LEI;
+          ex:ticker ?Stock_ticker;
     }
     FROM <file:companies.csv>
     WHERE {
-      BIND (URI(CONCAT('companies/', ?d)) AS ?uri)
-      BIND (STRLANG(?a, "en") AS ?name)
+      BIND (URI(CONCAT('companies/', ?Stock_ticker)) AS ?URI)
+      BIND (STRLANG(?Name, "en") AS ?NameWithLang)
     }
     OFFSET 1
 
 
 ## TODO
 
-* Use first row as column names if OFFSET 1 is specified
 * Allow specification of column name behaviour on command line
 * Allow multiple CONSTRUCT/FROM/WHERE blocks in one file
 * Choice of output format, writing to file, etc.
@@ -95,6 +100,7 @@ Tarql uses Maven. To create executable scripts for Windows and Unix in `/target/
 * Experiment with input files in TSV, different quoting styles, etc.
 * Allow overriding of encoding on command line
 * Find a way of streaming the CSV parser output into ARQ
+* Handle tables where repeated values within a column are omitted, maybe tarql:valueFromPreviousRow(?a))
 * Support Excel files?
 * Read CSV from stdin?
 * Web service?

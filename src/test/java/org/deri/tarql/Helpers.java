@@ -22,6 +22,14 @@ public class Helpers {
 	public static List<Binding> bindings(Binding... bindings) {
 		return Arrays.asList(bindings);
 	}
+
+	public static List<Var> vars(List<String> header) {
+		List<Var> vars = new ArrayList<Var>(header.size());
+		for (String var: header) {
+			vars.add(Var.alloc(var));
+		}
+		return vars;
+	}
 	
 	public static Binding binding(List<Var> header, String... values) {
 		if (header.size() != values.length) {

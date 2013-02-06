@@ -37,16 +37,15 @@ public class TarqlTest {
 	}
 	
 	@Test
-	public void testSkipFirstRow() {
+	public void testSkipFirstRows() {
 		String csv = "First,Last\nAlice,Smith\nBob,Cook";
 		String query = "SELECT * {} OFFSET 1";
 		ResultSet rs = CSVQueryExecutionFactory.create(
 				new StringReader(csv), query).execSelect();
-		List<Var> vars = vars("a", "b");
 		assertTrue(rs.hasNext());
-		assertEquals(binding(vars, "\"Alice\"", "\"Smith\""), rs.nextBinding());
+		assertEquals(binding(vars(rs.getResultVars()), "\"Alice\"", "\"Smith\""), rs.nextBinding());
 		assertTrue(rs.hasNext());
-		assertEquals(binding(vars, "\"Bob\"", "\"Cook\""), rs.nextBinding());
+		assertEquals(binding(vars(rs.getResultVars()), "\"Bob\"", "\"Cook\""), rs.nextBinding());
 		assertFalse(rs.hasNext());
 	}
 	
@@ -137,4 +136,17 @@ public class TarqlTest {
 		String afterwards = q.getGraphURIs().get(0);
 		assertEquals(original, afterwards);
 	}
+	
+	@Test
+	public void testVarNamesFromHeaders() {
+		String csv = "First,Last\nAlice,Smith";
+		String query = "SELECT * {} OFFSET 1";
+		ResultSet rs = CSVQueryExecutionFactory.create(
+				new StringReader(csv), query).execSelect();
+		List<Var> vars = vars("First", "Last");
+		assertTrue(rs.hasNext());
+		assertEquals(binding(vars, "\"Alice\"", "\"Smith\""), rs.nextBinding());
+		assertFalse(rs.hasNext());
+	}
+	
 }
