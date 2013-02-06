@@ -21,6 +21,16 @@ import com.hp.hpl.jena.util.FileManager;
 
 public class CSVQueryExecutionFactory {
 
+	private final static Model EMPTY_MODEL = ModelFactory.createDefaultModel();
+	// FIXME: Oh god, what a hack! But adding this to each create() method is worse...
+	private static Model previousResults = EMPTY_MODEL;
+	public static void setPreviousResults(Model previousResults) {
+		CSVQueryExecutionFactory.previousResults = previousResults;
+	}
+	public static void resetPreviousResults() {
+		previousResults = EMPTY_MODEL;
+	}
+	
 	public static QueryExecution create(Query query) {
 		return create(query, FileManager.get());
 	}
@@ -83,9 +93,8 @@ public class CSVQueryExecutionFactory {
 
 	private static QueryExecution makeExecution(TableData table, Query query) {
 		modifyQuery(query, table);
-		return QueryExecutionFactory.create(query, EMPTY_MODEL);
+		return QueryExecutionFactory.create(query, previousResults);
 	}
-	private final static Model EMPTY_MODEL = ModelFactory.createDefaultModel();
 	
 	private static QueryExecution makeExecution(Reader reader, Query query) {
 		boolean useColumnHeadersAsVars = modifyQueryForColumnHeaders(query);

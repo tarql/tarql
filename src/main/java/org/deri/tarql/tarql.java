@@ -1,6 +1,7 @@
 package org.deri.tarql;
 
 import java.io.Reader;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,8 +12,9 @@ import arq.cmdline.CmdGeneral;
 
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
-import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.ResultSetFormatter;
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.shared.NotFoundException;
 import com.hp.hpl.jena.sparql.algebra.table.TableData;
 import com.hp.hpl.jena.sparql.serializer.FmtTemplate;
@@ -35,6 +37,7 @@ public class tarql extends CmdGeneral {
 	private boolean withHeader = false;
 	private boolean withoutHeader = false;
 	private boolean testQuery = false;
+	private Model resultModel = ModelFactory.createDefaultModel();
 	
 	public tarql(String[] args) {
 		super(args);
@@ -86,35 +89,64 @@ public class tarql extends CmdGeneral {
 	@Override
 	protected void exec() {
 		try {
-			Query q = QueryFactory.create(FileManager.get().readWholeFileAsUTF8(queryFile));
-			if (q.isConstructType() && testQuery) {
-				modifyToShowOnlyVars(q);
+			String s = FileManager.get().readWholeFileAsUTF8(queryFile);
+			TarqlQuery q = new TarqlParser(new StringReader(s)).getResult();
+			if (testQuery) {
+				q.makeTest();
 			}
 			if (csvFiles.isEmpty()) {
-				executeQuery(CSVQueryExecutionFactory.create(q));
+				executeQuery(q);
 			} else {
 				for (String csvFile: csvFiles) {
 					if (withHeader || withoutHeader) {
 						Reader reader = CSVQueryExecutionFactory.createReader(csvFile, FileManager.get());
 						TableData table = new CSVToValues(reader, withHeader).read();
-						executeQuery(CSVQueryExecutionFactory.create(table, q));
+						executeQuery(table, q);
 					} else {
 						// Let factory decide after looking at the query
-						executeQuery(CSVQueryExecutionFactory.create(csvFile, q));
+						executeQuery(csvFile, q);
 					}
 				}
+			}
+			if (!resultModel.isEmpty()) {
+				resultModel.write(System.out, "TURTLE", q.getPrologue().getBaseURI());
 			}
 		} catch (NotFoundException ex) {
 			cmdError("Not found: " + ex.getMessage());
 		}
 	}
-		
-	private void modifyToShowOnlyVars(Query q) {
-		q.setQuerySelectType();
-		q.setLimit(5);
+
+	private void executeQuery(TarqlQuery query) {
+		for (Query q: query.getQueries()) {
+			Model previousResults = ModelFactory.createDefaultModel();
+			previousResults.add(resultModel);
+			CSVQueryExecutionFactory.setPreviousResults(previousResults);
+			processResults(CSVQueryExecutionFactory.create(q));
+			CSVQueryExecutionFactory.resetPreviousResults();
+		}
 	}
 	
-	private void executeQuery(QueryExecution ex) {
+	private void executeQuery(TableData table, TarqlQuery query) {
+		for (Query q: query.getQueries()) {
+			Model previousResults = ModelFactory.createDefaultModel();
+			previousResults.add(resultModel);
+			CSVQueryExecutionFactory.setPreviousResults(previousResults);
+			processResults(CSVQueryExecutionFactory.create(table, q));
+			CSVQueryExecutionFactory.resetPreviousResults();
+		}
+	}
+	
+	private void executeQuery(String csvFile, TarqlQuery query) {
+		for (Query q: query.getQueries()) {
+			Model previousResults = ModelFactory.createDefaultModel();
+			previousResults.add(resultModel);
+			CSVQueryExecutionFactory.setPreviousResults(previousResults);
+			processResults(CSVQueryExecutionFactory.create(csvFile, q));
+			CSVQueryExecutionFactory.resetPreviousResults();
+		}
+	}
+	
+	private void processResults(QueryExecution ex) {
 		if (testQuery && ex.getQuery().getConstructTemplate() != null) {
 			IndentedWriter out = new IndentedWriter(System.out); 
 			new FmtTemplate(out, new SerializationContext(ex.getQuery())).format(ex.getQuery().getConstructTemplate());
@@ -125,7 +157,8 @@ public class tarql extends CmdGeneral {
 		} else if (ex.getQuery().isAskType()) {
 			System.out.println(ResultSetFormatter.asText(ex.execSelect()));
 		} else if (ex.getQuery().isConstructType()) {
-			ex.execConstruct().write(System.out, "TURTLE");
+			resultModel.setNsPrefixes(resultModel);
+			ex.execConstruct(resultModel);
 		} else {
 			cmdError("Only query forms CONSTRUCT, SELECT and ASK are supported");
 		}

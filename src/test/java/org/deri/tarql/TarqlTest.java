@@ -149,4 +149,20 @@ public class TarqlTest {
 		assertFalse(rs.hasNext());
 	}
 	
+	@Test
+	public void testMultipleQueries() {
+		String csv = "Alice,Smith";
+		String query = 
+				"PREFIX ex: <http://example.com/>\n" +
+				"CONSTRUCT { _:x ex:first ?a } {}\n" +
+				"CONSTRUCT { _:x ex:last ?b } {}\n";
+		String ttl = "@prefix ex: <http://example.com/>. _:x ex:first \"Alice\". _:y ex:last \"Smith\".";
+		TarqlQuery tq = TarqlParser.parse(new StringReader(query));
+		Model actual = ModelFactory.createDefaultModel();
+		for (Query q: tq.getQueries()) {
+			CSVQueryExecutionFactory.create(new StringReader(csv), q).execConstruct(actual);
+		}
+		Model expected = ModelFactory.createDefaultModel().read(new StringReader(ttl), null, "TURTLE");
+		assertTrue(actual.isIsomorphicWith(expected));
+	}
 }
