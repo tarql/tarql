@@ -94,6 +94,8 @@ Tarql uses Maven. To create executable scripts for Windows and Unix in `/target/
 * Package a proper distribution
 * Experiment with input files in TSV, different quoting styles, etc.
 * Allow overriding of encoding on command line
+* Find a way of streaming the CSV parser output into ARQ
+* Support Excel files?
 * Read CSV from stdin?
 * Web service?
 * Get this into ARQ!?
