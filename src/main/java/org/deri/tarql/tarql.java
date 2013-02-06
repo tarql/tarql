@@ -4,6 +4,8 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.openjena.atlas.io.IndentedWriter;
+
 import arq.cmdline.ArgDecl;
 import arq.cmdline.CmdGeneral;
 
@@ -13,6 +15,8 @@ import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.ResultSetFormatter;
 import com.hp.hpl.jena.shared.NotFoundException;
 import com.hp.hpl.jena.sparql.algebra.table.TableData;
+import com.hp.hpl.jena.sparql.serializer.FmtTemplate;
+import com.hp.hpl.jena.sparql.serializer.SerializationContext;
 import com.hp.hpl.jena.sparql.util.Utils;
 import com.hp.hpl.jena.util.FileManager;
 
@@ -22,6 +26,7 @@ public class tarql extends CmdGeneral {
 		new tarql(args).mainRun();
 	}
 
+	private final ArgDecl testQueryArg = new ArgDecl(false, "test");
 	private final ArgDecl withHeaderArg = new ArgDecl(false, "header");
 	private final ArgDecl withoutHeaderArg = new ArgDecl(false, "no-header");
 	
@@ -29,12 +34,14 @@ public class tarql extends CmdGeneral {
 	private List<String> csvFiles = new ArrayList<String>();
 	private boolean withHeader = false;
 	private boolean withoutHeader = false;
+	private boolean testQuery = false;
 	
 	public tarql(String[] args) {
 		super(args);
 		getUsage().startCategory("Options");
+		add(testQueryArg, "--test", "Show CONSTRUCT template and first rows only (for query debugging)");
 		add(withHeaderArg, "--header", "Force use of first row as variable names");
-		add(withoutHeaderArg, "--no-heaer", "Force default variable names (?a, ?b, ...)");
+		add(withoutHeaderArg, "--no-header", "Force default variable names (?a, ?b, ...)");
 		getUsage().startCategory("Main arguments");
 		getUsage().addUsage("query.sparql", "File containing a SPARQL query to be applied to a CSV file");
 		getUsage().addUsage("table.csv", "CSV file to be processed; can be omitted if specified in FROM clause");
@@ -71,12 +78,18 @@ public class tarql extends CmdGeneral {
 			}
 			withoutHeader = true;
 		}
+		if (hasArg(testQueryArg)) {
+			testQuery = true;
+		}
 	}
 
 	@Override
 	protected void exec() {
 		try {
 			Query q = QueryFactory.create(FileManager.get().readWholeFileAsUTF8(queryFile));
+			if (q.isConstructType() && testQuery) {
+				modifyToShowOnlyVars(q);
+			}
 			if (csvFiles.isEmpty()) {
 				executeQuery(CSVQueryExecutionFactory.create(q));
 			} else {
@@ -96,7 +109,17 @@ public class tarql extends CmdGeneral {
 		}
 	}
 		
+	private void modifyToShowOnlyVars(Query q) {
+		q.setQuerySelectType();
+		q.setLimit(5);
+	}
+	
 	private void executeQuery(QueryExecution ex) {
+		if (testQuery && ex.getQuery().getConstructTemplate() != null) {
+			IndentedWriter out = new IndentedWriter(System.out); 
+			new FmtTemplate(out, new SerializationContext(ex.getQuery())).format(ex.getQuery().getConstructTemplate());
+			out.flush();
+		}
 		if (ex.getQuery().isSelectType()) {
 			System.out.println(ResultSetFormatter.asText(ex.execSelect()));
 		} else if (ex.getQuery().isAskType()) {

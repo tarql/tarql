@@ -35,8 +35,9 @@ Tarql uses Maven. To create executable scripts for Windows and Unix in `/target/
 
 * `tarql --help` to show full command line help
 * `tarql my_mapping.sparql input1.csv input2.csv` to translate two CSV files using the same mapping
-* `tarql my_mapping.sparql --header input1.csv` to force use of column headers as variable names
+* `tarql --header  my_mapping.sparql input1.csv` to force use of column headers as variable names
 * `tarql my_mapping.sparql` to translate a CSV file defined in SPARQL `FROM` clause
+* `tarql --test my_mapping.sparql` to show only the CONSTRUCT template, variable names, and a few input rows (useful for CONSTRUCT query development)`
 
 
 ## Details
