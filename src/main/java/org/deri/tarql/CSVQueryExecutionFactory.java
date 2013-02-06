@@ -46,7 +46,7 @@ public class CSVQueryExecutionFactory {
 	}
 
 	public static QueryExecution create(InputStream input, Query query) {
-		return create(makeReader(input), query);
+		return create(createReader(input), query);
 	}
 
 	public static QueryExecution create(InputStream input, String query) {
@@ -61,28 +61,40 @@ public class CSVQueryExecutionFactory {
 		return create(input, QueryFactory.create(query));
 	}
 
-	private static Reader makeReader(InputStream inputStream) {
+	public static QueryExecution create(TableData table, Query query) {
+		return makeExecution(table, query);
+	}
+
+	public static QueryExecution create(TableData table, String query) {
+		return create(table, QueryFactory.create(query));
+	}
+
+	public static Reader createReader(InputStream inputStream) {
 		return new CharsetDetectingReader(inputStream);
 	}
 	
-	private static Reader makeReader(String filenameOrURL, FileManager fm) {
+	public static Reader createReader(String filenameOrURL, FileManager fm) {
 		InputStream in = fm.open(filenameOrURL);
 		if (in == null) {
 			throw new NotFoundException(filenameOrURL);
 		}
-		return makeReader(in);
+		return createReader(in);
 	}
-	
-	private static QueryExecution makeExecution(Reader reader, Query query) {
-		boolean useColumnHeadersAsVars = modifyQueryForColumnHeaders(query);
-		modifyQuery(query, new CSVToValues(reader, useColumnHeadersAsVars).read());
+
+	private static QueryExecution makeExecution(TableData table, Query query) {
+		modifyQuery(query, table);
 		return QueryExecutionFactory.create(query, EMPTY_MODEL);
 	}
 	private final static Model EMPTY_MODEL = ModelFactory.createDefaultModel();
 	
+	private static QueryExecution makeExecution(Reader reader, Query query) {
+		boolean useColumnHeadersAsVars = modifyQueryForColumnHeaders(query);
+		return makeExecution(new CSVToValues(reader, useColumnHeadersAsVars).read(), query);
+	}
+	
 	private static QueryExecution makeExecution(Query query, FileManager fm) {
 		String filenameOrURL = getSingleFromClause(query, fm);
-		return makeExecution(makeReader(filenameOrURL, fm), query);
+		return makeExecution(createReader(filenameOrURL, fm), query);
 	}
 	
 	private static String getSingleFromClause(Query query, FileManager fm) {

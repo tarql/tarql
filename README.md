@@ -33,9 +33,10 @@ Tarql uses Maven. To create executable scripts for Windows and Unix in `/target/
 
 ## Command line
 
-* `tarql --help`
-* `tarql my_mapping.sparql input1.csv input2.csv`
-* `tarql my_mapping.sparql` (if CSV file is defined in `FROM` clause in query)
+* `tarql --help` to show full command line help
+* `tarql my_mapping.sparql input1.csv input2.csv` to translate two CSV files using the same mapping
+* `tarql my_mapping.sparql --header input1.csv` to force use of column headers as variable names
+* `tarql my_mapping.sparql` to translate a CSV file defined in SPARQL `FROM` clause
 
 
 ## Details
@@ -93,7 +94,6 @@ The `OFFSET 1` indicates that the first row is to be used to provide variable na
 
 ## TODO
 
-* Allow specification of column name behaviour on command line
 * Allow multiple CONSTRUCT/FROM/WHERE blocks in one file
 * Choice of output format, writing to file, etc.
 * Package a proper distribution

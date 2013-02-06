@@ -1,8 +1,10 @@
 package org.deri.tarql;
 
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 
+import arq.cmdline.ArgDecl;
 import arq.cmdline.CmdGeneral;
 
 import com.hp.hpl.jena.query.Query;
@@ -10,6 +12,8 @@ import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.ResultSetFormatter;
 import com.hp.hpl.jena.shared.NotFoundException;
+import com.hp.hpl.jena.sparql.algebra.table.TableData;
+import com.hp.hpl.jena.sparql.serializer.Serializer;
 import com.hp.hpl.jena.sparql.util.Utils;
 import com.hp.hpl.jena.util.FileManager;
 
@@ -19,11 +23,19 @@ public class tarql extends CmdGeneral {
 		new tarql(args).mainRun();
 	}
 
+	private final ArgDecl withHeaderArg = new ArgDecl(false, "header");
+	private final ArgDecl withoutHeaderArg = new ArgDecl(false, "no-header");
+	
 	private String queryFile;
 	private List<String> csvFiles = new ArrayList<String>();
+	private boolean withHeader = false;
+	private boolean withoutHeader = false;
 	
 	public tarql(String[] args) {
 		super(args);
+		getUsage().startCategory("Options");
+		add(withHeaderArg, "--header", "Force use of first row as variable names");
+		add(withoutHeaderArg, "--no-heaer", "Force default variable names (?a, ?b, ...)");
 		getUsage().startCategory("Main arguments");
 		getUsage().addUsage("query.sparql", "File containing a SPARQL query to be applied to a CSV file");
 		getUsage().addUsage("table.csv", "CSV file to be processed; can be omitted if specified in FROM clause");
@@ -48,6 +60,18 @@ public class tarql extends CmdGeneral {
 		for (int i = 1; i < getPositional().size(); i++) {
 			csvFiles.add(getPositionalArg(i));
 		}
+		if (hasArg(withHeaderArg)) {
+			if (csvFiles.isEmpty()) {
+				cmdError("Cannot use --header if no input data file specified");
+			}
+			withHeader = true;
+		}
+		if (hasArg(withoutHeaderArg)) {
+			if (csvFiles.isEmpty()) {
+				cmdError("Cannot use --no-header if no input data file specified");
+			}
+			withoutHeader = true;
+		}
 	}
 
 	@Override
@@ -58,7 +82,14 @@ public class tarql extends CmdGeneral {
 				executeQuery(CSVQueryExecutionFactory.create(q));
 			} else {
 				for (String csvFile: csvFiles) {
-					executeQuery(CSVQueryExecutionFactory.create(csvFile, q));
+					if (withHeader || withoutHeader) {
+						Reader reader = CSVQueryExecutionFactory.createReader(csvFile, FileManager.get());
+						TableData table = new CSVToValues(reader, withHeader).read();
+						executeQuery(CSVQueryExecutionFactory.create(table, q));
+					} else {
+						// Let factory decide after looking at the query
+						executeQuery(CSVQueryExecutionFactory.create(csvFile, q));
+					}
 				}
 			}
 		} catch (NotFoundException ex) {
