@@ -104,6 +104,7 @@ The `OFFSET 1` indicates that the first row is to be used to provide variable na
 ## TODO
 
 * Choice of output format, writing to file, etc.
+* Set base URI from command line
 * Allow feeding of triples from RDF files into the mapping process
 * Extract and document a proper API with TarqlQuery, TarqlExecution, etc.
 * Package a proper precompiled zip/tar distribution
@@ -114,6 +115,6 @@ The `OFFSET 1` indicates that the first row is to be used to provide variable na
 * Handle tables where repeated values within a column are omitted, maybe tarql:valueFromPreviousRow(?a))
 * Support Excel files?
 * Find a way of streaming the CSV parser output into ARQ
-* Read CSV from stdin?
+* Read input from stdin?
 * Web service?
 * Get this into ARQ!?

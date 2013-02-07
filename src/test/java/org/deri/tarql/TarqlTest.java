@@ -157,12 +157,32 @@ public class TarqlTest {
 				"CONSTRUCT { _:x ex:first ?a } {}\n" +
 				"CONSTRUCT { _:x ex:last ?b } {}\n";
 		String ttl = "@prefix ex: <http://example.com/>. _:x ex:first \"Alice\". _:y ex:last \"Smith\".";
-		TarqlQuery tq = TarqlParser.parse(new StringReader(query));
+		TarqlQuery tq = new TarqlParser(new StringReader(query), null).getResult();
 		Model actual = ModelFactory.createDefaultModel();
 		for (Query q: tq.getQueries()) {
 			CSVQueryExecutionFactory.create(new StringReader(csv), q).execConstruct(actual);
 		}
 		Model expected = ModelFactory.createDefaultModel().read(new StringReader(ttl), null, "TURTLE");
 		assertTrue(actual.isIsomorphicWith(expected));
+	}
+	
+	@Test
+	public void testFROMisRelativeToMappingLocation1() {
+		String file = "src/test/resources/mappings/simple-with-from.sparql";
+		ResultSet rs = CSVQueryExecutionFactory.create(
+				new TarqlParser(file).getResult().getQueries().get(0)).execSelect();
+		assertTrue(rs.hasNext());
+		assertEquals(binding(vars("a"), "\"x\""), rs.nextBinding());
+		assertFalse(rs.hasNext());
+	}
+	
+	@Test
+	public void testFROMisRelativeToMappingLocation2() {
+		String file = "src/test/resources/mappings/simple-with-base.sparql";
+		ResultSet rs = CSVQueryExecutionFactory.create(
+				new TarqlParser(file).getResult().getQueries().get(0)).execSelect();
+		assertTrue(rs.hasNext());
+		assertEquals(binding(vars("a", "base"), "\"x\"", "<http://example.com/>"), rs.nextBinding());
+		assertFalse(rs.hasNext());
 	}
 }

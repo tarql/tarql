@@ -1,30 +1,55 @@
 package org.deri.tarql;
 
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
+import java.io.UnsupportedEncodingException;
 
 import org.openjena.atlas.logging.Log;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import com.hp.hpl.jena.n3.IRIResolver;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryException;
 import com.hp.hpl.jena.query.QueryParseException;
 import com.hp.hpl.jena.shared.JenaException;
+import com.hp.hpl.jena.shared.NotFoundException;
 import com.hp.hpl.jena.sparql.lang.SyntaxVarScope;
 import com.hp.hpl.jena.sparql.lang.sparql_11.ParseException;
 import com.hp.hpl.jena.sparql.lang.sparql_11.SPARQLParser11;
+import com.hp.hpl.jena.util.FileManager;
 
 public class TarqlParser {
-	
-	public static TarqlQuery parse(Reader reader) {
-		return new TarqlParser(reader).getResult();
-	}
+	private final static Logger log = LoggerFactory.getLogger(TarqlParser.class);
 	
 	private final Reader reader;
 	private final TarqlQuery result = new TarqlQuery();
 	private boolean done = false;
 	private boolean seenSelectOrAsk = false;
 	
+	public TarqlParser(String filenameOrURL) {
+		this(open(filenameOrURL), FileManager.get().mapURI(filenameOrURL));
+	}
+	
 	public TarqlParser(Reader reader) {
+		this(reader, null);
+	}
+	
+	public TarqlParser(Reader reader, String baseIRI) {
 		this.reader = reader;
+		result.getPrologue().setResolver(new IRIResolver(baseIRI));
+	}
+	
+	private static Reader open(String filenameOrURL) {
+		try {
+			InputStream in = FileManager.get().open(filenameOrURL);
+			if (in == null) throw new NotFoundException(filenameOrURL);
+			return new InputStreamReader(in, "UTF-8");
+		} catch (UnsupportedEncodingException ex) {
+			// Can't happen, UTF-8 is always supported
+			return null;
+		}
 	}
 	
 	public TarqlQuery getResult() {
@@ -55,6 +80,9 @@ public class TarqlParser {
 			SyntaxVarScope.check(query);
 			
 			result.getPrologue().usePrologueFrom(query);
+			if (log.isDebugEnabled()) {
+				log.debug(query.toString());
+			}
 		} while (parser.getToken(1).kind != SPARQLParser11.EOF);
 	}
 

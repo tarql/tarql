@@ -1,7 +1,6 @@
 package org.deri.tarql;
 
 import java.io.Reader;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -89,8 +88,7 @@ public class tarql extends CmdGeneral {
 	@Override
 	protected void exec() {
 		try {
-			String s = FileManager.get().readWholeFileAsUTF8(queryFile);
-			TarqlQuery q = new TarqlParser(new StringReader(s)).getResult();
+			TarqlQuery q = new TarqlParser(queryFile).getResult();
 			if (testQuery) {
 				q.makeTest();
 			}
