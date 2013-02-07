@@ -103,13 +103,14 @@ The `OFFSET 1` indicates that the first row is to be used to provide variable na
 
 ## TODO
 
-* Choice of output format, writing to file, etc.
-* Set base URI from command line
-* Allow feeding of triples from RDF files into the mapping process
-* Extract and document a proper API with TarqlQuery, TarqlExecution, etc.
 * Package a proper precompiled zip/tar distribution
+* Set base URI from command line
+* Choice of output format, writing to file, etc.
+* Extract and document a proper API with TarqlQuery, TarqlExecution, etc.
+* Allow feeding of triples from RDF files into the mapping process
 * Experiment with input files in TSV, different quoting styles, etc.
 * Allow overriding of encoding on command line
+* Optionally generate VoID/PROV triples
 * Find a way of producing consistent blank nodes from strings (esp. in multiple CONSTRUCT clauses)
 * Find a way of using the table multiple times, e.g.: `{ { SELECT ?author1 { TABLE } } UNION { SELECT ?author2 { TABLE } } }`
 * Handle tables where repeated values within a column are omitted, maybe tarql:valueFromPreviousRow(?a))
