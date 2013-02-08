@@ -1,12 +1,48 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.deri.tarql</groupId>
+  <groupId>ie.deri.tarql</groupId>
   <artifactId>tarql</artifactId>
   <packaging>jar</packaging>
-  <version>1.0-SNAPSHOT</version>
-  <name>tarql</name>
-  <url>http://maven.apache.org</url>
+  <version>0.9</version>
+
+  <name>Tarql</name>
+  <description>Convert CSV files to RDF using SPARQL syntax</description>
+  <url>http://github.com/cygri/tarql</url>
+  <inceptionYear>2013</inceptionYear>
+
+  <licenses>
+    <license>
+      <name>The BSD 2-Clause License</name>
+      <url>https://raw.github.com/cygri/tarql/master/LICENSE</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <scm>
+    <connection>scm:git:git@github.com:cygri/tarql.git</connection>
+    <developerConnection>scm:git:git@github.com:cygri/tarql.git</developerConnection>
+    <url>https://github.com/cygri/tarql/tree/master/</url>
+  </scm>
+
+  <developers>
+    <developer>
+      <id>cygri</id>
+      <name>Richard Cyganiak</name>
+      <email>richard@cyganiak.de</email>
+      <url>http://richard.cyganiak.de/</url>
+      <organization>DERI, NUI Galway</organization>
+      <organizationUrl>http://www.deri.ie/</organizationUrl>
+      <roles>
+        <role>developer</role>
+      </roles>
+    </developer>
+  </developers>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
@@ -30,6 +66,7 @@
       <version>1.0</version>
     </dependency>
   </dependencies>
+
   <build>
     <plugins>
       <plugin>
@@ -37,6 +74,9 @@
         <artifactId>appassembler-maven-plugin</artifactId>
         <version>1.3</version>
         <configuration>
+          <repositoryLayout>flat</repositoryLayout>
+          <repositoryName>lib</repositoryName>
+          <installArtifacts>false</installArtifacts>
           <programs>
             <program>
               <mainClass>org.deri.tarql.tarql</mainClass>
@@ -44,6 +84,57 @@
             </program>
           </programs>
         </configuration>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>assemble</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <configuration>
+          <descriptors>
+            <descriptor>assembly.xml</descriptor>
+          </descriptors>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <version>2.2.1</version>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>2.9</version>
+        <executions>
+          <execution>
+            <id>attach-javadocs</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

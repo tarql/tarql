@@ -24,14 +24,14 @@ is equivalent to executing the following over an empty graph:
 In other words, the CSV file's contents are input into the query as a table of bindings. This allows manipulation of CSV data using the full power of SPARQL 1.1 syntax, and in particular the generation of RDF using `CONSTRUCT` queries. See below for more examples.
 
 
-## Building
+## Download
 
-Tarql uses Maven. To create executable scripts for Windows and Unix in `/target/appassembler/bin/tarql`:
-
-    mvn package appassembler:assemble
+Get the latest releases from here: http://lab.linkeddata.deri.ie/2013/tarql/
 
 
 ## Command line
+
+For Unix, the executable script is `bin/tarql`. For Windows, `bin\tarql.bat`. Example invocations:
 
 * `tarql --help` to show full command line help
 * `tarql my_mapping.sparql input1.csv input2.csv` to translate two CSV files using the same mapping
@@ -101,9 +101,19 @@ The `OFFSET 1` indicates that the first row is to be used to provide variable na
     OFFSET 1
 
 
+## Building
+
+Get the code from GitHub: http://github.com/cygri/tarql
+
+Tarql uses Maven. To create executable scripts for Windows and Unix in `/target/appassembler/bin/tarql`:
+
+    mvn package appassembler:assemble
+
+Otherwise it's standard Maven.
+
+
 ## TODO
 
-* Package a proper precompiled zip/tar distribution
 * Set base URI from command line
 * Choice of output format, writing to file, etc.
 * Extract and document a proper API with TarqlQuery, TarqlExecution, etc.
@@ -114,6 +124,7 @@ The `OFFSET 1` indicates that the first row is to be used to provide variable na
 * Find a way of producing consistent blank nodes from strings (esp. in multiple CONSTRUCT clauses)
 * Find a way of using the table multiple times, e.g.: `{ { SELECT ?author1 { TABLE } } UNION { SELECT ?author2 { TABLE } } }`
 * Handle tables where repeated values within a column are omitted, maybe tarql:valueFromPreviousRow(?a))
+* Make a proper homepage and set it up at http://tarql.deri.ie/
 * Support Excel files?
 * Find a way of streaming the CSV parser output into ARQ
 * Read input from stdin?
