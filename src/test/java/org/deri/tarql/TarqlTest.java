@@ -185,4 +185,29 @@ public class TarqlTest {
 		assertEquals(binding(vars("a", "base"), "\"x\"", "<http://example.com/>"), rs.nextBinding());
 		assertFalse(rs.hasNext());
 	}
+	
+	@Test
+	public void testROWNUM() {
+		String csv = "First,Last\nAlice,Smith\nBob,Miller";
+		String query = "SELECT ?ROWNUM ?First ?Last {} OFFSET 1";
+		ResultSet rs = CSVQueryExecutionFactory.create(
+				new StringReader(csv), query).execSelect();
+		List<Var> vars = vars("ROWNUM", "First", "Last");
+		assertTrue(rs.hasNext());
+		assertEquals(binding(vars, "1", "\"Alice\"", "\"Smith\""), rs.nextBinding());
+		assertTrue(rs.hasNext());
+		assertEquals(binding(vars, "2", "\"Bob\"", "\"Miller\""), rs.nextBinding());
+		assertFalse(rs.hasNext());
+	}
+	
+	@Test
+	public void testAvoidNameClashWithROWNUM() {
+		String csv = "ROWNUM\nfoo";
+		String query = "SELECT ?ROWNUM ?a {} OFFSET 1";
+		ResultSet rs = CSVQueryExecutionFactory.create(
+				new StringReader(csv), query).execSelect();
+		assertTrue(rs.hasNext());
+		assertEquals(binding(vars("ROWNUM", "a"), "1", "\"foo\""), rs.nextBinding());
+		assertFalse(rs.hasNext());
+	}
 }

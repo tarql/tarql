@@ -2,6 +2,7 @@ package org.deri.tarql;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 import com.hp.hpl.jena.sparql.core.Var;
@@ -45,4 +46,15 @@ public class Helpers {
 	}
 
 	private Helpers() {} // Only static methods
+	
+	public static Binding removePseudoVars(Binding binding) {
+		BindingHashMap result = new BindingHashMap();
+		Iterator<Var> it = binding.vars();
+		while (it.hasNext()) {
+			Var var = it.next();
+			if (var.equals(TarqlQuery.ROWNUM)) continue;
+			result.add(var, binding.get(var));
+		}
+		return result;
+	}
 }

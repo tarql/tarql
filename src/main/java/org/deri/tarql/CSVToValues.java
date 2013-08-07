@@ -7,6 +7,7 @@ import java.util.List;
 
 import au.com.bytecode.opencsv.CSVReader;
 
+import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.graph.Node;
 import com.hp.hpl.jena.shared.JenaException;
 import com.hp.hpl.jena.sparql.algebra.table.TableData;
@@ -30,6 +31,7 @@ public class CSVToValues {
 	private final Reader reader;
 	private final boolean varsFromHeader;
 	private final List<Var> vars = new ArrayList<Var>();
+	private int rownum;
 	
 	/**
 	 * @param reader Reader over the contents of a CSV file
@@ -58,7 +60,7 @@ public class CSVToValues {
 						if (!foundValidColumnName) continue;
 						for (int i = 0; i < row.length; i++) {
 							Var var = toVar(row[i]);
-							if (var == null || vars.contains(var)) {
+							if (var == null || vars.contains(var) || var.equals(TarqlQuery.ROWNUM)) {
 								getVar(i);
 							} else {
 								vars.add(var);
@@ -67,12 +69,14 @@ public class CSVToValues {
 						break;
 					}
 				}
+				rownum = 1;
 				while ((row = csv.readNext()) != null) {
-					Binding binding = toBinding(row);
 					// Skip rows without data
-					if (binding.size() == 0) continue;
-					bindings.add(binding);
+					if (isEmpty(row)) continue;
+					bindings.add(toBinding(row));
+					rownum++;
 				}
+				vars.add(TarqlQuery.ROWNUM);
 				return new TableData(vars, bindings);
 			} finally {
 				csv.close();
@@ -89,13 +93,29 @@ public class CSVToValues {
 		// FIXME: Handle other characters not allowed in Vars
 		return Var.alloc(s);
 	}
+
+	private boolean isEmpty(String[] row) {
+		for (int i = 0; i < row.length; i++) {
+			if (!isUnboundValue(row[i])) return false;
+		}
+		return true;
+	}
+
+	/**
+	 * Checks whether a string taken from a CSV cell is considered an unbound SPARQL value
+	 */
+	private boolean isUnboundValue(String value) {
+		return value == null || "".equals(value);
+	}
 	
 	private Binding toBinding(String[] row) {
 		BindingHashMap result = new BindingHashMap();
 		for (int i = 0; i < row.length; i++) {
-			if (row[i] == null || "".equals(row[i])) continue;
+			if (isUnboundValue(row[i])) continue;
 			result.add(getVar(i), Node.createLiteral(row[i]));
 		}
+		// Add current row number as ?ROWNUM
+		result.add(TarqlQuery.ROWNUM, Node.createLiteral(Integer.toString(rownum), XSDDatatype.XSDinteger));
 		return result;
 	}
 	

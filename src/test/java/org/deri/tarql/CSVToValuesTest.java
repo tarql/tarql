@@ -1,10 +1,13 @@
 package org.deri.tarql;
 
-import static org.deri.tarql.Helpers.vars;
 import static org.deri.tarql.Helpers.binding;
+import static org.deri.tarql.Helpers.removePseudoVars;
+import static org.deri.tarql.Helpers.vars;
 import static org.junit.Assert.assertEquals;
 
 import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.Test;
 
@@ -26,13 +29,13 @@ public class CSVToValuesTest {
 	@Test
 	public void testCountVars() {
 		String csv = "1\n1,1,1\n1,1";
-		assertEquals(3, readCSV(csv, false).getVars().size());
+		assertEquals(3, getNonPseudoVars(readCSV(csv, false)).size());
 	}
 	
 	@Test
 	public void testHeading() {
 		String csv = "1,2,3,4,5";
-		assertEquals(vars("a", "b", "c", "d", "e"), readCSV(csv, false).getVars());
+		assertEquals(vars("a", "b", "c", "d", "e"), getNonPseudoVars(readCSV(csv, false)));
 	}
 	
 	@Test
@@ -58,60 +61,80 @@ public class CSVToValuesTest {
 		String csv = "X,Y\n1,2";
 		TableData table = readCSV(csv, true);
 		assertEquals(1, table.getRows().size());
-		assertEquals(vars("X", "Y"), table.getVars());
-		assertEquals(binding(vars("X", "Y"), "\"1\"", "\"2\""), table.getRows().get(0));
+		assertEquals(vars("X", "Y"), getNonPseudoVars(table));
+		assertEquals(binding(vars("X", "Y"), "\"1\"", "\"2\""), removePseudoVars(table.getRows().get(0)));
 	}
 	
 	@Test
 	public void testSkipEmptyRowsBeforeHeader() {
 		String csv = "\n\nX,Y\n1,2";
 		TableData table = readCSV(csv, true);
-		assertEquals(vars("X", "Y"), table.getVars());
+		assertEquals(vars("X", "Y"), getNonPseudoVars(table));
 	}
 	
 	@Test
 	public void testFillAdditionalColumnsNotInHeader() {
 		String csv = "X\n1,2,3";
 		TableData table = readCSV(csv, true);
-		assertEquals(vars("X", "b", "c"), table.getVars());
+		assertEquals(vars("X", "b", "c"), getNonPseudoVars(table));
 	}
 	
 	@Test
 	public void testFillNonColumnsInHeader() {
 		String csv = "X,,Y\n1,2,3";
 		TableData table = readCSV(csv, true);
-		assertEquals(vars("X", "b", "Y"), table.getVars());
+		assertEquals(vars("X", "b", "Y"), getNonPseudoVars(table));
 	}
 	
 	@Test
 	public void testHandleSpacesInColumnNames() {
 		String csv = "Total Value\n123";
 		TableData table = readCSV(csv, true);
-		assertEquals(vars("Total_Value"), table.getVars());
+		assertEquals(vars("Total_Value"), getNonPseudoVars(table));
 	}
 	
 	@Test
 	public void testDuplicateColumnName() {
 		String csv = "X,X\n1,2";
 		TableData table = readCSV(csv, true);
-		assertEquals(vars("X", "b"), table.getVars());
+		assertEquals(vars("X", "b"), getNonPseudoVars(table));
 	}
 	
 	@Test
 	public void testHandleClashWhenFillingInVarNames1() {
 		String csv = "a,b,,c";
 		TableData table = readCSV(csv, true);
-		assertEquals(vars("a", "b", "c", "d"), table.getVars());
+		assertEquals(vars("a", "b", "c", "d"), getNonPseudoVars(table));
 	}
 	
 	@Test
 	public void testHandleClashWhenFillingInVarNames2() {
 		String csv = "a,c,,d";
 		TableData table = readCSV(csv, true);
-		assertEquals(vars("a", "c", "_c", "d"), table.getVars());
+		assertEquals(vars("a", "c", "_c", "d"), getNonPseudoVars(table));
+	}
+	
+	@Test
+	public void testAssignNewNameToReservedColumnName() {
+		String csv = "ROWNUM";
+		TableData table = readCSV(csv, true);
+		assertEquals(vars("a"), getNonPseudoVars(table));
+	}
+	
+	@Test
+	public void testIncludesROWNUM() {
+		String csv = "a,b";
+		TableData table = readCSV(csv, true);
+		assertEquals(vars("a", "b", "ROWNUM"), table.getVars());
 	}
 	
 	private static TableData readCSV(String csv, boolean varsFromHeader) {
 		return new CSVToValues(new StringReader(csv), varsFromHeader).read();
+	}
+	
+	private static List<Var> getNonPseudoVars(TableData table) {
+		List<Var> result = new ArrayList<Var>(table.getVars());
+		result.remove(TarqlQuery.ROWNUM);
+		return result;
 	}
 }

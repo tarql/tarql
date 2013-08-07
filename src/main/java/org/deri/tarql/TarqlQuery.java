@@ -5,8 +5,11 @@ import java.util.List;
 
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.sparql.core.Prologue;
+import com.hp.hpl.jena.sparql.core.Var;
 
 public class TarqlQuery {
+	public final static Var ROWNUM = Var.alloc("ROWNUM");
+	
 	private  Prologue prologue = null;
 	private final List<Query> queries = new ArrayList<Query>();
 

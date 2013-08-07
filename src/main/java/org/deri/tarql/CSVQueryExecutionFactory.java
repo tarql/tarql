@@ -141,10 +141,10 @@ public class CSVQueryExecutionFactory {
 	private static void modifyQuery(Query query, TableData table) {
 		ElementData tableElement = new ElementData();
 		for (Var var: table.getVars()) {
+			// Skip ?ROWNUM for "SELECT *" queries -- see further below
+			if (query.isSelectType() && query.isQueryResultStar() 
+					&& var.equals(TarqlQuery.ROWNUM)) continue;
 			tableElement.add(var);
-		}
-		for (Binding binding: table.getRows()) {
-			tableElement.add(binding);
 		}
 		ElementGroup groupElement = new ElementGroup();
 		groupElement.addElement(tableElement);
@@ -156,5 +156,24 @@ public class CSVQueryExecutionFactory {
 			groupElement.addElement(query.getQueryPattern());
 		}
 		query.setQueryPattern(groupElement);
+		
+		// For SELECT * queries, we don't want to include pseudo
+		// columns such as ?ROWNUM that may exist in the table.
+		// That's why we skipped ?ROWNUM further up.
+		if (query.isSelectType() && query.isQueryResultStar()) {
+			// Force expansion of "SELECT *" to actual projection list
+			query.setResultVars();
+			// Tell ARQ that it actually needs to pay attention to
+			// the projection list
+			query.setQueryResultStar(false);
+			// And now we can add ?ROWNUM to the table, as the "*"
+			// has already been expanded.
+			tableElement.add(TarqlQuery.ROWNUM);
+		}
+		// Data can only be added to table after we've finished the
+		// ?ROWNUM shenangians
+		for (Binding binding: table.getRows()) {
+			tableElement.add(binding);
+		}
 	}
 }

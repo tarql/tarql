@@ -79,4 +79,12 @@ public class ARQTest extends TestCase {
 		assertEquals(b2, rs.nextBinding());
 		assertFalse(rs.hasNext());
 	}
+	
+	@Test
+	public void testDetectSelectStar() {
+		Query selectStar = QueryFactory.create("SELECT * { ?s ?p ?o }");
+		assertTrue(selectStar.isQueryResultStar());
+		Query selectVars = QueryFactory.create("SELECT ?s ?p ?o { ?s ?p ?o }");
+		assertFalse(selectVars.isQueryResultStar());
+	}
 }
