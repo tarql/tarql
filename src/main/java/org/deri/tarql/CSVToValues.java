@@ -112,11 +112,20 @@ public class CSVToValues {
 		BindingHashMap result = new BindingHashMap();
 		for (int i = 0; i < row.length; i++) {
 			if (isUnboundValue(row[i])) continue;
-			result.add(getVar(i), Node.createLiteral(row[i]));
+			result.add(getVar(i), Node.createLiteral(sanitizeString(row[i])));
 		}
 		// Add current row number as ?ROWNUM
 		result.add(TarqlQuery.ROWNUM, Node.createLiteral(Integer.toString(rownum), XSDDatatype.XSDinteger));
 		return result;
+	}
+	
+	/**
+	 * Remove/replace weird characters known to cause problems in RDF toolkits.
+	 */
+	private String sanitizeString(String s) {
+		// ASCII 10h, "Data Link Escape", causes parse failure in Turtle
+        // in Virtuoso 7.0.0
+		return s.replace((char) 0x10, (char) 0xFFFD);
 	}
 	
 	private Var getVar(int column) {
