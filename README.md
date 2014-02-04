@@ -66,11 +66,21 @@ Tarql supports a magic `?ROWNUM` variable for accessing the number of the row wi
 
 ### Use column headings in first row as variable names
 
-    SELECT ?First_name ?Last_name ?Phone_number
-    WHERE { ... }
-    OFFSET 1
+	SELECT ?First_name ?Last_name ?Phone_number
+	WHERE { ... }
+	OFFSET 1
 
 The `OFFSET 1` indicates that the first row is to be used to provide variable names.
+
+### List the content of the file, projecting the first 100 rows and only the ?id and ?name bindings
+
+	SELECT DISTINCT ?id ?name
+	FROM <file:filename.csv>
+	WHERE {}
+	LIMIT 100
+	OFFSET 1
+
+Note that using OFFSET 1 we could not start by a specific offset, and we have to add a FILTER.
 
 ### Skip bad rows
 
