@@ -1,6 +1,10 @@
 package org.deri.tarql;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.Reader;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,6 +62,29 @@ public class tarql extends CmdGeneral {
 	protected String getSummary() {
 		return getCommandName() + " query.sparql [table.csv [...]]";
 	}
+	
+	/**
+	 *  
+	 * @param path - the name of the file: we can use a wildcard '*' in the name of the file, such as data/*csv.
+	 * NOTE: at the moment wildcard for directory name (for example data/*other/something.csv) is not supported.
+	 * @return
+	 * @throws IOException
+	 */
+	public static String[] getFilesList(final String path) {
+		final List<String> files = new ArrayList<String>(1);
+		try {
+			if (path.contains("*") && (path.contains("/") && path.indexOf("*") > path.lastIndexOf("/") ) ) {
+				final File dir = (path.contains("/")) ? new File(path.substring(0, path.lastIndexOf("/"))) : new File(path);
+				final String glob = (path.contains("/")) ? path.substring(path.lastIndexOf("/")+1) : path;
+				for (Path p : Files.newDirectoryStream(dir.toPath(), glob)) 
+					files.add(p.toString());
+			}else 
+				files.add(new File(path).getCanonicalFile().toString());
+		} catch (IOException e) {
+			throw new RuntimeException("Problem parsing path: " + path, e);
+		}
+		return files.toArray(new String[files.size()]);
+	}
 
 	@Override
 	protected void processModulesAndArgs() {
@@ -66,7 +93,11 @@ public class tarql extends CmdGeneral {
 		}
 		queryFile = getPositionalArg(0);
 		for (int i = 1; i < getPositional().size(); i++) {
-			csvFiles.add(getPositionalArg(i));
+			// check for multiple files, with wildcard
+			String[] files = getFilesList(getPositionalArg(i));
+			for (String file : files) {				
+				csvFiles.add(file);
+			}
 		}
 		if (hasArg(withHeaderArg)) {
 			if (csvFiles.isEmpty()) {
