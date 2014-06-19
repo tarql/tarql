@@ -9,7 +9,7 @@ import com.hp.hpl.jena.shared.NotFoundException;
 import com.hp.hpl.jena.sparql.algebra.table.TableData;
 import com.hp.hpl.jena.util.FileManager;
 
-public class CSVQueryExecutionFactory {
+public class TarqlQueryExecutionFactory {
 
 	public static TarqlQueryExecution create(TarqlQuery query) {
 		return create(query, FileManager.get());

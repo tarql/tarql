@@ -95,7 +95,7 @@ public class tarql extends CmdGeneral {
 			} else {
 				for (String csvFile: csvFiles) {
 					if (withHeader || withoutHeader) {
-						Reader reader = CSVQueryExecutionFactory.createReader(csvFile, FileManager.get());
+						Reader reader = TarqlQueryExecutionFactory.createReader(csvFile, FileManager.get());
 						TableData table = new CSVToValues(reader, withHeader).read();
 						executeQuery(table, q);
 					} else {
@@ -113,15 +113,15 @@ public class tarql extends CmdGeneral {
 	}
 
 	private void executeQuery(TarqlQuery query) {
-		processResults(CSVQueryExecutionFactory.create(query));
+		processResults(TarqlQueryExecutionFactory.create(query));
 	}
 	
 	private void executeQuery(TableData table, TarqlQuery query) {
-		processResults(CSVQueryExecutionFactory.create(table, query));
+		processResults(TarqlQueryExecutionFactory.create(table, query));
 	}
 	
 	private void executeQuery(String csvFile, TarqlQuery query) {
-		processResults(CSVQueryExecutionFactory.create(csvFile, query));
+		processResults(TarqlQueryExecutionFactory.create(csvFile, query));
 	}
 	
 	private void processResults(TarqlQueryExecution ex) {

@@ -34,9 +34,9 @@ public class TarqlTest {
 		
 		TarqlQueryExecution ex;
 		if(csv != null){
-			ex = CSVQueryExecutionFactory.create(new StringReader(csv), tq);
+			ex = TarqlQueryExecutionFactory.create(new StringReader(csv), tq);
 		} else{
-			ex = CSVQueryExecutionFactory.create(tq);
+			ex = TarqlQueryExecutionFactory.create(tq);
 		}
 		ResultSet rs = ex.execSelect();
 		int counter = 0;
@@ -49,7 +49,7 @@ public class TarqlTest {
 	
 	private void assertConstruct(TarqlQuery tq, String expectedTTL){
 		Model expected = ModelFactory.createDefaultModel().read(new StringReader(expectedTTL), null, "TURTLE");
-		TarqlQueryExecution ex = CSVQueryExecutionFactory.create(new StringReader(csv), tq);
+		TarqlQueryExecution ex = TarqlQueryExecutionFactory.create(new StringReader(csv), tq);
 		Model actual = ex.exec();
 		assertTrue(actual.isIsomorphicWith(expected));
 	}
