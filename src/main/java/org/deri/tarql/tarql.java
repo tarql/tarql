@@ -9,8 +9,6 @@ import org.openjena.atlas.io.IndentedWriter;
 import arq.cmdline.ArgDecl;
 import arq.cmdline.CmdGeneral;
 
-import com.hp.hpl.jena.query.Query;
-import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.ResultSetFormatter;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -115,48 +113,30 @@ public class tarql extends CmdGeneral {
 	}
 
 	private void executeQuery(TarqlQuery query) {
-		for (Query q: query.getQueries()) {
-			Model previousResults = ModelFactory.createDefaultModel();
-			previousResults.add(resultModel);
-			CSVQueryExecutionFactory.setPreviousResults(previousResults);
-			processResults(CSVQueryExecutionFactory.create(q));
-			CSVQueryExecutionFactory.resetPreviousResults();
-		}
+		processResults(CSVQueryExecutionFactory.create(query));
 	}
 	
 	private void executeQuery(TableData table, TarqlQuery query) {
-		for (Query q: query.getQueries()) {
-			Model previousResults = ModelFactory.createDefaultModel();
-			previousResults.add(resultModel);
-			CSVQueryExecutionFactory.setPreviousResults(previousResults);
-			processResults(CSVQueryExecutionFactory.create(table, q));
-			CSVQueryExecutionFactory.resetPreviousResults();
-		}
+		processResults(CSVQueryExecutionFactory.create(table, query));
 	}
 	
 	private void executeQuery(String csvFile, TarqlQuery query) {
-		for (Query q: query.getQueries()) {
-			Model previousResults = ModelFactory.createDefaultModel();
-			previousResults.add(resultModel);
-			CSVQueryExecutionFactory.setPreviousResults(previousResults);
-			processResults(CSVQueryExecutionFactory.create(csvFile, q));
-			CSVQueryExecutionFactory.resetPreviousResults();
-		}
+		processResults(CSVQueryExecutionFactory.create(csvFile, query));
 	}
 	
-	private void processResults(QueryExecution ex) {
-		if (testQuery && ex.getQuery().getConstructTemplate() != null) {
+	private void processResults(TarqlQueryExecution ex) {
+		if (testQuery && ex.getFirstQuery().getConstructTemplate() != null) {
 			IndentedWriter out = new IndentedWriter(System.out); 
-			new FmtTemplate(out, new SerializationContext(ex.getQuery())).format(ex.getQuery().getConstructTemplate());
+			new FmtTemplate(out, new SerializationContext(ex.getFirstQuery())).format(ex.getFirstQuery().getConstructTemplate());
 			out.flush();
 		}
-		if (ex.getQuery().isSelectType()) {
+		if (ex.getFirstQuery().isSelectType()) {
 			System.out.println(ResultSetFormatter.asText(ex.execSelect()));
-		} else if (ex.getQuery().isAskType()) {
+		} else if (ex.getFirstQuery().isAskType()) {
 			System.out.println(ResultSetFormatter.asText(ex.execSelect()));
-		} else if (ex.getQuery().isConstructType()) {
+		} else if (ex.getFirstQuery().isConstructType()) {
 			resultModel.setNsPrefixes(resultModel);
-			ex.execConstruct(resultModel);
+			resultModel = ex.exec();
 		} else {
 			cmdError("Only query forms CONSTRUCT, SELECT and ASK are supported");
 		}
