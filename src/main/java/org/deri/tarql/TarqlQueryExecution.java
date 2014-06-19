@@ -93,9 +93,6 @@ public class TarqlQueryExecution {
 	}
 
 	public Model exec() {
-		//TODO
-		//for each query call modify query
-		//execute & memorize
 		Model model = ModelFactory.createDefaultModel();
 		for(Query q:tq.getQueries()){
 			modifyQuery(q, table);
