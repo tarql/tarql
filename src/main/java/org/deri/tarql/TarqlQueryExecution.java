@@ -2,7 +2,9 @@ package org.deri.tarql;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.util.Iterator;
 
+import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
@@ -103,6 +105,17 @@ public class TarqlQueryExecution {
 		return model;
 	}
 
+	public Iterator<Triple> streamExec() throws IOException {
+		if(tq.getQueries().size() > 1){
+			throw new UnsupportedOperationException("Streaming results is only supported on a single query. Input Tarql query has " + tq.getQueries().size());
+		}
+		Model model = ModelFactory.createDefaultModel();
+		Query q = tq.getQueries().get(0);
+		modifyQuery(q, table);
+		QueryExecution ex = QueryExecutionFactory.create(q, model);
+		return ex.execConstructTriples();
+	}
+	
 	public ResultSet execSelect() {
 		//TODO check only first query. right?
 		Model model = ModelFactory.createDefaultModel();
