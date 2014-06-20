@@ -1,5 +1,6 @@
 package org.deri.tarql;
 
+import java.io.IOException;
 import java.io.Reader;
 
 import com.hp.hpl.jena.query.Query;
@@ -8,26 +9,25 @@ import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.sparql.algebra.table.TableData;
+import com.hp.hpl.jena.sparql.algebra.Table;
 import com.hp.hpl.jena.sparql.core.Var;
-import com.hp.hpl.jena.sparql.engine.binding.Binding;
 import com.hp.hpl.jena.sparql.syntax.Element;
 import com.hp.hpl.jena.sparql.syntax.ElementData;
 import com.hp.hpl.jena.sparql.syntax.ElementGroup;
 
 public class TarqlQueryExecution {
 
-	private TableData table;
+	private CSVTable table;
 	private TarqlQuery tq;
 	
-	public TarqlQueryExecution(TableData table, TarqlQuery query) {
+	public TarqlQueryExecution(CSVTable table, TarqlQuery query) {
 		this.table = table;
 		this.tq = query;
 	}
 
-	public TarqlQueryExecution(Reader reader, TarqlQuery query) {
+	public TarqlQueryExecution(Reader reader, TarqlQuery query) throws IOException {
 		boolean useColumnHeadersAsVars = modifyQueryForColumnHeaders(query.getQueries().get(0));
-		this.table = new CSVToValues(reader, useColumnHeadersAsVars).read();
+		this.table = new CSVTable(reader, useColumnHeadersAsVars);
 		this.tq = query;
 	}
 	
@@ -53,8 +53,8 @@ public class TarqlQueryExecution {
 	 * @param query Original query; will be modified in place
 	 * @param table Data table to be added into the query
 	 */
-	private void modifyQuery(Query query, TableData table) {
-		ElementData tableElement = new ElementData();
+	private void modifyQuery(Query query, Table table) {
+		ElementData tableElement = new MyTableElement(table);
 		for (Var var: table.getVars()) {
 			// Skip ?ROWNUM for "SELECT *" queries -- see further below
 			if (query.isSelectType() && query.isQueryResultStar() 
@@ -87,23 +87,24 @@ public class TarqlQueryExecution {
 		}
 		// Data can only be added to table after we've finished the
 		// ?ROWNUM shenangians
-		for (Binding binding: table.getRows()) {
+		/*for (Binding binding: table.getRows()) {
 			tableElement.add(binding);
-		}
+		}*/
 	}
 
-	public Model exec() {
+	public Model exec() throws IOException {
 		Model model = ModelFactory.createDefaultModel();
 		for(Query q:tq.getQueries()){
 			modifyQuery(q, table);
 			QueryExecution ex = QueryExecutionFactory.create(q, model);
 			ex.execConstruct(model);
+			table.reset();
 		}
 		return model;
 	}
 
 	public ResultSet execSelect() {
-		//TODO check only query. right?
+		//TODO check only first query. right?
 		Model model = ModelFactory.createDefaultModel();
 		Query q = tq.getQueries().get(0);
 		modifyQuery(q, table);
@@ -114,4 +115,22 @@ public class TarqlQueryExecution {
 	public Query getFirstQuery() {
 		return tq.getQueries().get(0);
 	}
+	
+	public void close(){
+		table.close();
+	}
+}
+
+class MyTableElement extends ElementData{
+
+	private final Table table;
+	
+	public MyTableElement(Table t) {
+		this.table = t;
+	}
+	@Override
+	public Table getTable() {
+		return table;
+	}
+	
 }

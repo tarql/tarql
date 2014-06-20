@@ -5,14 +5,16 @@ import static org.deri.tarql.Helpers.removePseudoVars;
 import static org.deri.tarql.Helpers.vars;
 import static org.junit.Assert.assertEquals;
 
+import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.junit.Test;
 
-import com.hp.hpl.jena.sparql.algebra.table.TableData;
 import com.hp.hpl.jena.sparql.core.Var;
+import com.hp.hpl.jena.sparql.engine.binding.Binding;
 
 public class CSVToValuesTest {
 
@@ -27,112 +29,121 @@ public class CSVToValuesTest {
 	}
 	
 	@Test
-	public void testCountVars() {
+	public void testCountVars() throws IOException {
 		String csv = "1\n1,1,1\n1,1";
-		assertEquals(3, getNonPseudoVars(readCSV(csv, false)).size());
+		assertEquals(3, countRows(csv, false));
 	}
 	
+	
 	@Test
-	public void testHeading() {
+	public void testHeading() throws IOException {
 		String csv = "1,2,3,4,5";
-		assertEquals(vars("a", "b", "c", "d", "e"), getNonPseudoVars(readCSV(csv, false)));
+		assertEquals(vars("a", "b", "c", "d", "e"), getNonPseudoVars(csv, false));
 	}
 	
 	@Test
-	public void testUnbound() {
+	public void testUnbound() throws IOException {
 		String csv = "1\n1,1";
-		assertEquals(null, readCSV(csv, false).getRows().get(0).get(Var.alloc("b")));
+		Binding binding = readCSV(csv, false).rows().next();
+		assertEquals(null, binding.get(Var.alloc("b")));
 	}
 
+	
 	@Test
-	public void testNoEmptyStrings() {
+	public void testNoEmptyStrings() throws IOException {
 		String csv = ",1";
-		assertEquals(null, readCSV(csv, false).getRows().get(0).get(Var.alloc("a")));
+		assertEquals(null, readCSV(csv, false).rows().next().get(Var.alloc("a")));
 	}
 	
 	@Test
-	public void testSkipEmptyLines() {
+	public void testSkipEmptyLines() throws IOException {
 		String csv = "\n,,,,\n1";
-		assertEquals(1, readCSV(csv, false).getRows().size());
+		assertEquals(1, countRows(csv, false));
 	}
 
 	@Test
-	public void testWithHeaders() {
+	public void testWithHeaders() throws IOException {
 		String csv = "X,Y\n1,2";
-		TableData table = readCSV(csv, true);
-		assertEquals(1, table.getRows().size());
-		assertEquals(vars("X", "Y"), getNonPseudoVars(table));
-		assertEquals(binding(vars("X", "Y"), "\"1\"", "\"2\""), removePseudoVars(table.getRows().get(0)));
+		assertEquals(1, countRows(csv, true));
+		assertEquals(vars("X", "Y"), getNonPseudoVars(csv, true));
+		assertEquals(binding(vars("X", "Y"), "\"1\"", "\"2\""), removePseudoVars(readCSV(csv,true).rows().next()));
 	}
 	
 	@Test
-	public void testSkipEmptyRowsBeforeHeader() {
+	public void testSkipEmptyRowsBeforeHeader() throws IOException {
 		String csv = "\n\nX,Y\n1,2";
-		TableData table = readCSV(csv, true);
-		assertEquals(vars("X", "Y"), getNonPseudoVars(table));
+		assertEquals(vars("X", "Y"), getNonPseudoVars(csv, true));
 	}
 	
 	@Test
-	public void testFillAdditionalColumnsNotInHeader() {
+	public void testFillAdditionalColumnsNotInHeader() throws IOException {
 		String csv = "X\n1,2,3";
-		TableData table = readCSV(csv, true);
-		assertEquals(vars("X", "b", "c"), getNonPseudoVars(table));
+		assertEquals(vars("X", "b", "c"), getNonPseudoVars(csv, true));
 	}
 	
 	@Test
-	public void testFillNonColumnsInHeader() {
+	public void testFillNonColumnsInHeader() throws IOException {
 		String csv = "X,,Y\n1,2,3";
-		TableData table = readCSV(csv, true);
-		assertEquals(vars("X", "b", "Y"), getNonPseudoVars(table));
+		assertEquals(vars("X", "b", "Y"), getNonPseudoVars(csv, true));
 	}
 	
 	@Test
-	public void testHandleSpacesInColumnNames() {
+	public void testHandleSpacesInColumnNames() throws IOException {
 		String csv = "Total Value\n123";
-		TableData table = readCSV(csv, true);
-		assertEquals(vars("Total_Value"), getNonPseudoVars(table));
+		assertEquals(vars("Total_Value"), getNonPseudoVars(csv, true));
 	}
 	
 	@Test
-	public void testDuplicateColumnName() {
+	public void testDuplicateColumnName() throws IOException {
 		String csv = "X,X\n1,2";
-		TableData table = readCSV(csv, true);
-		assertEquals(vars("X", "b"), getNonPseudoVars(table));
+		assertEquals(vars("X", "b"), getNonPseudoVars(csv, true));
 	}
 	
 	@Test
-	public void testHandleClashWhenFillingInVarNames1() {
+	public void testHandleClashWhenFillingInVarNames1() throws IOException {
 		String csv = "a,b,,c";
-		TableData table = readCSV(csv, true);
-		assertEquals(vars("a", "b", "c", "d"), getNonPseudoVars(table));
+		assertEquals(vars("a", "b", "c", "d"), getNonPseudoVars(csv, true));
 	}
 	
 	@Test
-	public void testHandleClashWhenFillingInVarNames2() {
+	public void testHandleClashWhenFillingInVarNames2() throws IOException {
 		String csv = "a,c,,d";
-		TableData table = readCSV(csv, true);
-		assertEquals(vars("a", "c", "_c", "d"), getNonPseudoVars(table));
+		assertEquals(vars("a", "c", "_c", "d"), getNonPseudoVars(csv, true));
 	}
 	
 	@Test
-	public void testAssignNewNameToReservedColumnName() {
+	public void testAssignNewNameToReservedColumnName() throws IOException {
 		String csv = "ROWNUM";
-		TableData table = readCSV(csv, true);
-		assertEquals(vars("a"), getNonPseudoVars(table));
+		assertEquals(vars("a"), getNonPseudoVars(csv, true));
 	}
 	
 	@Test
-	public void testIncludesROWNUM() {
+	public void testIncludesROWNUM() throws IOException {
 		String csv = "a,b";
-		TableData table = readCSV(csv, true);
-		assertEquals(vars("a", "b", "ROWNUM"), table.getVars());
+		assertEquals(vars("a", "b", "ROWNUM"), readCSV(csv, true).getVars());
 	}
 	
-	private static TableData readCSV(String csv, boolean varsFromHeader) {
-		return new CSVToValues(new StringReader(csv), varsFromHeader).read();
+	private static CSVTable readCSV(String csv, boolean varsFromHeader) throws IOException {
+		return new CSVTable(new StringReader(csv), varsFromHeader);
 	}
 	
-	private static List<Var> getNonPseudoVars(TableData table) {
+	private static long countRows(String csv, boolean varsFromHeader) throws IOException {
+		Iterator<Binding> table =  readCSV(csv, varsFromHeader).rows();
+		long count = 0;
+		while(table.hasNext()){
+			table.next();
+			count +=1;
+		}
+		return count;
+	}
+	
+	private static List<Var> getNonPseudoVars(String csv, boolean varsFromHeader) throws IOException {
+		CSVTable table =  readCSV(csv, varsFromHeader);
+		Iterator<Binding> bindings = table.rows();
+		while(bindings.hasNext()){
+			bindings.next();
+		}
+		
 		List<Var> result = new ArrayList<Var>(table.getVars());
 		result.remove(TarqlQuery.ROWNUM);
 		return result;

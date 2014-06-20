@@ -1,10 +1,11 @@
 package org.deri.tarql;
 
+import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.openjena.atlas.io.IndentedWriter;
+import org.apache.jena.atlas.io.IndentedWriter;
 
 import arq.cmdline.ArgDecl;
 import arq.cmdline.CmdGeneral;
@@ -13,7 +14,6 @@ import com.hp.hpl.jena.query.ResultSetFormatter;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.shared.NotFoundException;
-import com.hp.hpl.jena.sparql.algebra.table.TableData;
 import com.hp.hpl.jena.sparql.serializer.FmtTemplate;
 import com.hp.hpl.jena.sparql.serializer.SerializationContext;
 import com.hp.hpl.jena.sparql.util.Utils;
@@ -96,7 +96,7 @@ public class tarql extends CmdGeneral {
 				for (String csvFile: csvFiles) {
 					if (withHeader || withoutHeader) {
 						Reader reader = TarqlQueryExecutionFactory.createReader(csvFile, FileManager.get());
-						TableData table = new CSVToValues(reader, withHeader).read();
+						CSVTable table = new CSVTable(reader, withHeader);
 						executeQuery(table, q);
 					} else {
 						// Let factory decide after looking at the query
@@ -109,22 +109,24 @@ public class tarql extends CmdGeneral {
 			}
 		} catch (NotFoundException ex) {
 			cmdError("Not found: " + ex.getMessage());
+		} catch(IOException ioe){
+			cmdError("IOException: " + ioe.getMessage());
 		}
 	}
 
-	private void executeQuery(TarqlQuery query) {
+	private void executeQuery(TarqlQuery query) throws IOException {
 		processResults(TarqlQueryExecutionFactory.create(query));
 	}
 	
-	private void executeQuery(TableData table, TarqlQuery query) {
+	private void executeQuery(CSVTable table, TarqlQuery query) throws IOException {
 		processResults(TarqlQueryExecutionFactory.create(table, query));
 	}
 	
-	private void executeQuery(String csvFile, TarqlQuery query) {
+	private void executeQuery(String csvFile, TarqlQuery query) throws IOException {
 		processResults(TarqlQueryExecutionFactory.create(csvFile, query));
 	}
 	
-	private void processResults(TarqlQueryExecution ex) {
+	private void processResults(TarqlQueryExecution ex) throws IOException {
 		if (testQuery && ex.getFirstQuery().getConstructTemplate() != null) {
 			IndentedWriter out = new IndentedWriter(System.out); 
 			new FmtTemplate(out, new SerializationContext(ex.getFirstQuery())).format(ex.getFirstQuery().getConstructTemplate());

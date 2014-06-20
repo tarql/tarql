@@ -6,6 +6,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.io.IOException;
 import java.io.StringReader;
 import java.util.List;
 
@@ -30,7 +31,7 @@ public class TarqlTest {
 		csv = null;
 	}
 	
-	private void assertSelect(TarqlQuery tq, Binding... bindings){
+	private void assertSelect(TarqlQuery tq, Binding... bindings) throws IOException{
 		
 		TarqlQueryExecution ex;
 		if(csv != null){
@@ -44,10 +45,10 @@ public class TarqlTest {
 			assertEquals(bindings[counter], rs.nextBinding());
 			counter += 1;
 		}
-		assertEquals(counter, bindings.length);
+		assertEquals(bindings.length, counter);
 	}
 	
-	private void assertConstruct(TarqlQuery tq, String expectedTTL){
+	private void assertConstruct(TarqlQuery tq, String expectedTTL) throws IOException{
 		Model expected = ModelFactory.createDefaultModel().read(new StringReader(expectedTTL), null, "TURTLE");
 		TarqlQueryExecution ex = TarqlQueryExecutionFactory.create(new StringReader(csv), tq);
 		Model actual = ex.exec();
@@ -55,7 +56,7 @@ public class TarqlTest {
 	}
 	
 	@Test
-	public void testSimpleSelect() {
+	public void testSimpleSelect() throws IOException {
 		csv = "Alice,Smith\nBob,Cook";
 		String query = "SELECT * {}";
 		TarqlQuery tq =  new TarqlParser(new StringReader(query), null).getResult();
@@ -64,7 +65,7 @@ public class TarqlTest {
 	}
 	
 	@Test
-	public void testSkipFirstRows() {
+	public void testSkipFirstRows() throws IOException {
 		csv = "First,Last\nAlice,Smith\nBob,Cook";
 		String query = "SELECT * {} OFFSET 1";
 		TarqlQuery tq =  new TarqlParser(new StringReader(query), null).getResult();
@@ -73,7 +74,7 @@ public class TarqlTest {
 	}
 	
 	@Test
-	public void testSelectWithFilter() {
+	public void testSelectWithFilter() throws IOException {
 		csv = "Alice,Smith\nBob,Cook";
 		String query = "SELECT * { FILTER(?b=\"Smith\") }";
 		TarqlQuery tq =  new TarqlParser(new StringReader(query), null).getResult();
@@ -82,7 +83,7 @@ public class TarqlTest {
 	}
 	
 	@Test
-	public void testConstruct() {
+	public void testConstruct() throws IOException {
 		csv = "Alice,Smith";
 		String query = "PREFIX ex: <http://example.com/> CONSTRUCT { _:x ex:first ?a; ex:last ?b } {}";
 		TarqlQuery tq =  new TarqlParser(new StringReader(query), null).getResult();
@@ -91,7 +92,7 @@ public class TarqlTest {
 	}
 	
 	@Test
-	public void testBindConstant() {
+	public void testBindConstant() throws IOException {
 		csv = "x";
 		String query = "SELECT * { BIND (\"y\" AS ?b) }";
 		TarqlQuery tq =  new TarqlParser(new StringReader(query), null).getResult();
@@ -100,7 +101,7 @@ public class TarqlTest {
 	}
 	
 	@Test
-	public void testBindData() {
+	public void testBindData() throws IOException {
 		csv = "x";
 		String query = "SELECT * { BIND (?a AS ?b) }";
 		TarqlQuery tq =  new TarqlParser(new StringReader(query), null).getResult();
@@ -109,14 +110,14 @@ public class TarqlTest {
 	}
 	
 	@Test
-	public void testFromClause() {
+	public void testFromClause() throws IOException {
 		String query = "SELECT * FROM <src/test/resources/simple.csv> {}";
 		TarqlQuery tq =  new TarqlParser(new StringReader(query), null).getResult();
 		assertSelect(tq, binding(vars("a"), "\"x\""));
 	}
 	
 	@Test
-	public void testNoInputFile() {
+	public void testNoInputFile() throws IOException {
 		String query = "SELECT * {}";
 		TarqlQuery tq =  new TarqlParser(new StringReader(query), null).getResult();
 		try {
@@ -128,7 +129,7 @@ public class TarqlTest {
 	}
 	
 	@Test
-	public void testMultipleInputFiles() {
+	public void testMultipleInputFiles() throws IOException {
 		String query = "SELECT * FROM <x> <y> {}";
 		try {
 			TarqlQuery tq =  new TarqlParser(new StringReader(query), null).getResult();
@@ -140,7 +141,7 @@ public class TarqlTest {
 	}
 	
 	@Test
-	public void testVarNamesFromHeaders() {
+	public void testVarNamesFromHeaders() throws IOException {
 		csv = "First,Last\nAlice,Smith";
 		String query = "SELECT * {} OFFSET 1";
 		TarqlQuery tq =  new TarqlParser(new StringReader(query), null).getResult();
@@ -149,7 +150,7 @@ public class TarqlTest {
 	}
 	
 	@Test
-	public void testMultipleQueries() {
+	public void testMultipleQueries() throws IOException {
 		csv = "Alice,Smith";
 		String query = 
 				"PREFIX ex: <http://example.com/>\n" +
@@ -161,21 +162,21 @@ public class TarqlTest {
 	}
 	
 	@Test
-	public void testFROMisRelativeToMappingLocation1() {
+	public void testFROMisRelativeToMappingLocation1() throws IOException {
 		String file = "src/test/resources/mappings/simple-with-from.sparql";
 		TarqlQuery tq = new TarqlParser(file).getResult();
 		assertSelect(tq, binding(vars("a"), "\"x\""));
 	}
 	
 	@Test
-	public void testFROMisRelativeToMappingLocation2() {
+	public void testFROMisRelativeToMappingLocation2() throws IOException {
 		String file = "src/test/resources/mappings/simple-with-base.sparql";
 		TarqlQuery tq = new TarqlParser(file).getResult();
 		assertSelect(tq, binding(vars("a", "base"), "\"x\"", "<http://example.com/>"));
 	}
 	
 	@Test
-	public void testROWNUM() {
+	public void testROWNUM() throws IOException {
 		csv = "First,Last\nAlice,Smith\nBob,Miller";
 		String query = "SELECT ?ROWNUM ?First ?Last {} OFFSET 1";
 		TarqlQuery tq =  new TarqlParser(new StringReader(query), null).getResult();
@@ -184,7 +185,7 @@ public class TarqlTest {
 	}
 	
 	@Test
-	public void testAvoidNameClashWithROWNUM() {
+	public void testAvoidNameClashWithROWNUM() throws IOException {
 		csv = "ROWNUM\nfoo";
 		String query = "SELECT ?ROWNUM ?a {} OFFSET 1";
 		TarqlQuery tq =  new TarqlParser(new StringReader(query), null).getResult();
