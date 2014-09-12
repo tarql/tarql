@@ -6,10 +6,10 @@ import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 
 import org.apache.jena.atlas.logging.Log;
+import org.apache.jena.riot.system.IRIResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.hp.hpl.jena.n3.IRIResolver;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryException;
 import com.hp.hpl.jena.query.QueryParseException;
@@ -38,7 +38,7 @@ public class TarqlParser {
 	
 	public TarqlParser(Reader reader, String baseIRI) {
 		this.reader = reader;
-		result.getPrologue().setResolver(new IRIResolver(baseIRI));
+		result.getPrologue().setResolver(IRIResolver.create(baseIRI));
 	}
 	
 	private static Reader open(String filenameOrURL) {
