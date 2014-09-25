@@ -129,6 +129,12 @@ public class CSVParserTest {
 		assertEquals(vars("a", "b", "ROWNUM"), readCSV(csv, true).getVars());
 	}
 	
+	@Test
+	public void testEmptyColumn() throws IOException {
+		String csv = "x,,y";
+		assertEquals(vars("a", "b", "c"), getNonPseudoVars(csv, false));
+	}
+	
 	private static CSVParser readCSV(String csv, boolean varsFromHeader) throws IOException {
 		return new CSVParser(new StringReader(csv), varsFromHeader);
 	}

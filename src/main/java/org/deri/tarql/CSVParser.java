@@ -107,15 +107,15 @@ public class CSVParser implements ClosableIterator<Binding> {
 	}
 
 	private Var getVar(int column) {
-		while (vars.size() <= column) {
-			vars.add(null);
+		if (vars.size() < column) {
+			getVar(column - 1);
 		}
-		if (vars.get(column) == null) {
+		if (vars.size() == column) {
 			Var var = Var.alloc(getColumnName(column));
 			while (vars.contains(var)) {
 				var = Var.alloc("_" + var.getName());
 			}
-			vars.set(column, var);
+			vars.add(var);
 		}
 		return vars.get(column);
 	}
