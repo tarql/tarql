@@ -39,6 +39,26 @@ For Unix, the executable script is `bin/tarql`. For Windows, `bin\tarql.bat`. Ex
 * `tarql my_mapping.sparql` to translate a CSV file defined in SPARQL `FROM` clause
 * `tarql --test my_mapping.sparql` to show only the CONSTRUCT template, variable names, and a few input rows (useful for CONSTRUCT query development)`
 
+Full options:
+
+```
+tarql query.sparql [table.csv [...]]
+  Main arguments
+      query.sparql           File containing a SPARQL query to be applied to a CSV file
+      table.csv              CSV file to be processed; can be omitted if specified in FROM clause
+  Options
+      --test                 Show CONSTRUCT template and first rows only (for query debugging)
+      --header               Force use of first row as variable names
+      --no-header            Force default variable names (?a, ?b, ...)
+      -e   --encoding        Override CSV file encoding (e.g., utf-8 or latin-1)
+      --ntriples             Write N-Triples instead of Turtle
+  General
+      -v   --verbose         Verbose
+      -q   --quiet           Run with minimal output
+      --debug                Output information for debugging
+      --help
+      --version              Version information
+```
 
 ## Details
 
@@ -138,14 +158,12 @@ Otherwise it's standard Maven.
 * Extract and document a proper API with TarqlQuery, TarqlExecution, etc.
 * Allow feeding of triples from RDF files into the mapping process
 * Experiment with input files in TSV, different quoting styles, etc.
-* Allow overriding of encoding on command line
 * Optionally generate VoID/PROV triples
 * Find a way of producing consistent blank nodes from strings (esp. in multiple CONSTRUCT clauses)
 * Find a way of using the table multiple times, e.g.: `{ { SELECT ?author1 { TABLE } } UNION { SELECT ?author2 { TABLE } } }`
 * Handle tables where repeated values within a column are omitted, maybe tarql:valueFromPreviousRow(?a))
 * Make a proper homepage and set it up at http://tarql.deri.ie/
 * Support Excel files?
-* Find a way of streaming the CSV parser output into ARQ
 * Read input from stdin?
 * Web service?
 * Get this into ARQ!?

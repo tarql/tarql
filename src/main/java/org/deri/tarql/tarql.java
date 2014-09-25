@@ -48,7 +48,7 @@ public class tarql extends CmdGeneral {
 		add(testQueryArg, "--test", "Show CONSTRUCT template and first rows only (for query debugging)");
 		add(withHeaderArg, "--header", "Force use of first row as variable names");
 		add(withoutHeaderArg, "--no-header", "Force default variable names (?a, ?b, ...)");
-		add(encodingArg, "--encoding", "Override CSV file encoding (e.g., utf-8 or latin-1)");
+		add(encodingArg, "-e   --encoding", "Override CSV file encoding (e.g., utf-8 or latin-1)");
 		add(nTriplesArg, "--ntriples", "Write N-Triples instead of Turtle");
 		getUsage().startCategory("Main arguments");
 		getUsage().addUsage("query.sparql", "File containing a SPARQL query to be applied to a CSV file");
