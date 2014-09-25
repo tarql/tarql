@@ -20,6 +20,9 @@ import com.hp.hpl.jena.sparql.lang.sparql_11.ParseException;
 import com.hp.hpl.jena.sparql.lang.sparql_11.SPARQLParser11;
 import com.hp.hpl.jena.util.FileManager;
 
+/**
+ * Parses a {@link TarqlQuery} provided as a string or reader.
+ */
 public class TarqlParser {
 	private final static Logger log = LoggerFactory.getLogger(TarqlParser.class);
 	
@@ -63,6 +66,12 @@ public class TarqlParser {
 			int beginColumn = parser.getToken(1).beginColumn;
 
 			Query query = new Query(result.getPrologue());
+
+			// You'd assume that a query initialized via "new Query(prologue)"
+			// has the IRI resolver from prologue.getResolver(), but that doesn't
+			// appear to be the case in Jena 2.12.0, so we set it manually
+			query.getPrologue().setResolver(result.getPrologue().getResolver());
+			
 			result.addQuery(query);
 			parser.setQuery(query);
 			parser.Query();

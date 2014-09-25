@@ -22,36 +22,35 @@ import com.hp.hpl.jena.sparql.engine.binding.Binding;
 
 public class TarqlTest {
 
-	
 	//fixture
 	String csv;
 	
 	@Before
-	public void setUp(){
+	public void setUp() {
 		csv = null;
 	}
 	
 	private void assertSelect(TarqlQuery tq, Binding... bindings) throws IOException{
-		
 		TarqlQueryExecution ex;
-		if(csv != null){
-			ex = TarqlQueryExecutionFactory.create(new StringReader(csv), tq);
-		} else{
+		if (csv == null) {
 			ex = TarqlQueryExecutionFactory.create(tq);
+		} else {
+			ex = TarqlQueryExecutionFactory.create(tq, InputStreamSource.fromBytes(csv.getBytes("utf-8")), null);
 		}
 		ResultSet rs = ex.execSelect();
 		int counter = 0;
-		while(rs.hasNext()){
+		while (rs.hasNext()) {
 			assertEquals(bindings[counter], rs.nextBinding());
 			counter += 1;
 		}
 		assertEquals(bindings.length, counter);
 	}
 	
-	private void assertConstruct(TarqlQuery tq, String expectedTTL) throws IOException{
+	private void assertConstruct(TarqlQuery tq, String expectedTTL) throws IOException {
 		Model expected = ModelFactory.createDefaultModel().read(new StringReader(expectedTTL), null, "TURTLE");
-		TarqlQueryExecution ex = TarqlQueryExecutionFactory.create(new StringReader(csv), tq);
-		Model actual = ex.exec();
+		TarqlQueryExecution ex = TarqlQueryExecutionFactory.create(tq, InputStreamSource.fromBytes(csv.getBytes("utf-8")), null);
+		Model actual = ModelFactory.createDefaultModel();
+		ex.exec(actual);
 		assertTrue(actual.isIsomorphicWith(expected));
 	}
 	
@@ -168,6 +167,12 @@ public class TarqlTest {
 		assertSelect(tq, binding(vars("a"), "\"x\""));
 	}
 	
+	/**
+	 * This isn't quite legal. An IRI of the form "file:relative/path/to/file" is
+	 * not valid, even though it appears to work here. Jena correctly prints out
+	 * a warning. We leave the test here for now, but this is not really a good
+	 * idea. ("file:///absolute/path/to/file" is fine, as is "relative/path/to/file".) 
+	 */
 	@Test
 	public void testFROMisRelativeToMappingLocation2() throws IOException {
 		String file = "src/test/resources/mappings/simple-with-base.sparql";

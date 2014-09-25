@@ -1,7 +1,6 @@
 package org.deri.tarql;
 
 import java.io.IOException;
-import java.io.Reader;
 import java.util.Iterator;
 
 import com.hp.hpl.jena.graph.Triple;
@@ -16,23 +15,38 @@ import com.hp.hpl.jena.sparql.core.Var;
 import com.hp.hpl.jena.sparql.syntax.Element;
 import com.hp.hpl.jena.sparql.syntax.ElementData;
 import com.hp.hpl.jena.sparql.syntax.ElementGroup;
+import com.hp.hpl.jena.util.iterator.ExtendedIterator;
+import com.hp.hpl.jena.util.iterator.NullIterator;
 
+/**
+ * The execution of a {@link TarqlQuery} over a particular CSV file.
+ * Results can be delivered written into a {@link Model} or as an
+ * iterator over triples.
+ */
 public class TarqlQueryExecution {
+	private final CSVTable table;
+	private final TarqlQuery tq;
 
-	private CSVTable table;
-	private TarqlQuery tq;
-	
-	public TarqlQueryExecution(CSVTable table, TarqlQuery query) {
-		this.table = table;
-		this.tq = query;
+	/**
+	 * Sets up a new query execution.
+	 * 
+	 * @param source The input CSV file
+	 * @param options Configuration options for the CSV file
+	 * @param query The input query
+	 */
+	public TarqlQueryExecution(InputStreamSource source, CSVOptions options, TarqlQuery query) {
+		if (options == null) {
+			options = new CSVOptions();
+		}
+		if (options.hasColumnNamesInFirstRow() == null) {
+			// Override the flag in csvFile
+			options = new CSVOptions(options);
+			options.setColumnNamesInFirstRow(modifyQueryForColumnHeaders(query.getQueries().get(0)));
+		}
+		table = new CSVTable(source, options);
+		tq = query;
 	}
 
-	public TarqlQueryExecution(Reader reader, TarqlQuery query) throws IOException {
-		boolean useColumnHeadersAsVars = modifyQueryForColumnHeaders(query.getQueries().get(0));
-		this.table = new CSVTable(reader, useColumnHeadersAsVars);
-		this.tq = query;
-	}
-	
 	/**
 	 * Detects whether column headers should be used as variable names
 	 * (indicated in the query by use of OFFSET 1), and modify the query
@@ -55,8 +69,13 @@ public class TarqlQueryExecution {
 	 * @param query Original query; will be modified in place
 	 * @param table Data table to be added into the query
 	 */
-	private void modifyQuery(Query query, Table table) {
-		ElementData tableElement = new MyTableElement(table);
+	private void modifyQuery(Query query, final Table table) {
+		ElementData tableElement = new ElementData() {
+			@Override
+			public Table getTable() {
+				return table;
+			}
+		};
 		for (Var var: table.getVars()) {
 			// Skip ?ROWNUM for "SELECT *" queries -- see further below
 			if (query.isSelectType() && query.isQueryResultStar() 
@@ -94,34 +113,30 @@ public class TarqlQueryExecution {
 		}*/
 	}
 
-	public Model exec() throws IOException {
-		Model model = ModelFactory.createDefaultModel();
-		for(Query q:tq.getQueries()){
+	public void exec(Model model) throws IOException {
+		for (Query q: tq.getQueries()) {
 			modifyQuery(q, table);
 			QueryExecution ex = QueryExecutionFactory.create(q, model);
 			ex.execConstruct(model);
-			table.reset();
 		}
-		return model;
 	}
 
-	public Iterator<Triple> streamExec() throws IOException {
-		if(tq.getQueries().size() > 1){
-			throw new UnsupportedOperationException("Streaming results is only supported on a single query. Input Tarql query has " + tq.getQueries().size());
-		}
+	public Iterator<Triple> execTriples() throws IOException {
 		Model model = ModelFactory.createDefaultModel();
-		Query q = tq.getQueries().get(0);
-		modifyQuery(q, table);
-		QueryExecution ex = QueryExecutionFactory.create(q, model);
-		return ex.execConstructTriples();
+		ExtendedIterator<Triple> result = new NullIterator<Triple>();
+		for (Query q: tq.getQueries()) {
+			modifyQuery(q, table);
+			QueryExecution ex = QueryExecutionFactory.create(q, model);
+			result = result.andThen(ex.execConstructTriples());
+		}
+		return result;
 	}
 	
 	public ResultSet execSelect() {
 		//TODO check only first query. right?
-		Model model = ModelFactory.createDefaultModel();
-		Query q = tq.getQueries().get(0);
+		Query q = getFirstQuery();
 		modifyQuery(q, table);
-		QueryExecution ex = QueryExecutionFactory.create(q, model);
+		QueryExecution ex = QueryExecutionFactory.create(q, ModelFactory.createDefaultModel());
 		return ex.execSelect();
 	}
 
@@ -129,21 +144,7 @@ public class TarqlQueryExecution {
 		return tq.getQueries().get(0);
 	}
 	
-	public void close(){
+	public void close() {
 		table.close();
 	}
-}
-
-class MyTableElement extends ElementData{
-
-	private final Table table;
-	
-	public MyTableElement(Table t) {
-		this.table = t;
-	}
-	@Override
-	public Table getTable() {
-		return table;
-	}
-	
 }

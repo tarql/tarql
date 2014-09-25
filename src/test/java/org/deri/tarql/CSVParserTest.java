@@ -16,16 +16,16 @@ import org.junit.Test;
 import com.hp.hpl.jena.sparql.core.Var;
 import com.hp.hpl.jena.sparql.engine.binding.Binding;
 
-public class CSVToValuesTest {
+public class CSVParserTest {
 
 	@Test
 	public void testColumnName() {
-		assertEquals("a", CSVToValues.getColumnName(0));
-		assertEquals("b", CSVToValues.getColumnName(1));
-		assertEquals("c", CSVToValues.getColumnName(2));
-		assertEquals("z", CSVToValues.getColumnName(25));
-		assertEquals("aa", CSVToValues.getColumnName(26));
-		assertEquals("ab", CSVToValues.getColumnName(27));
+		assertEquals("a", CSVParser.getColumnName(0));
+		assertEquals("b", CSVParser.getColumnName(1));
+		assertEquals("c", CSVParser.getColumnName(2));
+		assertEquals("z", CSVParser.getColumnName(25));
+		assertEquals("aa", CSVParser.getColumnName(26));
+		assertEquals("ab", CSVParser.getColumnName(27));
 	}
 	
 	@Test
@@ -44,7 +44,7 @@ public class CSVToValuesTest {
 	@Test
 	public void testUnbound() throws IOException {
 		String csv = "1\n1,1";
-		Binding binding = readCSV(csv, false).rows().next();
+		Binding binding = readCSV(csv, false).next();
 		assertEquals(null, binding.get(Var.alloc("b")));
 	}
 
@@ -52,7 +52,7 @@ public class CSVToValuesTest {
 	@Test
 	public void testNoEmptyStrings() throws IOException {
 		String csv = ",1";
-		assertEquals(null, readCSV(csv, false).rows().next().get(Var.alloc("a")));
+		assertEquals(null, readCSV(csv, false).next().get(Var.alloc("a")));
 	}
 	
 	@Test
@@ -66,7 +66,7 @@ public class CSVToValuesTest {
 		String csv = "X,Y\n1,2";
 		assertEquals(1, countRows(csv, true));
 		assertEquals(vars("X", "Y"), getNonPseudoVars(csv, true));
-		assertEquals(binding(vars("X", "Y"), "\"1\"", "\"2\""), removePseudoVars(readCSV(csv,true).rows().next()));
+		assertEquals(binding(vars("X", "Y"), "\"1\"", "\"2\""), removePseudoVars(readCSV(csv,true).next()));
 	}
 	
 	@Test
@@ -123,14 +123,14 @@ public class CSVToValuesTest {
 		assertEquals(vars("a", "b", "ROWNUM"), readCSV(csv, true).getVars());
 	}
 	
-	private static CSVTable readCSV(String csv, boolean varsFromHeader) throws IOException {
-		return new CSVTable(new StringReader(csv), varsFromHeader);
+	private static CSVParser readCSV(String csv, boolean varsFromHeader) throws IOException {
+		return new CSVParser(new StringReader(csv), varsFromHeader);
 	}
 	
 	private static long countRows(String csv, boolean varsFromHeader) throws IOException {
-		Iterator<Binding> table =  readCSV(csv, varsFromHeader).rows();
+		Iterator<Binding> table = readCSV(csv, varsFromHeader);
 		long count = 0;
-		while(table.hasNext()){
+		while(table.hasNext()) {
 			table.next();
 			count +=1;
 		}
@@ -138,12 +138,10 @@ public class CSVToValuesTest {
 	}
 	
 	private static List<Var> getNonPseudoVars(String csv, boolean varsFromHeader) throws IOException {
-		CSVTable table =  readCSV(csv, varsFromHeader);
-		Iterator<Binding> bindings = table.rows();
-		while(bindings.hasNext()){
-			bindings.next();
+		CSVParser table = readCSV(csv, varsFromHeader);
+		while(table.hasNext()) {
+			table.next();
 		}
-		
 		List<Var> result = new ArrayList<Var>(table.getVars());
 		result.remove(TarqlQuery.ROWNUM);
 		return result;

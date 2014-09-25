@@ -1,7 +1,6 @@
 package org.deri.tarql;
 
 import java.io.IOException;
-import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,15 +9,18 @@ import org.apache.jena.atlas.io.IndentedWriter;
 import arq.cmdline.ArgDecl;
 import arq.cmdline.CmdGeneral;
 
+import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.query.ResultSetFormatter;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.shared.NotFoundException;
 import com.hp.hpl.jena.sparql.serializer.FmtTemplate;
 import com.hp.hpl.jena.sparql.serializer.SerializationContext;
 import com.hp.hpl.jena.sparql.util.Utils;
-import com.hp.hpl.jena.util.FileManager;
+import com.hp.hpl.jena.util.iterator.ExtendedIterator;
+import com.hp.hpl.jena.util.iterator.NullIterator;
 
+/**
+ * The <code>tarql</code> CLI command.
+ */
 public class tarql extends CmdGeneral {
 
 	public static void main(String... args) {
@@ -28,13 +30,17 @@ public class tarql extends CmdGeneral {
 	private final ArgDecl testQueryArg = new ArgDecl(false, "test");
 	private final ArgDecl withHeaderArg = new ArgDecl(false, "header");
 	private final ArgDecl withoutHeaderArg = new ArgDecl(false, "no-header");
+	private final ArgDecl encodingArg = new ArgDecl(true, "encoding", "e");
+	private final ArgDecl nTriplesArg = new ArgDecl(false, "ntriples");
 	
 	private String queryFile;
 	private List<String> csvFiles = new ArrayList<String>();
 	private boolean withHeader = false;
 	private boolean withoutHeader = false;
 	private boolean testQuery = false;
-	private Model resultModel = ModelFactory.createDefaultModel();
+	private String encoding = null;
+	private boolean writeNTriples = false;
+	private ExtendedIterator<Triple> resultTripleIterator = NullIterator.instance();
 	
 	public tarql(String[] args) {
 		super(args);
@@ -42,6 +48,8 @@ public class tarql extends CmdGeneral {
 		add(testQueryArg, "--test", "Show CONSTRUCT template and first rows only (for query debugging)");
 		add(withHeaderArg, "--header", "Force use of first row as variable names");
 		add(withoutHeaderArg, "--no-header", "Force default variable names (?a, ?b, ...)");
+		add(encodingArg, "--encoding", "Override CSV file encoding (e.g., utf-8 or latin-1)");
+		add(nTriplesArg, "--ntriples", "Write N-Triples instead of Turtle");
 		getUsage().startCategory("Main arguments");
 		getUsage().addUsage("query.sparql", "File containing a SPARQL query to be applied to a CSV file");
 		getUsage().addUsage("table.csv", "CSV file to be processed; can be omitted if specified in FROM clause");
@@ -81,6 +89,12 @@ public class tarql extends CmdGeneral {
 		if (hasArg(testQueryArg)) {
 			testQuery = true;
 		}
+		if (hasArg(encodingArg)) {
+			encoding = getValue(encodingArg);
+		}
+		if (hasArg(nTriplesArg)) {
+			writeNTriples = true;
+		}
 	}
 
 	@Override
@@ -90,42 +104,40 @@ public class tarql extends CmdGeneral {
 			if (testQuery) {
 				q.makeTest();
 			}
+			CSVOptions options = new CSVOptions();
+			// Are column names in first row of CSV file?
+			// Default: let factory decide after looking at the query
+			if (withHeader || withoutHeader) {
+				options.setColumnNamesInFirstRow(withHeader);
+			}
+			if (encoding != null) {
+				options.setEncoding(encoding);
+			}
 			if (csvFiles.isEmpty()) {
-				executeQuery(q);
+				processResults(TarqlQueryExecutionFactory.create(q, options));
 			} else {
 				for (String csvFile: csvFiles) {
-					if (withHeader || withoutHeader) {
-						Reader reader = TarqlQueryExecutionFactory.createReader(csvFile, FileManager.get());
-						CSVTable table = new CSVTable(reader, withHeader);
-						executeQuery(table, q);
-					} else {
-						// Let factory decide after looking at the query
-						executeQuery(csvFile, q);
-					}
+					InputStreamSource source = InputStreamSource.fromFilenameOrIRI(csvFile);
+					processResults(TarqlQueryExecutionFactory.create(q, source, options));
 				}
 			}
-			if (!resultModel.isEmpty()) {
-				resultModel.write(System.out, "TURTLE", q.getPrologue().getBaseURI());
+			if (resultTripleIterator.hasNext()) {
+				StreamingRDFWriter writer = new StreamingRDFWriter(System.out, resultTripleIterator);
+				if (writeNTriples) {
+					writer.writeNTriples();
+				} else {
+					writer.writeTurtle(
+							q.getPrologue().getBaseURI(),
+							q.getPrologue().getPrefixMapping());
+				}
 			}
 		} catch (NotFoundException ex) {
 			cmdError("Not found: " + ex.getMessage());
-		} catch(IOException ioe){
+		} catch (IOException ioe) {
 			cmdError("IOException: " + ioe.getMessage());
 		}
 	}
 
-	private void executeQuery(TarqlQuery query) throws IOException {
-		processResults(TarqlQueryExecutionFactory.create(query));
-	}
-	
-	private void executeQuery(CSVTable table, TarqlQuery query) throws IOException {
-		processResults(TarqlQueryExecutionFactory.create(table, query));
-	}
-	
-	private void executeQuery(String csvFile, TarqlQuery query) throws IOException {
-		processResults(TarqlQueryExecutionFactory.create(csvFile, query));
-	}
-	
 	private void processResults(TarqlQueryExecution ex) throws IOException {
 		if (testQuery && ex.getFirstQuery().getConstructTemplate() != null) {
 			IndentedWriter out = new IndentedWriter(System.out); 
@@ -137,8 +149,7 @@ public class tarql extends CmdGeneral {
 		} else if (ex.getFirstQuery().isAskType()) {
 			System.out.println(ResultSetFormatter.asText(ex.execSelect()));
 		} else if (ex.getFirstQuery().isConstructType()) {
-			resultModel.setNsPrefixes(resultModel);
-			resultModel = ex.exec();
+			resultTripleIterator = resultTripleIterator.andThen(ex.execTriples());
 		} else {
 			cmdError("Only query forms CONSTRUCT, SELECT and ASK are supported");
 		}

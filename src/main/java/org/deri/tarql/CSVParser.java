@@ -3,7 +3,6 @@ package org.deri.tarql;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import au.com.bytecode.opencsv.CSVReader;
@@ -13,8 +12,18 @@ import com.hp.hpl.jena.graph.NodeFactory;
 import com.hp.hpl.jena.sparql.core.Var;
 import com.hp.hpl.jena.sparql.engine.binding.Binding;
 import com.hp.hpl.jena.sparql.engine.binding.BindingHashMap;
+import com.hp.hpl.jena.util.iterator.ClosableIterator;
 
-public class CSVToValues implements Iterator<Binding> {
+/**
+ * Parses a CSV file presented as a {@link Reader}, and delivers
+ * results as an iterator of {@link Binding}s. Also provides
+ * access to the variable names (which may come from row 1 or
+ * could be auto-generated).
+ * <p>
+ * Adds a <code>ROWNUM</code> column with the number of the
+ * row.
+ */
+public class CSVParser implements ClosableIterator<Binding> {
 
 	public static String getColumnName(int i) {
 		String var = "";
@@ -42,7 +51,7 @@ public class CSVToValues implements Iterator<Binding> {
 	 *            If true, use values of first row as column names
 	 * @throws IOException
 	 */
-	public CSVToValues(Reader reader, boolean varsFromHeader)
+	public CSVParser(Reader reader, boolean varsFromHeader)
 			throws IOException {
 		this.varsFromHeader = varsFromHeader;
 		this.reader = reader;
@@ -142,8 +151,13 @@ public class CSVToValues implements Iterator<Binding> {
 				"Remove is not supported. It is a read-only iterator");
 	}
 
-	public void close() throws IOException {
-		csv.close();
+	@Override
+	public void close() {
+		try {
+			csv.close();
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 	public List<Var> getVars() {
@@ -152,12 +166,7 @@ public class CSVToValues implements Iterator<Binding> {
 		return varsWithRowNum;
 	}
 	
-	public void reset() throws IOException{
-		reader.reset();
-		init();
-	}
-	
-	private void init() throws IOException{
+	private void init() throws IOException {
 		String[] row;
 		csv = new CSVReader(reader);
 		if (varsFromHeader) {
