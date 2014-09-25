@@ -7,6 +7,10 @@ import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.sparql.core.Prologue;
 import com.hp.hpl.jena.sparql.core.Var;
 
+/**
+ * A Tarql mapping. Conceptually, this is one or more SPARQL queries
+ * with a shared prologue (prefixes and base declarations).
+ */
 public class TarqlQuery {
 	public final static Var ROWNUM = Var.alloc("ROWNUM");
 	

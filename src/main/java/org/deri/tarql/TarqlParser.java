@@ -5,11 +5,11 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 
-import org.openjena.atlas.logging.Log;
+import org.apache.jena.atlas.logging.Log;
+import org.apache.jena.riot.system.IRIResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.hp.hpl.jena.n3.IRIResolver;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryException;
 import com.hp.hpl.jena.query.QueryParseException;
@@ -20,6 +20,9 @@ import com.hp.hpl.jena.sparql.lang.sparql_11.ParseException;
 import com.hp.hpl.jena.sparql.lang.sparql_11.SPARQLParser11;
 import com.hp.hpl.jena.util.FileManager;
 
+/**
+ * Parses a {@link TarqlQuery} provided as a string or reader.
+ */
 public class TarqlParser {
 	private final static Logger log = LoggerFactory.getLogger(TarqlParser.class);
 	
@@ -38,7 +41,7 @@ public class TarqlParser {
 	
 	public TarqlParser(Reader reader, String baseIRI) {
 		this.reader = reader;
-		result.getPrologue().setResolver(new IRIResolver(baseIRI));
+		result.getPrologue().setResolver(IRIResolver.create(baseIRI));
 	}
 	
 	private static Reader open(String filenameOrURL) {
@@ -63,6 +66,12 @@ public class TarqlParser {
 			int beginColumn = parser.getToken(1).beginColumn;
 
 			Query query = new Query(result.getPrologue());
+
+			// You'd assume that a query initialized via "new Query(prologue)"
+			// has the IRI resolver from prologue.getResolver(), but that doesn't
+			// appear to be the case in Jena 2.12.0, so we set it manually
+			query.getPrologue().setResolver(result.getPrologue().getResolver());
+			
 			result.addQuery(query);
 			parser.setQuery(query);
 			parser.Query();

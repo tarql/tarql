@@ -8,7 +8,7 @@ import java.util.List;
 import com.hp.hpl.jena.sparql.core.Var;
 import com.hp.hpl.jena.sparql.engine.binding.Binding;
 import com.hp.hpl.jena.sparql.engine.binding.BindingHashMap;
-import com.hp.hpl.jena.sparql.util.NodeFactory;
+import com.hp.hpl.jena.sparql.util.NodeFactoryExtra;
 
 public class Helpers {
 
@@ -40,7 +40,7 @@ public class Helpers {
 		}
 		BindingHashMap result = new BindingHashMap();
 		for (int i = 0; i < header.size(); i++) {
-			result.add(header.get(i), NodeFactory.parseNode(values[i]));
+			result.add(header.get(i), NodeFactoryExtra.parseNode(values[i]));
 		}
 		return result;
 	}
