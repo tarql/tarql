@@ -94,6 +94,12 @@ public class CSVParserTest {
 	}
 	
 	@Test
+	public void testHandleDashesInColumnNames() throws IOException {
+		String csv = "Total-Value\n123";
+		assertEquals(vars("Total_Value"), getNonPseudoVars(csv, true));
+	}
+	
+	@Test
 	public void testDuplicateColumnName() throws IOException {
 		String csv = "X,X\n1,2";
 		assertEquals(vars("X", "b"), getNonPseudoVars(csv, true));
