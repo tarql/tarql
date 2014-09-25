@@ -139,6 +139,12 @@ Note that using OFFSET 1 we could not start by a specific offset, and we have to
     }
     ...
 
+### Count the number of triples from a csv file
+
+    SELECT (COUNT(*) AS ?count)
+    FROM <file.csv>
+    WHERE {}
+    OFFSET 1
 
 ## Building
 
