@@ -134,9 +134,67 @@ public class CSVParserTest {
 		String csv = "x,,y";
 		assertEquals(vars("a", "b", "c"), getNonPseudoVars(csv, false));
 	}
+
+	@Test
+	public void testTabSeparated() throws IOException {
+		String csv = "foo\tbar\n1\t2";
+		List<Var> vars = vars("foo", "bar");
+		assertEquals(binding(vars, "\"1\"", "\"2\""), removePseudoVars(readCSV(csv, true, '\t', '"').next()));
+	}
+	
+	@Test
+	public void testSemicolonSeparated() throws IOException {
+		String csv = "foo;bar\n1,5;2,0";
+		assertEquals(binding(vars("foo", "bar"), "\"1,5\"", "\"2,0\""), 
+				removePseudoVars(readCSV(csv, true, ';', '"').next()));
+	}
+
+	@Test
+	public void testStandardQuotes() throws IOException {
+		String csv = "Value\n\"This, too\"";
+		assertEquals(binding(vars("Value"), "\"This, too\""), 
+				removePseudoVars(readCSV(csv, true).next()));
+	}
+	
+	@Test
+	public void testSingleQuotes() throws IOException {
+		String csv = "Value\n\'This, too\'";
+		assertEquals(binding(vars("Value"), "\"This, too\""), 
+				removePseudoVars(readCSV(csv, true, ',', '\'').next()));
+	}
+	
+	@Test
+	public void testQuoteDoubling() throws IOException {
+		String csv = "Value\nJoseph \"\"Joe\"\" Smith";
+		assertEquals(binding(vars("Value"), "\"Joseph \\\"Joe\\\" Smith\""), 
+				removePseudoVars(readCSV(csv, true).next()));
+	}
+	
+	@Test
+	public void testEscapingQuoteWithBackslash() throws IOException {
+		String csv = "Value\n\"Joseph \\\"Joe\\\" Smith\"";
+		assertEquals(binding(vars("Value"), "\"Joseph \\\"Joe\\\" Smith\""), 
+				removePseudoVars(readCSV(csv, true, '\\').next()));
+	}
+
+	/* OpenCSV only uses the escape character for quotes, not for delimiters */
+	//@Test
+	public void testEscapingDelimiterWithBackslash() throws IOException {
+		String csv = "Value\nThis\\, too";
+		assertEquals(binding(vars("Value"), "\"This, too\""), 
+				removePseudoVars(readCSV(csv, true, '\\').next()));
+	}
 	
 	private static CSVParser readCSV(String csv, boolean varsFromHeader) throws IOException {
-		return new CSVParser(new StringReader(csv), varsFromHeader);
+		return new CSVParser(new StringReader(csv), varsFromHeader, null, null, null);
+	}
+	
+	private static CSVParser readCSV(String csv, boolean varsFromHeader, char delimiter, char quote) throws IOException {
+		return new CSVParser(new StringReader(csv), varsFromHeader, delimiter, quote, null);
+	}
+	
+	private static CSVParser readCSV(String csv, boolean varsFromHeader, char escape) throws IOException {
+		return new CSVParser(new StringReader(csv), varsFromHeader, null, null, escape);
 	}
 	
 	private static long countRows(String csv, boolean varsFromHeader) throws IOException {

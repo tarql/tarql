@@ -87,6 +87,9 @@ public class CSVOptions {
 	
 	private String encoding = null;
 	private Boolean columnNamesInFirstRow = null;
+	private Character delimiter = null;
+	private Character quote = null;
+	private Character escape = null;
 
 	/**
 	 * Creates a new instance with default values.
@@ -150,12 +153,36 @@ public class CSVOptions {
 	}
 	
 	/**
+	 * Sets the delimiter between entries. <code>null</code> means unknown.
+	 */
+	public void setDelimiter(Character delimiter) {
+		this.delimiter = delimiter;
+	}
+	
+	/**
+	 * Sets the quote character used in the file. <code>null</code> means unknown.
+	 */
+	public void setQuote(Character quote) {
+		this.quote = quote;
+	}
+	
+	/**
+	 * Sets the escape character used in the file to escape quotes.
+	 * <code>null</code> means no escape character, and quotes inside quoted
+	 * values are escaped as two quote characters.
+	 */
+	public void setEscape(Character escape) {
+		this.escape = escape;
+	}
+	
+	/**
 	 * Creates a new {@link CSVParser} for a given {@link InputStreamSource}
 	 * with the options of this instance.
 	 */
 	public CSVParser openParserFor(InputStreamSource source) throws IOException {
 		return new CSVParser(openReaderFor(source), 
-				columnNamesInFirstRow == null ? false : columnNamesInFirstRow);
+				columnNamesInFirstRow == null ? false : columnNamesInFirstRow,
+				delimiter, quote, escape);
 	}
 	
 	/**

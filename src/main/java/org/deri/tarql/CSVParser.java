@@ -36,8 +36,11 @@ public class CSVParser implements ClosableIterator<Binding> {
 
 	private final static String alphabet = "abcdefghijklmnopqrstuvwxyz";
 
-	private Reader reader;
-	private boolean varsFromHeader;
+	private final Reader reader;
+	private final boolean varsFromHeader;
+	private final char delimiter;
+	private final char quote;
+	private final Character escape;
 	private final List<Var> vars = new ArrayList<Var>();
 	private int rownum;
 
@@ -49,12 +52,21 @@ public class CSVParser implements ClosableIterator<Binding> {
 	 *            Reader over the contents of a CSV file
 	 * @param varsFromHeader
 	 *            If true, use values of first row as column names
+	 * @param delimiter
+	 *            The delimiter character to use for separating entries (e.g., ',' or ';' or '\t'), or <code>null</code> for default
+	 * @param quote
+	 *            The quote character used to quote values (typically double or single quote), or <code>null</code> for default
+	 * @param escape
+	 *            The escape character for quotes and delimiters, or <code>null</code> for none 
 	 * @throws IOException
 	 */
-	public CSVParser(Reader reader, boolean varsFromHeader)
+	public CSVParser(Reader reader, boolean varsFromHeader, Character delimiter, Character quote, Character escape)
 			throws IOException {
-		this.varsFromHeader = varsFromHeader;
 		this.reader = reader;
+		this.varsFromHeader = varsFromHeader;
+		this.delimiter = delimiter == null ? ',' : delimiter;
+		this.quote = quote == null ? '"' : quote;
+		this.escape = escape;
 		init();
 	}
 
@@ -168,7 +180,9 @@ public class CSVParser implements ClosableIterator<Binding> {
 	
 	private void init() throws IOException {
 		String[] row;
-		csv = new CSVReader(reader);
+		csv = escape == null
+				? new CSVReader(reader, delimiter, quote)
+				: new CSVReader(reader, delimiter, quote, escape);
 		if (varsFromHeader) {
 			while ((row = csv.readNext()) != null) {
 				boolean foundValidColumnName = false;

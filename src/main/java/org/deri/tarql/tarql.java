@@ -33,6 +33,10 @@ public class tarql extends CmdGeneral {
 	private final ArgDecl withoutHeaderArg = new ArgDecl(false, "no-header");
 	private final ArgDecl encodingArg = new ArgDecl(true, "encoding", "e");
 	private final ArgDecl nTriplesArg = new ArgDecl(false, "ntriples");
+	private final ArgDecl delimiterArg = new ArgDecl(true, "delimiter", "d");
+	private final ArgDecl tabsArg = new ArgDecl(false, "tabs", "t");
+	private final ArgDecl quoteArg = new ArgDecl(true, "quotechar");
+	private final ArgDecl escapeArg = new ArgDecl(true, "escapechar", "p");
 	
 	private String queryFile;
 	private List<String> csvFiles = new ArrayList<String>();
@@ -41,16 +45,24 @@ public class tarql extends CmdGeneral {
 	private boolean testQuery = false;
 	private String encoding = null;
 	private boolean writeNTriples = false;
+	private Character delimiter = null;
+	private Character quote = null;
+	private Character escape = null;
+
 	private ExtendedIterator<Triple> resultTripleIterator = NullIterator.instance();
 	
 	public tarql(String[] args) {
 		super(args);
 		getUsage().startCategory("Options");
-		add(testQueryArg, "--test", "Show CONSTRUCT template and first rows only (for query debugging)");
-		add(withHeaderArg, "--header", "Force use of first row as variable names");
+		add(testQueryArg,     "--test", "Show CONSTRUCT template and first rows only (for query debugging)");
+		add(delimiterArg,     "-d   --delimiter", "Delimiting character of the CSV file");
+		add(tabsArg,          "-t   --tabs", "Specifies that the input is tab-separagted (TSV), overriding -d");
+		add(quoteArg,         "--quotechar", "Quote character used in the CSV file");
+		add(escapeArg,        "-p   --escapechar", "Character used to escape quotes in the CSV file");
+		add(encodingArg,      "-e   --encoding", "Override CSV file encoding (e.g., utf-8 or latin-1)");
+		add(withHeaderArg,    "--header", "Force use of first row as variable names");
 		add(withoutHeaderArg, "--no-header", "Force default variable names (?a, ?b, ...)");
-		add(encodingArg, "-e   --encoding", "Override CSV file encoding (e.g., utf-8 or latin-1)");
-		add(nTriplesArg, "--ntriples", "Write N-Triples instead of Turtle");
+		add(nTriplesArg,      "--ntriples", "Write N-Triples instead of Turtle");
 		getUsage().startCategory("Main arguments");
 		getUsage().addUsage("query.sparql", "File containing a SPARQL query to be applied to a CSV file");
 		getUsage().addUsage("table.csv", "CSV file to be processed; can be omitted if specified in FROM clause");
@@ -63,7 +75,7 @@ public class tarql extends CmdGeneral {
 	
 	@Override
 	protected String getSummary() {
-		return getCommandName() + " query.sparql [table.csv [...]]";
+		return getCommandName() + " [options] query.sparql [table.csv [...]]";
 	}
 
 	@Override
@@ -96,6 +108,30 @@ public class tarql extends CmdGeneral {
 		if (hasArg(nTriplesArg)) {
 			writeNTriples = true;
 		}
+		if (hasArg(delimiterArg)) {
+			String d = getValue(delimiterArg);
+			if (d == null || d.length() != 1) {
+				cmdError("Value of --delimiter must be a single character");
+			}
+			delimiter = d.charAt(0);
+		}
+		if (hasArg(tabsArg)) {
+			delimiter = '\t';
+		}
+		if (hasArg(quoteArg)) {
+			String q = getValue(quoteArg);
+			if (q == null || q.length() != 1) {
+				cmdError("Value of --quotechar must be a single character");
+			}
+			quote = q.charAt(0);
+		}
+		if (hasArg(escapeArg)) {
+			String e = getValue(escapeArg);
+			if (e == null || e.length() != 1) {
+				cmdError("Value of --escapechar must be a single character");
+			}
+			escape = e.charAt(0);
+		}
 	}
 
 	@Override
@@ -113,6 +149,15 @@ public class tarql extends CmdGeneral {
 			}
 			if (encoding != null) {
 				options.setEncoding(encoding);
+			}
+			if (delimiter != null) {
+				options.setDelimiter(delimiter);
+			}
+			if (quote != null) {
+				options.setQuote(quote);
+			}
+			if (escape != null) {
+				options.setEscape(escape);
 			}
 			if (csvFiles.isEmpty()) {
 				processResults(TarqlQueryExecutionFactory.create(q, options));

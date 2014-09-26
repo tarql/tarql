@@ -42,15 +42,19 @@ For Unix, the executable script is `bin/tarql`. For Windows, `bin\tarql.bat`. Ex
 Full options:
 
 ```
-tarql query.sparql [table.csv [...]]
+tarql [options] query.sparql [table.csv [...]]
   Main arguments
       query.sparql           File containing a SPARQL query to be applied to a CSV file
       table.csv              CSV file to be processed; can be omitted if specified in FROM clause
   Options
       --test                 Show CONSTRUCT template and first rows only (for query debugging)
+      -d   --delimiter       Delimiting character of the CSV file
+      -t   --tabs            Specifies that the input is tab-separagted (TSV), overriding -d
+      --quotechar            Quote character used in the CSV file
+      -p   --escapechar      Character used to escape quotes in the CSV file
+      -e   --encoding        Override CSV file encoding (e.g., utf-8 or latin-1)
       --header               Force use of first row as variable names
       --no-header            Force default variable names (?a, ?b, ...)
-      -e   --encoding        Override CSV file encoding (e.g., utf-8 or latin-1)
       --ntriples             Write N-Triples instead of Turtle
   General
       -v   --verbose         Verbose
