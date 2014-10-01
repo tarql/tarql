@@ -35,9 +35,10 @@ For Unix, the executable script is `bin/tarql`. For Windows, `bin\tarql.bat`. Ex
 
 * `tarql --help` to show full command line help
 * `tarql my_mapping.sparql input1.csv input2.csv` to translate two CSV files using the same mapping
-* `tarql --header  my_mapping.sparql input1.csv` to force use of column headers as variable names
+* `tarql --no-header-row my_mapping.sparql input1.csv` if CSV file doesn't have column headers; variables will be called `?a`, `?b`, etc.
 * `tarql my_mapping.sparql` to translate a CSV file defined in SPARQL `FROM` clause
 * `tarql --test my_mapping.sparql` to show only the CONSTRUCT template, variable names, and a few input rows (useful for CONSTRUCT query development)`
+* `tarql --tabs my_mapping.sparql input.tsv` to read a tab-separated (TSV) file
 
 Full options:
 
