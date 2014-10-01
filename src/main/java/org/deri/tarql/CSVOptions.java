@@ -3,6 +3,10 @@ package org.deri.tarql;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Configuration options for describing a CSV file. Also provides
@@ -42,10 +46,26 @@ public class CSVOptions {
 				if ("present".equals(value)) {
 					result.setColumnNamesInFirstRow(true);
 					continue;
-				} else if ("absent".equals(value)) {
+				}
+				if ("absent".equals(value)) {
 					result.setColumnNamesInFirstRow(false);
 					continue;
 				}
+			}
+			if (part.startsWith(delimiterKey)) {
+				Character c = parseChar(part.substring(delimiterKey.length()));
+				if (c == null) continue;
+				result.setDelimiter(c);
+			}
+			if (part.startsWith(quoteCharKey)) {
+				Character c = parseChar(part.substring(quoteCharKey.length()));
+				if (c == null) continue;
+				result.setQuoteChar(c);
+			}
+			if (part.startsWith(escapeCharKey)) {
+				Character c = parseChar(part.substring(escapeCharKey.length()));
+				if (c == null) continue;
+				result.setEscapeChar(c);
 			}
 			if (hasHash) {
 				remainingIRI.append(";");
@@ -60,7 +80,39 @@ public class CSVOptions {
 	private final static String encodingKey = "encoding=";
 	private final static String charsetKey = "charset=";
 	private final static String headerKey = "header=";
+	private final static String delimiterKey = "delimiter=";
+	private final static String quoteCharKey = "quotechar=";
+	private final static String escapeCharKey = "escapechar=";
+	@SuppressWarnings("serial")
+	private final static Map<String, Character> charNames = new HashMap<String, Character>() {{
+		put("tab", '\t');
+		put("comma", ',');
+		put("semicolon", ';');
+		put("singlequote", '\'');
+		put("doublequote", '"');
+		put("backslash", '\\');
+	}};
 
+	/**
+	 * Interprets argument as a character. Can be a literal single-character
+	 * string, or a %-encoded character (e.g., %09 for tab), or one of the
+	 * pre-defined named characters such as "tab", "backslash", etc.
+	 */
+	private static Character parseChar(String value) {
+		if (charNames.containsKey(value.toLowerCase())) {
+			return charNames.get(value.toLowerCase());
+		}
+		try {
+			value = URLDecoder.decode(value, "utf-8");
+			if (value.length() == 1) {
+				return value.charAt(0);
+			}
+		} catch (UnsupportedEncodingException ex) {
+			// Can't happen, UTF-8 always supported
+		}
+		return null;
+	}
+	
 	/**
 	 * Helper class for the result of parseIRI(iri)
 	 */
@@ -115,6 +167,15 @@ public class CSVOptions {
 		if (other.columnNamesInFirstRow != null) {
 			this.columnNamesInFirstRow = other.columnNamesInFirstRow;
 		}
+		if (other.delimiter != null) {
+			this.delimiter = other.delimiter;
+		}
+		if (other.quote != null) {
+			this.quote = other.quote;
+		}
+		if (other.escape != null) {
+			this.escape = other.escape;
+		}
 	}
 	
 	/**
@@ -160,10 +221,24 @@ public class CSVOptions {
 	}
 	
 	/**
+	 * Gets the delimiter between entries. <code>null</code> means unknown.
+	 */
+	public Character getDelimiter() {
+		return delimiter;
+	}
+	
+	/**
 	 * Sets the quote character used in the file. <code>null</code> means unknown.
 	 */
-	public void setQuote(Character quote) {
+	public void setQuoteChar(Character quote) {
 		this.quote = quote;
+	}
+	
+	/**
+	 * Gets the quote character used in the file. <code>null</code> means unknown.
+	 */
+	public Character getQuoteChar() {
+		return quote;
 	}
 	
 	/**
@@ -171,8 +246,17 @@ public class CSVOptions {
 	 * <code>null</code> means no escape character, and quotes inside quoted
 	 * values are escaped as two quote characters.
 	 */
-	public void setEscape(Character escape) {
+	public void setEscapeChar(Character escape) {
 		this.escape = escape;
+	}
+	
+	/**
+	 * Gets the escape character used in the file to escape quotes.
+	 * <code>null</code> means no escape character, and quotes inside quoted
+	 * values are escaped as two quote characters.
+	 */
+	public Character getEscapeChar() {
+		return escape;
 	}
 	
 	/**

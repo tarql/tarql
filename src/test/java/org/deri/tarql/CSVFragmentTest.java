@@ -91,4 +91,36 @@ public class CSVFragmentTest {
 		assertEquals("utf-8", parsed.getOptions().getEncoding());
 		assertEquals(false, parsed.getOptions().hasColumnNamesInFirstRow());
 	}
+	
+	@Test
+	public void testExtractDelimiter() {
+		assertNull(CSVOptions.parseIRI("file.csv").getOptions().getDelimiter());
+		assertEquals(',', CSVOptions.parseIRI("file.csv#delimiter=,").getOptions().getDelimiter().charValue());
+		assertEquals(',', CSVOptions.parseIRI("file.csv#delimiter=comma").getOptions().getDelimiter().charValue());
+		assertEquals(';', CSVOptions.parseIRI("file.csv#delimiter=semicolon").getOptions().getDelimiter().charValue());
+		assertEquals('\t', CSVOptions.parseIRI("file.csv#delimiter=tab").getOptions().getDelimiter().charValue());
+		assertEquals(' ', CSVOptions.parseIRI("file.csv#delimiter=%20").getOptions().getDelimiter().charValue());
+		assertEquals(';', CSVOptions.parseIRI("file.csv#delimiter=%3B").getOptions().getDelimiter().charValue());
+		assertEquals(',', CSVOptions.parseIRI("file.csv#delimiter=%2C").getOptions().getDelimiter().charValue());
+		assertEquals('\t', CSVOptions.parseIRI("file.csv#delimiter=%09").getOptions().getDelimiter().charValue());
+		assertNull(CSVOptions.parseIRI("file.csv#delimiter=foo").getOptions().getDelimiter());
+	}
+	
+	@Test
+	public void testExtractQuoteChar() {
+		assertNull(CSVOptions.parseIRI("file.csv").getOptions().getQuoteChar());
+		assertEquals('"', CSVOptions.parseIRI("file.csv#quotechar=%22").getOptions().getQuoteChar().charValue());
+		assertEquals('"', CSVOptions.parseIRI("file.csv#quotechar=doublequote").getOptions().getQuoteChar().charValue());
+		assertEquals('\'', CSVOptions.parseIRI("file.csv#quotechar=%27").getOptions().getQuoteChar().charValue());
+		assertEquals('\'', CSVOptions.parseIRI("file.csv#quotechar=singlequote").getOptions().getQuoteChar().charValue());
+		assertNull(CSVOptions.parseIRI("file.csv#quotechar=foo").getOptions().getDelimiter());
+	}
+	
+	@Test
+	public void testExtractEscapeChar() {
+		assertNull(CSVOptions.parseIRI("file.csv").getOptions().getEscapeChar());
+		assertEquals('\\', CSVOptions.parseIRI("file.csv#escapechar=%5C").getOptions().getEscapeChar().charValue());
+		assertEquals('\\', CSVOptions.parseIRI("file.csv#escapechar=backslash").getOptions().getEscapeChar().charValue());
+		assertNull(CSVOptions.parseIRI("file.csv#escapechar=foo").getOptions().getEscapeChar());
+	}
 }

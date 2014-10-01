@@ -154,10 +154,10 @@ public class tarql extends CmdGeneral {
 				options.setDelimiter(delimiter);
 			}
 			if (quote != null) {
-				options.setQuote(quote);
+				options.setQuoteChar(quote);
 			}
 			if (escape != null) {
-				options.setEscape(escape);
+				options.setEscapeChar(escape);
 			}
 			if (csvFiles.isEmpty()) {
 				processResults(TarqlQueryExecutionFactory.create(q, options));
