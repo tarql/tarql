@@ -272,7 +272,7 @@ public class CSVOptions {
 	 */
 	public CSVParser openParserFor(InputStreamSource source) throws IOException {
 		return new CSVParser(openReaderFor(source), 
-				columnNamesInFirstRow == null ? false : columnNamesInFirstRow,
+				columnNamesInFirstRow == null ? true : columnNamesInFirstRow,
 				delimiter, quote, escape);
 	}
 	

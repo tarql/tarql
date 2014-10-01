@@ -39,7 +39,9 @@ public class CSVTableTest {
 	
 	@Test
 	public void testSimpleTable() throws IOException {
-		CSVTable table = new CSVTable(InputStreamSource.fromString("Alice,Smith\nBob,Cook"));
+		CSVOptions options = new CSVOptions();
+		options.setColumnNamesInFirstRow(false);
+		CSVTable table = new CSVTable(InputStreamSource.fromString("Alice,Smith\nBob,Cook"), options);
 		assertFalse(table.isEmpty());
 		assertEquals(2, table.size());
 		List<Var> vars = vars("a", "b", "ROWNUM");
@@ -51,7 +53,9 @@ public class CSVTableTest {
 	
 	@Test
 	public void testMultipleParallelIterators() throws IOException {
-		CSVTable table = new CSVTable(InputStreamSource.fromString("Alice,Smith\nBob,Cook"));
+		CSVOptions options = new CSVOptions();
+		options.setColumnNamesInFirstRow(false);
+		CSVTable table = new CSVTable(InputStreamSource.fromString("Alice,Smith\nBob,Cook"), options);
 		List<Var> vars = vars("a", "b", "ROWNUM");
 		Binding row1 = binding(vars, "\"Alice\"", "\"Smith\"", "1");
 		Binding row2 = binding(vars, "\"Bob\"", "\"Cook\"", "2");

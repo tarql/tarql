@@ -39,28 +39,22 @@ public class TarqlQueryExecution {
 			options = new CSVOptions();
 		}
 		if (options.hasColumnNamesInFirstRow() == null) {
-			// Override the flag in csvFile
+			// Presence or absence of header row was not specified on command line or FROM clause.
+			// So we fall back to the convention where OFFSET 1 in the query
+			// indicates that a header is present. To make that work, we
+			// set the OFFSET to 0 and tell the parser to gobble up the first
+			// row for column names.
 			options = new CSVOptions(options);
-			options.setColumnNamesInFirstRow(modifyQueryForColumnHeaders(query.getQueries().get(0)));
+			Query firstQuery = query.getQueries().get(0);
+			if (firstQuery.getOffset() == 1) {
+				options.setColumnNamesInFirstRow(true);
+				firstQuery.setOffset(0);
+			}
 		}
 		table = new CSVTable(source, options);
 		tq = query;
 	}
 
-	/**
-	 * Detects whether column headers should be used as variable names
-	 * (indicated in the query by use of OFFSET 1), and modify the query
-	 * to make it work (setting OFFSET to 0, because the CSV reader will
-	 * already remove the header row from the data)
-	 * @param query Query to be analyzed and modified
-	 * @return True if header row is to be used for variable names
-	 */
-	private boolean modifyQueryForColumnHeaders(Query query) {
-		if (query.getOffset() != 1) return false;
-		query.setOffset(0);
-		return true;
-	}
-	
 	/**
 	 * Modifies a query so that it operates onto a table. This is achieved
 	 * by appending the table as a VALUES block to the end of the main

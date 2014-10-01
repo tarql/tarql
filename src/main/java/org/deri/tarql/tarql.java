@@ -29,8 +29,8 @@ public class tarql extends CmdGeneral {
 	}
 
 	private final ArgDecl testQueryArg = new ArgDecl(false, "test");
-	private final ArgDecl withHeaderArg = new ArgDecl(false, "header");
-	private final ArgDecl withoutHeaderArg = new ArgDecl(false, "no-header");
+	private final ArgDecl withHeaderArg = new ArgDecl(false, "header-row", "header");
+	private final ArgDecl withoutHeaderArg = new ArgDecl(false, "no-header-row", "no-header", "H");
 	private final ArgDecl encodingArg = new ArgDecl(true, "encoding", "e");
 	private final ArgDecl nTriplesArg = new ArgDecl(false, "ntriples");
 	private final ArgDecl delimiterArg = new ArgDecl(true, "delimiter", "d");
@@ -40,8 +40,7 @@ public class tarql extends CmdGeneral {
 	
 	private String queryFile;
 	private List<String> csvFiles = new ArrayList<String>();
-	private boolean withHeader = false;
-	private boolean withoutHeader = false;
+	private Boolean header = null;
 	private boolean testQuery = false;
 	private String encoding = null;
 	private boolean writeNTriples = false;
@@ -60,8 +59,8 @@ public class tarql extends CmdGeneral {
 		add(quoteArg,         "--quotechar", "Quote character used in the CSV file");
 		add(escapeArg,        "-p   --escapechar", "Character used to escape quotes in the CSV file");
 		add(encodingArg,      "-e   --encoding", "Override CSV file encoding (e.g., utf-8 or latin-1)");
-		add(withHeaderArg,    "--header", "Force use of first row as variable names");
-		add(withoutHeaderArg, "--no-header", "Force default variable names (?a, ?b, ...)");
+		add(withoutHeaderArg, "-H   --no-header-row", "CSV file has no header row; use variable names ?a, ?b, ...");
+		add(withHeaderArg,    "--header-row", "CSV file's first row is a header with variable names (default)");
 		add(nTriplesArg,      "--ntriples", "Write N-Triples instead of Turtle");
 		getUsage().startCategory("Main arguments");
 		getUsage().addUsage("query.sparql", "File containing a SPARQL query to be applied to a CSV file");
@@ -88,16 +87,10 @@ public class tarql extends CmdGeneral {
 			csvFiles.add(getPositionalArg(i));
 		}
 		if (hasArg(withHeaderArg)) {
-			if (csvFiles.isEmpty()) {
-				cmdError("Cannot use --header if no input data file specified");
-			}
-			withHeader = true;
+			header = true;
 		}
 		if (hasArg(withoutHeaderArg)) {
-			if (csvFiles.isEmpty()) {
-				cmdError("Cannot use --no-header if no input data file specified");
-			}
-			withoutHeader = true;
+			header = false;
 		}
 		if (hasArg(testQueryArg)) {
 			testQuery = true;
@@ -142,10 +135,8 @@ public class tarql extends CmdGeneral {
 				q.makeTest();
 			}
 			CSVOptions options = new CSVOptions();
-			// Are column names in first row of CSV file?
-			// Default: let factory decide after looking at the query
-			if (withHeader || withoutHeader) {
-				options.setColumnNamesInFirstRow(withHeader);
+			if (header != null) {
+				options.setColumnNamesInFirstRow(header);
 			}
 			if (encoding != null) {
 				options.setEncoding(encoding);

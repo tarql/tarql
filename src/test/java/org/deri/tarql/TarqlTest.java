@@ -23,23 +23,29 @@ import com.hp.hpl.jena.sparql.engine.binding.Binding;
 public class TarqlTest {
 
 	//fixture
-	String csv;
+	private String csv;
+	private CSVOptions options;
 	
 	@Before
 	public void setUp() {
 		csv = null;
+		options = new CSVOptions();
+		options.setColumnNamesInFirstRow(false);
 	}
 	
 	private void assertSelect(TarqlQuery tq, Binding... bindings) throws IOException{
 		TarqlQueryExecution ex;
 		if (csv == null) {
-			ex = TarqlQueryExecutionFactory.create(tq);
+			ex = TarqlQueryExecutionFactory.create(tq, options);
 		} else {
-			ex = TarqlQueryExecutionFactory.create(tq, InputStreamSource.fromBytes(csv.getBytes("utf-8")), null);
+			ex = TarqlQueryExecutionFactory.create(tq, InputStreamSource.fromBytes(csv.getBytes("utf-8")), options);
 		}
 		ResultSet rs = ex.execSelect();
 		int counter = 0;
 		while (rs.hasNext()) {
+			if (counter >= bindings.length) {
+				fail("Too many bindings in result; expected " + bindings.length);
+			}
 			assertEquals(bindings[counter], rs.nextBinding());
 			counter += 1;
 		}
@@ -48,7 +54,7 @@ public class TarqlTest {
 	
 	private void assertConstruct(TarqlQuery tq, String expectedTTL) throws IOException {
 		Model expected = ModelFactory.createDefaultModel().read(new StringReader(expectedTTL), null, "TURTLE");
-		TarqlQueryExecution ex = TarqlQueryExecutionFactory.create(tq, InputStreamSource.fromBytes(csv.getBytes("utf-8")), null);
+		TarqlQueryExecution ex = TarqlQueryExecutionFactory.create(tq, InputStreamSource.fromBytes(csv.getBytes("utf-8")), options);
 		Model actual = ModelFactory.createDefaultModel();
 		ex.exec(actual);
 		assertTrue(actual.isIsomorphicWith(expected));
@@ -65,6 +71,7 @@ public class TarqlTest {
 	
 	@Test
 	public void testSkipFirstRows() throws IOException {
+		options = new CSVOptions();
 		csv = "First,Last\nAlice,Smith\nBob,Cook";
 		String query = "SELECT * {} OFFSET 1";
 		TarqlQuery tq =  new TarqlParser(new StringReader(query), null).getResult();
@@ -140,11 +147,23 @@ public class TarqlTest {
 	}
 	
 	@Test
-	public void testVarNamesFromHeaders() throws IOException {
+	public void testVarNamesFromHeadersViaOFFSET() throws IOException {
+		options = new CSVOptions();
 		csv = "First,Last\nAlice,Smith";
 		String query = "SELECT * {} OFFSET 1";
 		TarqlQuery tq =  new TarqlParser(new StringReader(query), null).getResult();
 		List<Var> vars = vars("First", "Last");
+		assertSelect(tq, binding(vars, "\"Alice\"", "\"Smith\""));
+	}
+	
+	@Test
+	public void testVarNamesFromHeadersViaOFFSETCanBeOverridden() throws IOException {
+		options = new CSVOptions();
+		options.setColumnNamesInFirstRow(false);
+		csv = "First,Last\nAlice,Smith";
+		String query = "SELECT * {} OFFSET 1";
+		TarqlQuery tq =  new TarqlParser(new StringReader(query), null).getResult();
+		List<Var> vars = vars("a", "b");
 		assertSelect(tq, binding(vars, "\"Alice\"", "\"Smith\""));
 	}
 	
@@ -182,6 +201,7 @@ public class TarqlTest {
 	
 	@Test
 	public void testROWNUM() throws IOException {
+		options = new CSVOptions();
 		csv = "First,Last\nAlice,Smith\nBob,Miller";
 		String query = "SELECT ?ROWNUM ?First ?Last {} OFFSET 1";
 		TarqlQuery tq =  new TarqlParser(new StringReader(query), null).getResult();
@@ -191,6 +211,7 @@ public class TarqlTest {
 	
 	@Test
 	public void testAvoidNameClashWithROWNUM() throws IOException {
+		options = new CSVOptions();
 		csv = "ROWNUM\nfoo";
 		String query = "SELECT ?ROWNUM ?a {} OFFSET 1";
 		TarqlQuery tq =  new TarqlParser(new StringReader(query), null).getResult();
@@ -199,6 +220,7 @@ public class TarqlTest {
 	
 	@Test
 	public void testOptionsInURLFragmentInFROMClause() throws IOException {
+		options = new CSVOptions();
 		String query1 = "SELECT * FROM <src/test/resources/simple.csv#header=absent> {}";
 		TarqlQuery tq1 = new TarqlParser(new StringReader(query1)).getResult();
 		assertSelect(tq1, binding(vars("a"), "\"x\""));
