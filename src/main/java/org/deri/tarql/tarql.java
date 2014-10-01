@@ -1,8 +1,11 @@
 package org.deri.tarql;
 
 import java.io.IOException;
+import java.net.JarURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.jar.Manifest;
 
 import org.apache.jena.atlas.io.IndentedWriter;
 import org.deri.tarql.CSVOptions.ParseResult;
@@ -24,6 +27,24 @@ import com.hp.hpl.jena.util.iterator.NullIterator;
  */
 public class tarql extends CmdGeneral {
 
+	// This will be displayed by --version
+	public static final String VERSION;
+	public static final String BUILD_DATE;
+	static {
+		String version = "Unknown";
+		String date = "Unknown";
+		try {
+			URL res = tarql.class.getResource(tarql.class.getSimpleName() + ".class");
+			Manifest mf = ((JarURLConnection) res.openConnection()).getManifest();
+			version = (String) mf.getMainAttributes().getValue("Implementation-Version");
+			date = (String) mf.getMainAttributes().getValue("Built-Date")
+					.replaceFirst("(\\d\\d\\d\\d)(\\d\\d)(\\d\\d)-(\\d\\d)(\\d\\d)", "$1-$2-$3T$4:$5:00Z");
+	    } catch (Exception ex) {
+		}
+		VERSION = version;
+		BUILD_DATE = date;
+	}
+	
 	public static void main(String... args) {
 		new tarql(args).mainRun();
 	}
@@ -65,6 +86,7 @@ public class tarql extends CmdGeneral {
 		getUsage().startCategory("Main arguments");
 		getUsage().addUsage("query.sparql", "File containing a SPARQL query to be applied to a CSV file");
 		getUsage().addUsage("table.csv", "CSV file to be processed; can be omitted if specified in FROM clause");
+		modVersion.addClass(tarql.class);
 	}
 	
 	@Override
