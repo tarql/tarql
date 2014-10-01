@@ -54,18 +54,24 @@ public class CSVOptions {
 			}
 			if (part.startsWith(delimiterKey)) {
 				Character c = parseChar(part.substring(delimiterKey.length()));
-				if (c == null) continue;
-				result.setDelimiter(c);
+				if (c != null) {
+					result.setDelimiter(c);
+					continue;
+				}
 			}
 			if (part.startsWith(quoteCharKey)) {
 				Character c = parseChar(part.substring(quoteCharKey.length()));
-				if (c == null) continue;
-				result.setQuoteChar(c);
+				if (c != null) {
+					result.setQuoteChar(c);
+					continue;
+				}
 			}
 			if (part.startsWith(escapeCharKey)) {
 				Character c = parseChar(part.substring(escapeCharKey.length()));
-				if (c == null) continue;
-				result.setEscapeChar(c);
+				if (c != null) {
+					result.setEscapeChar(c);
+					continue;
+				}
 			}
 			if (hasHash) {
 				remainingIRI.append(";");
@@ -86,6 +92,7 @@ public class CSVOptions {
 	@SuppressWarnings("serial")
 	private final static Map<String, Character> charNames = new HashMap<String, Character>() {{
 		put("tab", '\t');
+		put("tabs", '\t');
 		put("comma", ',');
 		put("semicolon", ';');
 		put("singlequote", '\'');

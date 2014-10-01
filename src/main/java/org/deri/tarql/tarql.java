@@ -34,7 +34,7 @@ public class tarql extends CmdGeneral {
 	private final ArgDecl encodingArg = new ArgDecl(true, "encoding", "e");
 	private final ArgDecl nTriplesArg = new ArgDecl(false, "ntriples");
 	private final ArgDecl delimiterArg = new ArgDecl(true, "delimiter", "d");
-	private final ArgDecl tabsArg = new ArgDecl(false, "tabs", "t");
+	private final ArgDecl tabsArg = new ArgDecl(false, "tabs", "tab", "t");
 	private final ArgDecl quoteArg = new ArgDecl(true, "quotechar");
 	private final ArgDecl escapeArg = new ArgDecl(true, "escapechar", "p");
 	
