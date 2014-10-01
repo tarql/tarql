@@ -196,4 +196,14 @@ public class TarqlTest {
 		TarqlQuery tq =  new TarqlParser(new StringReader(query), null).getResult();
 		assertSelect(tq, binding(vars("ROWNUM", "a"), "1", "\"foo\""));
 	}
+	
+	@Test
+	public void testOptionsInURLFragmentInFROMClause() throws IOException {
+		String query1 = "SELECT * FROM <src/test/resources/simple.csv#header=absent> {}";
+		TarqlQuery tq1 = new TarqlParser(new StringReader(query1)).getResult();
+		assertSelect(tq1, binding(vars("a"), "\"x\""));
+		String query2 = "SELECT * FROM <src/test/resources/simple.csv#header=present> {}";
+		TarqlQuery tq2 = new TarqlParser(new StringReader(query2)).getResult();
+		assertSelect(tq2);
+	}
 }

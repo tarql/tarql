@@ -2,6 +2,8 @@ package org.deri.tarql;
 
 import java.io.IOException;
 
+import org.deri.tarql.CSVOptions.ParseResult;
+
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.shared.JenaException;
 import com.hp.hpl.jena.util.FileManager;
@@ -21,12 +23,16 @@ public class TarqlQueryExecutionFactory {
 
 	public static TarqlQueryExecution create(TarqlQuery query, FileManager fm) throws IOException {
 		String filenameOrURL = getSingleFromClause(query.getQueries().get(0), fm);
-		return create(query, InputStreamSource.fromFilenameOrIRI(filenameOrURL, fm), new CSVOptions());
+		ParseResult parseResult = CSVOptions.parseIRI(filenameOrURL);
+		return create(query, InputStreamSource.fromFilenameOrIRI(parseResult.getRemainingIRI(), fm), parseResult.getOptions());
 	}
 
 	public static TarqlQueryExecution create(TarqlQuery query, FileManager fm, CSVOptions options) throws IOException {
 		String filenameOrURL = getSingleFromClause(query.getQueries().get(0), fm);
-		return create(query, InputStreamSource.fromFilenameOrIRI(filenameOrURL, fm), options);
+		ParseResult parseResult = CSVOptions.parseIRI(filenameOrURL);
+		CSVOptions newOptions = new CSVOptions(parseResult.getOptions());
+		newOptions.overrideWith(options);
+		return create(query, InputStreamSource.fromFilenameOrIRI(parseResult.getRemainingIRI(), fm), newOptions);
 	}
 
 	public static TarqlQueryExecution create(TarqlQuery query, String filenameOrURL) throws IOException {

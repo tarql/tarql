@@ -64,11 +64,13 @@ tarql query.sparql [table.csv [...]]
 
 The **input CSV file** can be specified using `FROM` or on the command line. Use `FROM <file:filename.csv>` to load a file from the current directory.
 
-Tarql auto-detects the input CSV file's **encoding**. This is a guess and may fail sometimes.
+The **character encoding** can be specified using `-e` on the command line, or by appending `#encoding=xxx` to the CSV file's URL. If not explicitly stated, Tarql will attempt to auto-detect the encoding.
 
 **Variable names**: By default, variable `?a` will contain values from the first column, `?b` from the second, and so on.
 
 If the CSV file already has **column headings** in the first row, Tarql can be instructed to use the column headings as variable names by appending `OFFSET 1` to the SPARQL query. In standard SPARQL, this has the effect of skipping the first row. Tarql will take it as a sign to use the first row as variable names. In the variable names, spaces will be replaced with underscores. If any column doesn't contain a valid variable name, then the default name (`?a`, `?b`, etc.) will be used for the column.
+
+The `--header` and `--no-header` flags on the command line can also be used to specify whether the CSV file has a header row that should be used for variable names. It can also be done by appending `#header=present` or `#header=absent` to the CSV file's URL.
 
 All-empty rows are skipped automatically.
 
@@ -87,10 +89,16 @@ Tarql supports a magic `?ROWNUM` variable for accessing the number of the row wi
 ### Use column headings in first row as variable names
 
 	SELECT ?First_name ?Last_name ?Phone_number
+	FROM <file.csv#header=present>
+	WHERE { ... }
+
+Use this pattern if the input file is specified via a URL in the `FROM` clause. The `#header=present` part of the URL indicates that the first row contains variable names.
+
+	SELECT ?First_name ?Last_name ?Phone_number
 	WHERE { ... }
 	OFFSET 1
 
-The `OFFSET 1` indicates that the first row is to be used to provide variable names.
+Here, the `OFFSET 1` is a convention that indicates that the first row is to be used to provide variable names, and not as data.
 
 ### List the content of the file, projecting the first 100 rows and only the ?id and ?name bindings
 
@@ -146,6 +154,13 @@ Note that using OFFSET 1 we could not start by a specific offset, and we have to
     WHERE {}
     OFFSET 1
 
+### Provide CSV file encoding and header information in the URL 
+
+    CONSTRUCT { ... }
+    FROM <file.csv#encoding=utf-8;header=present>
+
+This is equivalent to using `<file.csv>` in the `FROM` clause and specifying `--header` and `--encoding` on the command line.
+
 ## Building
 
 Get the code from GitHub: http://github.com/cygri/tarql
@@ -161,7 +176,6 @@ Otherwise it's standard Maven.
 
 * Set base URI from command line
 * Choice of output format, writing to file, etc.
-* Extract and document a proper API with TarqlQuery, TarqlExecution, etc.
 * Allow feeding of triples from RDF files into the mapping process
 * Experiment with input files in TSV, different quoting styles, etc.
 * Optionally generate VoID/PROV triples

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.jena.atlas.io.IndentedWriter;
+import org.deri.tarql.CSVOptions.ParseResult;
 
 import arq.cmdline.ArgDecl;
 import arq.cmdline.CmdGeneral;
@@ -117,8 +118,10 @@ public class tarql extends CmdGeneral {
 				processResults(TarqlQueryExecutionFactory.create(q, options));
 			} else {
 				for (String csvFile: csvFiles) {
-					InputStreamSource source = InputStreamSource.fromFilenameOrIRI(csvFile);
-					processResults(TarqlQueryExecutionFactory.create(q, source, options));
+					ParseResult parseResult = CSVOptions.parseIRI(csvFile);
+					processResults(TarqlQueryExecutionFactory.create(q, 
+							InputStreamSource.fromFilenameOrIRI(parseResult.getRemainingIRI()), 
+							parseResult.getOptions(options)));
 				}
 			}
 			if (resultTripleIterator.hasNext()) {
