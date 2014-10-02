@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.jar.Manifest;
 
 import org.apache.jena.atlas.io.IndentedWriter;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.deri.tarql.CSVOptions.ParseResult;
 
 import arq.cmdline.ArgDecl;
@@ -151,6 +153,7 @@ public class tarql extends CmdGeneral {
 
 	@Override
 	protected void exec() {
+		initLogging();
 		try {
 			TarqlQuery q = new TarqlParser(queryFile).getResult();
 			if (testQuery) {
@@ -213,6 +216,19 @@ public class tarql extends CmdGeneral {
 			resultTripleIterator = resultTripleIterator.andThen(ex.execTriples());
 		} else {
 			cmdError("Only query forms CONSTRUCT, SELECT and ASK are supported");
+		}
+	}
+	
+	// Not sure if this really works...
+	private void initLogging() {
+		if (isQuiet()) {
+			Logger.getRootLogger().setLevel(Level.ERROR);
+		}
+		if (isVerbose()) {
+			Logger.getLogger("org.deri.tarql").setLevel(Level.INFO);
+		}
+		if (isDebug()) {
+			Logger.getLogger("org.deri.tarql").setLevel(Level.DEBUG);
 		}
 	}
 }
