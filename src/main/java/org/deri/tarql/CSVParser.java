@@ -73,7 +73,7 @@ public class CSVParser implements ClosableIterator<Binding> {
 	private Var toVar(String s) {
 		if (s == null)
 			return null;
-		s = s.trim().replace(" ", "_").replace("-", "_");
+		s = s.trim().replace(" ", "_").replace("-", "_").replace("?", "_");
 		if ("".equals(s))
 			return null;
 		// FIXME: Handle other characters not allowed in Vars

@@ -98,6 +98,11 @@ public class CSVParserTest {
 		String csv = "Total-Value\n123";
 		assertEquals(vars("Total_Value"), getNonPseudoVars(csv, true));
 	}
+	@Test
+	public void testHandleQuestionMarkInColumnNames() throws IOException {
+		String csv = "Is-Estimated?\nYes";
+		assertEquals(vars("Is_Estimated_"), getNonPseudoVars(csv, true));
+	}
 	
 	@Test
 	public void testDuplicateColumnName() throws IOException {
