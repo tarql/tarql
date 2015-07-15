@@ -16,9 +16,8 @@ public class ParseDateTest {
     @Test
     public void parseDate() throws ParseException {
         String strDate = "1-May-07";
-        SimpleDateFormat format = new SimpleDateFormat("d-MMM-yy");
-        Date dateStr = format.parse(strDate);
-        // System.out.println(dateStr);
+        SimpleDateFormat format = new SimpleDateFormat("d-MMM-yy Z");
+        Date dateStr = format.parse(strDate + " IST");
         // should return Tue May 01 00:00:00 IST 2007
         assertEquals("Tue May 01 00:00:00 IST 2007", dateStr.toString());
 
