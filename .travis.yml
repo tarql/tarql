@@ -1,0 +1,4 @@
+language: java
+script: "mvn verify -P fast -DskipTests"
+jdk:
+  - oraclejdk7
