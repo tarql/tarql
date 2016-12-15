@@ -12,9 +12,6 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.deri.tarql.CSVOptions.ParseResult;
 
-import arq.cmdline.ArgDecl;
-import arq.cmdline.CmdGeneral;
-
 import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.query.ResultSetFormatter;
 import com.hp.hpl.jena.shared.NotFoundException;
@@ -24,6 +21,9 @@ import com.hp.hpl.jena.sparql.util.Utils;
 import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 import com.hp.hpl.jena.util.iterator.NullIterator;
 
+import arq.cmdline.ArgDecl;
+import arq.cmdline.CmdGeneral;
+
 /**
  * The <code>tarql</code> CLI command.
  */
@@ -32,6 +32,9 @@ public class tarql extends CmdGeneral {
 	// This will be displayed by --version
 	public static final String VERSION;
 	public static final String BUILD_DATE;
+	
+	public static final String NS = "http://tarql.github.io/tarql#";
+	
 	static {
 		String version = "Unknown";
 		String date = "Unknown";
@@ -45,6 +48,8 @@ public class tarql extends CmdGeneral {
 		}
 		VERSION = version;
 		BUILD_DATE = date;
+		
+		TarqlQuery.registerFunctions();
 	}
 	
 	public static void main(String... args) {

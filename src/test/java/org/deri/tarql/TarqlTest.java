@@ -228,4 +228,26 @@ public class TarqlTest {
 		TarqlQuery tq2 = new TarqlParser(new StringReader(query2)).getResult();
 		assertSelect(tq2);
 	}
+	
+	@Test
+	public void testExpandPrefixFunctionSimple() throws IOException {
+		csv = "x";
+		String query = 
+				"SELECT ?ns { BIND (tarql:expandPrefix('tarql') AS ?ns) }";
+				TarqlQuery tq =  new TarqlParser(new StringReader(query), null).getResult();
+				List<Var> vars = vars("ns");
+				assertSelect(tq, binding(vars, "\"" + tarql.NS + "\""));
+	}
+	
+	@Test
+	public void testExpandPrefixFunction() throws IOException {
+		csv = "ex:foo\naaa:bbb";
+		String query = 
+				"PREFIX ex: <http://example.com/>\n" +
+				"PREFIX aaa: <http://aaa.example.com/>\n" +
+				"SELECT ?uri { BIND (URI(CONCAT(tarql:expandPrefix(STRBEFORE(?a, ':')), STRAFTER(?a, ':'))) AS ?uri) }";
+				TarqlQuery tq =  new TarqlParser(new StringReader(query), null).getResult();
+				List<Var> vars = vars("uri");
+				assertSelect(tq, binding(vars, "<http://example.com/foo>"), binding(vars, "<http://aaa.example.com/bbb>"));
+	}
 }

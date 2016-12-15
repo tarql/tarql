@@ -15,6 +15,8 @@ import com.hp.hpl.jena.query.QueryException;
 import com.hp.hpl.jena.query.QueryParseException;
 import com.hp.hpl.jena.shared.JenaException;
 import com.hp.hpl.jena.shared.NotFoundException;
+import com.hp.hpl.jena.shared.PrefixMapping;
+import com.hp.hpl.jena.shared.impl.PrefixMappingImpl;
 import com.hp.hpl.jena.sparql.lang.SyntaxVarScope;
 import com.hp.hpl.jena.sparql.lang.sparql_11.ParseException;
 import com.hp.hpl.jena.sparql.lang.sparql_11.SPARQLParser11;
@@ -42,6 +44,7 @@ public class TarqlParser {
 	public TarqlParser(Reader reader, String baseIRI) {
 		this.reader = reader;
 		result.getPrologue().setResolver(IRIResolver.create(baseIRI));
+		addTarqlPrefix();
 	}
 	
 	private static Reader open(String filenameOrURL) {
@@ -71,7 +74,7 @@ public class TarqlParser {
 			// has the IRI resolver from prologue.getResolver(), but that doesn't
 			// appear to be the case in Jena 2.12.0, so we set it manually
 			query.getPrologue().setResolver(result.getPrologue().getResolver());
-			
+
 			result.addQuery(query);
 			parser.setQuery(query);
 			parser.Query();
@@ -93,6 +96,7 @@ public class TarqlParser {
 				log.debug(query.toString());
 			}
 		} while (parser.getToken(1).kind != SPARQLParser11.EOF);
+		removeTarqlPrefix();
 	}
 
 	// Adapted from ARQ ParserSPARQL11.java
@@ -121,6 +125,21 @@ public class TarqlParser {
 		} catch (Throwable th) {
 			Log.warn(TarqlParser.class, "Unexpected throwable: ",th);
 			throw new QueryException(th.getMessage(), th);
+		}
+	}
+	
+	private void addTarqlPrefix() {
+		if (result.getPrologue().getPrefix("tarql") == null) {
+			result.getPrologue().getPrefixMapping().setNsPrefix("tarql", tarql.NS);
+		}
+	}
+	
+	private void removeTarqlPrefix() {
+		if (tarql.NS.equals(result.getPrologue().getPrefix("tarql"))) {
+			PrefixMapping prefixes = new PrefixMappingImpl();
+			prefixes.setNsPrefixes(result.getPrologue().getPrefixMapping());
+			prefixes.removeNsPrefix("tarql");
+			result.getPrologue().setPrefixMapping(prefixes);
 		}
 	}
 }

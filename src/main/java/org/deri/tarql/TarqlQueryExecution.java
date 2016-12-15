@@ -3,6 +3,8 @@ package org.deri.tarql;
 import java.io.IOException;
 import java.util.Iterator;
 
+import org.deri.tarql.functions.ExpandPrefixFunction;
+
 import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
@@ -10,6 +12,7 @@ import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.shared.impl.PrefixMappingImpl;
 import com.hp.hpl.jena.sparql.algebra.Table;
 import com.hp.hpl.jena.sparql.core.Var;
 import com.hp.hpl.jena.sparql.syntax.Element;
@@ -107,10 +110,19 @@ public class TarqlQueryExecution {
 		}*/
 	}
 
+	private QueryExecution createQueryExecution(Query query, Model model) {
+		QueryExecution result = QueryExecutionFactory.create(query, model);
+		PrefixMappingImpl prefixes = new PrefixMappingImpl();
+		prefixes.setNsPrefixes(tq.getPrologue().getPrefixMapping());
+		prefixes.setNsPrefix("tarql", tarql.NS);
+		result.getContext().set(ExpandPrefixFunction.PREFIX_MAPPING, prefixes);
+		return result;
+	}
+	
 	public void exec(Model model) throws IOException {
 		for (Query q: tq.getQueries()) {
 			modifyQuery(q, table);
-			QueryExecution ex = QueryExecutionFactory.create(q, model);
+			QueryExecution ex = createQueryExecution(q, model);
 			ex.execConstruct(model);
 		}
 	}
@@ -120,7 +132,7 @@ public class TarqlQueryExecution {
 		ExtendedIterator<Triple> result = new NullIterator<Triple>();
 		for (Query q: tq.getQueries()) {
 			modifyQuery(q, table);
-			QueryExecution ex = QueryExecutionFactory.create(q, model);
+			QueryExecution ex = createQueryExecution(q, model);
 			result = result.andThen(ex.execConstructTriples());
 		}
 		return result;
@@ -130,7 +142,7 @@ public class TarqlQueryExecution {
 		//TODO check only first query. right?
 		Query q = getFirstQuery();
 		modifyQuery(q, table);
-		QueryExecution ex = QueryExecutionFactory.create(q, ModelFactory.createDefaultModel());
+		QueryExecution ex = createQueryExecution(q, ModelFactory.createDefaultModel());
 		return ex.execSelect();
 	}
 

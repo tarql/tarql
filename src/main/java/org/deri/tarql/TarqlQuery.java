@@ -3,15 +3,32 @@ package org.deri.tarql;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.deri.tarql.functions.ExpandPrefixFunction;
+import org.deri.tarql.functions.ExpandPrefixedNameFunction;
+
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.sparql.core.Prologue;
 import com.hp.hpl.jena.sparql.core.Var;
+import com.hp.hpl.jena.sparql.function.FunctionRegistry;
 
 /**
  * A Tarql mapping. Conceptually, this is one or more SPARQL queries
  * with a shared prologue (prefixes and base declarations).
  */
 public class TarqlQuery {
+
+	static {
+		registerFunctions();
+	}
+	
+	public static void registerFunctions() {
+		if (registered) return;
+		registered = true;
+		FunctionRegistry.get().put(ExpandPrefixFunction.IRI, ExpandPrefixFunction.class);
+		FunctionRegistry.get().put(ExpandPrefixedNameFunction.IRI, ExpandPrefixedNameFunction.class);
+	}
+	private static boolean registered = false;
+	
 	public final static Var ROWNUM = Var.alloc("ROWNUM");
 	
 	private  Prologue prologue = null;
