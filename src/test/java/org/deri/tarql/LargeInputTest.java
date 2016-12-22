@@ -136,7 +136,8 @@ public class LargeInputTest {
 		assertTrue(out.getBytesWritten() > lines * 100);
 	}
 	
-	@Ignore @Test public void testSmallInputWithRunawayQuote() {
+	@Ignore("This doesn't work with OpenCSV 3.8, but works with cygri's fork on GitHub")
+	@Test public void testSmallInputWithRunawayQuote() {
 		System.out.println("testInput5GBWithRunawayQuote");
 		final int lines = 20000;
 		String query = "SELECT * {}";
@@ -159,7 +160,8 @@ public class LargeInputTest {
 		}
 	}
 	
-	@Ignore @Test public void testInput5GBWithRunawayQuote() {
+	@Ignore("This doesn't work with OpenCSV 3.8, but works with cygri's fork on GitHub")
+	@Test public void testInput5GBWithRunawayQuote() {
 		System.out.println("testInput5GBWithRunawayQuote");
 		final int lines = 50000000;
 		String query = "SELECT * {}";
@@ -180,5 +182,15 @@ public class LargeInputTest {
 				throw ex;
 			}
 		}
+	}
+
+	@Ignore("This breaks streaming as of v1.1-SNAPSHOT")
+	@Test public void testDodgyVALUES() {
+		System.out.println("testInput5GB");
+		final int lines = 50000000;
+		String query = "SELECT * { VALUES ?undef { UNDEF } }";
+		ResultSet rs = prepare(query, new DummyContentSource(lines)).execSelect();
+		int results = consume(rs);
+		assertEquals(lines - 1, results);
 	}
 }
