@@ -10,15 +10,15 @@ import java.io.OutputStream;
 import java.io.StringReader;
 import java.util.Iterator;
 
+import org.apache.jena.graph.Triple;
+import org.apache.jena.query.ResultSet;
+import org.apache.jena.shared.PrefixMapping;
+import org.apache.jena.shared.impl.PrefixMappingImpl;
+import org.apache.jena.sparql.ARQException;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import com.hp.hpl.jena.graph.Triple;
-import com.hp.hpl.jena.query.ResultSet;
-import com.hp.hpl.jena.shared.PrefixMapping;
-import com.hp.hpl.jena.shared.impl.PrefixMappingImpl;
-import com.hp.hpl.jena.sparql.ARQException;
 
 /**
  * Test cases on large input. Not run as part of the normal

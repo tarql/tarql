@@ -2,11 +2,11 @@ package org.deri.tarql;
 
 import java.io.IOException;
 
+import org.apache.jena.query.Query;
+import org.apache.jena.shared.JenaException;
+import org.apache.jena.util.FileManager;
 import org.deri.tarql.CSVOptions.ParseResult;
 
-import com.hp.hpl.jena.query.Query;
-import com.hp.hpl.jena.shared.JenaException;
-import com.hp.hpl.jena.util.FileManager;
 
 /**
  * Static convenience methods for setting up TARQL query executions.

@@ -6,9 +6,9 @@ import static org.junit.Assert.fail;
 
 import java.io.StringReader;
 
+import org.apache.jena.query.QueryParseException;
 import org.junit.Test;
 
-import com.hp.hpl.jena.query.QueryParseException;
 
 public class TarqlParserTest {
 

@@ -5,13 +5,13 @@ import java.util.Iterator;
 import java.util.Map.Entry;
 
 import org.apache.jena.atlas.io.IndentedWriter;
+import org.apache.jena.graph.Triple;
+import org.apache.jena.riot.system.StreamOps;
 import org.apache.jena.riot.system.StreamRDF;
-import org.apache.jena.riot.system.StreamRDFLib;
 import org.apache.jena.riot.writer.WriterStreamRDFBlocks;
-import org.apache.jena.riot.writer.WriterStreamRDFTuples;
+import org.apache.jena.riot.writer.WriterStreamRDFPlain;
+import org.apache.jena.shared.PrefixMapping;
 
-import com.hp.hpl.jena.graph.Triple;
-import com.hp.hpl.jena.shared.PrefixMapping;
 
 /**
  * Writes an iterator over triples to N-Triples or Turtle
@@ -31,22 +31,22 @@ public class StreamingRDFWriter {
 		this.out = out;
 		this.triples = triples;
 	}
-	
+
 	public void writeNTriples() {
-		StreamRDF stream = new WriterStreamRDFTuples(new IndentedWriter(out));
-		stream.start();
-        StreamRDFLib.triplesToStream(stream, triples) ;
-        stream.finish();
+		StreamRDF writer = new WriterStreamRDFPlain(new IndentedWriter(out));
+		writer.start();
+		StreamOps.sendTriplesToStream(triples, writer);
+		writer.finish();
 	}
-	
+
 	public void writeTurtle(String baseIRI, PrefixMapping prefixes) {
 		WriterStreamRDFBlocks writer = new WriterStreamRDFBlocks(out);
 		writer.start();
-        writer.base(baseIRI);
-        for (Entry<String, String> e: prefixes.getNsPrefixMap().entrySet()) {
-            writer.prefix(e.getKey(), e.getValue()) ;
-        }
-        StreamRDFLib.triplesToStream(writer, triples) ;
-        writer.finish();
+		writer.base(baseIRI);
+		for (Entry<String, String> e : prefixes.getNsPrefixMap().entrySet()) {
+			writer.prefix(e.getKey(), e.getValue());
+		}
+		StreamOps.sendTriplesToStream(triples, writer);
+		writer.finish();
 	}
 }

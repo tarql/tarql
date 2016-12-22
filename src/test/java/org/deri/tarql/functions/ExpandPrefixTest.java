@@ -2,12 +2,12 @@ package org.deri.tarql.functions;
 
 import static org.junit.Assert.fail;
 
+import org.apache.jena.sparql.expr.ExprEvalException;
+import org.apache.jena.sparql.expr.VariableNotBoundException;
+import org.apache.jena.vocabulary.DC;
 import org.deri.tarql.tarql;
 import org.junit.Test;
 
-import com.hp.hpl.jena.sparql.expr.ExprEvalException;
-import com.hp.hpl.jena.sparql.expr.VariableNotBoundException;
-import com.hp.hpl.jena.vocabulary.DC;
 
 public class ExpandPrefixTest extends FunctionTest {
 	

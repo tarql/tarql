@@ -5,8 +5,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 
-import com.hp.hpl.jena.shared.NotFoundException;
-import com.hp.hpl.jena.util.FileManager;
+import org.apache.jena.shared.NotFoundException;
+import org.apache.jena.util.FileManager;
+
 
 /**
  * A source of {@link InputStream}s. Can be opened repeatedly

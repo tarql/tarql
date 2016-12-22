@@ -8,21 +8,22 @@ import java.util.List;
 import java.util.jar.Manifest;
 
 import org.apache.jena.atlas.io.IndentedWriter;
+import org.apache.jena.atlas.lib.Lib;
+import org.apache.jena.graph.Triple;
+import org.apache.jena.query.ResultSetFormatter;
+import org.apache.jena.shared.NotFoundException;
+import org.apache.jena.sparql.serializer.FmtTemplate;
+import org.apache.jena.sparql.serializer.SerializationContext;
+import org.apache.jena.util.iterator.ExtendedIterator;
+import org.apache.jena.util.iterator.NullIterator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.deri.tarql.CSVOptions.ParseResult;
 
-import com.hp.hpl.jena.graph.Triple;
-import com.hp.hpl.jena.query.ResultSetFormatter;
-import com.hp.hpl.jena.shared.NotFoundException;
-import com.hp.hpl.jena.sparql.serializer.FmtTemplate;
-import com.hp.hpl.jena.sparql.serializer.SerializationContext;
-import com.hp.hpl.jena.sparql.util.Utils;
-import com.hp.hpl.jena.util.iterator.ExtendedIterator;
-import com.hp.hpl.jena.util.iterator.NullIterator;
+import jena.cmd.ArgDecl;
+import jena.cmd.CmdGeneral;
 
-import arq.cmdline.ArgDecl;
-import arq.cmdline.CmdGeneral;
+
 
 /**
  * The <code>tarql</code> CLI command.
@@ -98,7 +99,7 @@ public class tarql extends CmdGeneral {
 	
 	@Override
     protected String getCommandName() {
-		return Utils.className(this);
+		return Lib.className(this);
 	}
 	
 	@Override
@@ -109,7 +110,7 @@ public class tarql extends CmdGeneral {
 	@Override
 	protected void processModulesAndArgs() {
 		if (getPositional().isEmpty()) {
-			doHelp();
+			printHelp();
 		}
 		queryFile = getPositionalArg(0);
 		for (int i = 1; i < getPositional().size(); i++) {

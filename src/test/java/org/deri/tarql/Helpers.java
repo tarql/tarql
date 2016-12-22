@@ -5,10 +5,11 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-import com.hp.hpl.jena.sparql.core.Var;
-import com.hp.hpl.jena.sparql.engine.binding.Binding;
-import com.hp.hpl.jena.sparql.engine.binding.BindingHashMap;
-import com.hp.hpl.jena.sparql.util.NodeFactoryExtra;
+import org.apache.jena.sparql.core.Var;
+import org.apache.jena.sparql.engine.binding.Binding;
+import org.apache.jena.sparql.engine.binding.BindingHashMap;
+import org.apache.jena.sparql.util.NodeFactoryExtra;
+
 
 public class Helpers {
 

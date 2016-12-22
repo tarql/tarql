@@ -2,18 +2,18 @@ package org.deri.tarql.functions;
 
 import static org.junit.Assert.assertEquals;
 
+import org.apache.jena.graph.Node;
+import org.apache.jena.graph.NodeFactory;
+import org.apache.jena.shared.PrefixMapping;
+import org.apache.jena.shared.impl.PrefixMappingImpl;
+import org.apache.jena.sparql.engine.binding.BindingFactory;
+import org.apache.jena.sparql.expr.Expr;
+import org.apache.jena.sparql.function.FunctionEnv;
+import org.apache.jena.sparql.function.FunctionEnvBase;
+import org.apache.jena.sparql.util.ExprUtils;
 import org.deri.tarql.tarql;
 import org.junit.Before;
 
-import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.graph.NodeFactory;
-import com.hp.hpl.jena.shared.PrefixMapping;
-import com.hp.hpl.jena.shared.impl.PrefixMappingImpl;
-import com.hp.hpl.jena.sparql.engine.binding.BindingFactory;
-import com.hp.hpl.jena.sparql.expr.Expr;
-import com.hp.hpl.jena.sparql.function.FunctionEnv;
-import com.hp.hpl.jena.sparql.function.FunctionEnvBase;
-import com.hp.hpl.jena.sparql.util.ExprUtils;
 
 public abstract class FunctionTest {
 	protected PrefixMapping prefixes;

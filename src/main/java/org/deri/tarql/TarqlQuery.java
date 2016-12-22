@@ -3,13 +3,13 @@ package org.deri.tarql;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.jena.query.Query;
+import org.apache.jena.sparql.core.Prologue;
+import org.apache.jena.sparql.core.Var;
+import org.apache.jena.sparql.function.FunctionRegistry;
 import org.deri.tarql.functions.ExpandPrefixFunction;
 import org.deri.tarql.functions.ExpandPrefixedNameFunction;
 
-import com.hp.hpl.jena.query.Query;
-import com.hp.hpl.jena.sparql.core.Prologue;
-import com.hp.hpl.jena.sparql.core.Var;
-import com.hp.hpl.jena.sparql.function.FunctionRegistry;
 
 /**
  * A Tarql mapping. Conceptually, this is one or more SPARQL queries
