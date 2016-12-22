@@ -3,11 +3,11 @@ package org.deri.tarql;
 import static org.deri.tarql.Helpers.binding;
 import static org.deri.tarql.Helpers.vars;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.List;
 
 import org.apache.jena.query.ResultSet;
@@ -18,6 +18,7 @@ import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.binding.Binding;
 import org.junit.Before;
 import org.junit.Test;
+
 
 
 public class TarqlTest {
@@ -57,7 +58,11 @@ public class TarqlTest {
 		TarqlQueryExecution ex = TarqlQueryExecutionFactory.create(tq, InputStreamSource.fromBytes(csv.getBytes("utf-8")), options);
 		Model actual = ModelFactory.createDefaultModel();
 		ex.exec(actual);
-		assertTrue(actual.isIsomorphicWith(expected));
+		if (!actual.isIsomorphicWith(expected)) {
+			StringWriter out = new StringWriter();
+			actual.write(out, "TURTLE");
+			fail("Actual not isomorphic to input. Actual was:\n" + out.toString());
+		}
 	}
 	
 	@Test
@@ -207,6 +212,22 @@ public class TarqlTest {
 		TarqlQuery tq =  new TarqlParser(new StringReader(query), null).getResult();
 		List<Var> vars = vars("ROWNUM", "First", "Last");
 		assertSelect(tq, binding(vars, "1", "\"Alice\"", "\"Smith\""), binding(vars, "2", "\"Bob\"", "\"Miller\""));
+	}
+	
+	@Test
+	public void testConstructROWNUM() throws IOException {
+		options = new CSVOptions();
+		csv = "First,Last\nAlice,Smith\nBob,Miller";
+		String query =
+				"PREFIX ex: <http://example.com/>\n" +
+				"CONSTRUCT { ?iri ex:first ?First; ex:last ?Last }\n" +
+				"{ BIND (IRI(CONCAT(STR(ex:person), STR(?ROWNUM))) AS ?iri) }";
+		TarqlQuery tq =  new TarqlParser(new StringReader(query)).getResult();
+		String ttl =
+				"@prefix ex: <http://example.com/>.\n" +
+				"ex:person1 ex:first \"Alice\"; ex:last \"Smith\".\n" +
+				"ex:person2 ex:first \"Bob\"; ex:last \"Miller\".\n";
+		assertConstruct(tq, ttl);
 	}
 	
 	@Test

@@ -125,6 +125,9 @@ public class TarqlQueryExecution {
 			QueryExecution ex = createQueryExecution(q, model);
 			ex.execConstruct(model);
 		}
+		if (tarql.NS.equals(model.getNsPrefixURI("tarql"))) {
+			model.removeNsPrefix("tarql");
+		}
 	}
 
 	public Iterator<Triple> execTriples() throws IOException {
