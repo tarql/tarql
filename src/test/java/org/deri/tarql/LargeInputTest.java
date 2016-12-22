@@ -2,6 +2,7 @@ package org.deri.tarql;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,6 +18,7 @@ import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.shared.PrefixMapping;
 import com.hp.hpl.jena.shared.impl.PrefixMappingImpl;
+import com.hp.hpl.jena.sparql.ARQException;
 
 /**
  * Test cases on large input. Not run as part of the normal
@@ -49,6 +51,7 @@ public class LargeInputTest {
 		int i = 0;
 		while (it.hasNext()) {
 			i++;
+//			System.out.println(it.next());
 			it.next();
 			if (i % 1000 == 0) System.out.println("  Result # " + i);
 		}
@@ -133,6 +136,29 @@ public class LargeInputTest {
 		assertTrue(out.getBytesWritten() > lines * 100);
 	}
 	
+	@Ignore @Test public void testSmallInputWithRunawayQuote() {
+		System.out.println("testInput5GBWithRunawayQuote");
+		final int lines = 20000;
+		String query = "SELECT * {}";
+		ResultSet rs = prepare(query, new DummyContentSource(lines) {
+			@Override
+			public String generateNonHeaderLine(int lineNumber) {
+				if (lineNumber == 11111) {
+					return super.generateNonHeaderLine(lineNumber) + "\"";
+				}
+				return super.generateNonHeaderLine(lineNumber);
+			}
+		}).execSelect();
+		try {
+			consume(rs);
+			fail("Should have thrown ARQException due to runaway quote");
+		} catch (ARQException ex) {
+			if (!ex.getMessage().contains("stray quote")) {
+				throw ex;
+			}
+		}
+	}
+	
 	@Ignore @Test public void testInput5GBWithRunawayQuote() {
 		System.out.println("testInput5GBWithRunawayQuote");
 		final int lines = 50000000;
@@ -146,7 +172,13 @@ public class LargeInputTest {
 				return super.generateNonHeaderLine(lineNumber);
 			}
 		}).execSelect();
-		int results = consume(rs);
-		assertEquals(lines - 1, results);
+		try {
+			consume(rs);
+			fail("Should have thrown ARQException due to runaway quote");
+		} catch (ARQException ex) {
+			if (!ex.getMessage().contains("stray quote")) {
+				throw ex;
+			}
+		}
 	}
 }

@@ -5,14 +5,15 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 
-import au.com.bytecode.opencsv.CSVReader;
-
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.graph.NodeFactory;
+import com.hp.hpl.jena.sparql.ARQException;
 import com.hp.hpl.jena.sparql.core.Var;
 import com.hp.hpl.jena.sparql.engine.binding.Binding;
 import com.hp.hpl.jena.sparql.engine.binding.BindingHashMap;
 import com.hp.hpl.jena.util.iterator.ClosableIterator;
+import com.opencsv.CSVReader;
+
 
 /**
  * Parses a CSV file presented as a {@link Reader}, and delivers
@@ -152,7 +153,7 @@ public class CSVParser implements ClosableIterator<Binding> {
 				break;
 			}
 		} catch (IOException e) {
-			throw new RuntimeException(e);
+			throw new ARQException(e.getMessage(), e);
 		}
 		return current;
 	}
