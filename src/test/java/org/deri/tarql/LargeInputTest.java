@@ -189,6 +189,7 @@ public class LargeInputTest {
 		}
 	}
 	
+	@Ignore
 	@Test public void testInput5GBWithRunawayQuoteButNoQuoteChar() {
 		System.out.println("testInput5GBWithRunawayQuoteButNoQuoteChar");
 		final int lines = 50000000;
