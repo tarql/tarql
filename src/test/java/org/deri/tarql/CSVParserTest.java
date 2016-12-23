@@ -191,7 +191,7 @@ public class CSVParserTest {
 	}
 	
 	private static CSVParser readCSV(String csv, boolean varsFromHeader) throws IOException {
-		return new CSVParser(new StringReader(csv), varsFromHeader, null, null, null);
+		return new CSVParser(new StringReader(csv), varsFromHeader, null, '"', null);
 	}
 	
 	private static CSVParser readCSV(String csv, boolean varsFromHeader, char delimiter, char quote) throws IOException {
@@ -199,7 +199,7 @@ public class CSVParserTest {
 	}
 	
 	private static CSVParser readCSV(String csv, boolean varsFromHeader, char escape) throws IOException {
-		return new CSVParser(new StringReader(csv), varsFromHeader, null, null, escape);
+		return new CSVParser(new StringReader(csv), varsFromHeader, null, '"', escape);
 	}
 	
 	private static long countRows(String csv, boolean varsFromHeader) throws IOException {

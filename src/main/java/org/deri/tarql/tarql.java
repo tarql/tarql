@@ -18,7 +18,6 @@ import org.apache.jena.util.iterator.ExtendedIterator;
 import org.apache.jena.util.iterator.NullIterator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.deri.tarql.CSVOptions.ParseResult;
 
 import jena.cmd.ArgDecl;
 import jena.cmd.CmdGeneral;
@@ -69,13 +68,9 @@ public class tarql extends CmdGeneral {
 	
 	private String queryFile;
 	private List<String> csvFiles = new ArrayList<String>();
-	private Boolean header = null;
+	private CSVOptions options = new CSVOptions();
 	private boolean testQuery = false;
-	private String encoding = null;
 	private boolean writeNTriples = false;
-	private Character delimiter = null;
-	private Character quote = null;
-	private Character escape = null;
 
 	private ExtendedIterator<Triple> resultTripleIterator = NullIterator.instance();
 	
@@ -83,17 +78,17 @@ public class tarql extends CmdGeneral {
 		super(args);
 		getUsage().startCategory("Options");
 		add(testQueryArg,     "--test", "Show CONSTRUCT template and first rows only (for query debugging)");
-		add(delimiterArg,     "-d   --delimiter", "Delimiting character of the CSV file");
-		add(tabsArg,          "-t   --tabs", "Specifies that the input is tab-separagted (TSV), overriding -d");
-		add(quoteArg,         "--quotechar", "Quote character used in the CSV file");
-		add(escapeArg,        "-p   --escapechar", "Character used to escape quotes in the CSV file");
-		add(encodingArg,      "-e   --encoding", "Override CSV file encoding (e.g., utf-8 or latin-1)");
-		add(withoutHeaderArg, "-H   --no-header-row", "CSV file has no header row; use variable names ?a, ?b, ...");
-		add(withHeaderArg,    "--header-row", "CSV file's first row is a header with variable names (default)");
+		add(delimiterArg,     "-d   --delimiter", "Delimiting character of the input file");
+		add(tabsArg,          "-t   --tabs", "Specifies that the input is tab-separagted (TSV)");
+		add(quoteArg,         "--quotechar", "Quote character used in the input file, or \"none\"");
+		add(escapeArg,        "-p   --escapechar", "Character used to escape quotes in the input file, or \"none\"");
+		add(encodingArg,      "-e   --encoding", "Override input file encoding (e.g., utf-8 or latin-1)");
+		add(withoutHeaderArg, "-H   --no-header-row", "Input file has no header row; use variable names ?a, ?b, ...");
+		add(withHeaderArg,    "--header-row", "Input file's first row is a header with variable names (default)");
 		add(nTriplesArg,      "--ntriples", "Write N-Triples instead of Turtle");
 		getUsage().startCategory("Main arguments");
-		getUsage().addUsage("query.sparql", "File containing a SPARQL query to be applied to a CSV file");
-		getUsage().addUsage("table.csv", "CSV file to be processed; can be omitted if specified in FROM clause");
+		getUsage().addUsage("query.sparql", "File containing a SPARQL query to be applied to an input file");
+		getUsage().addUsage("table.csv", "CSV/TSV file to be processed; can be omitted if specified in FROM clause");
 		modVersion.addClass(tarql.class);
 	}
 	
@@ -117,43 +112,37 @@ public class tarql extends CmdGeneral {
 			csvFiles.add(getPositionalArg(i));
 		}
 		if (hasArg(withHeaderArg)) {
-			header = true;
+			options.setColumnNamesInFirstRow(true);
 		}
 		if (hasArg(withoutHeaderArg)) {
-			header = false;
+			options.setColumnNamesInFirstRow(false);
 		}
 		if (hasArg(testQueryArg)) {
 			testQuery = true;
 		}
 		if (hasArg(encodingArg)) {
-			encoding = getValue(encodingArg);
+			options.setEncoding(getValue(encodingArg));
 		}
 		if (hasArg(nTriplesArg)) {
 			writeNTriples = true;
 		}
+		if (hasArg(tabsArg)) {
+			options.setDefaultsForTSV();
+		} else {
+			options.setDefaultsForCSV();
+		}
 		if (hasArg(delimiterArg)) {
-			String d = getValue(delimiterArg);
-			if (d == null || d.length() != 1) {
+			Character d = getCharValue(delimiterArg);
+			if (d == null) {
 				cmdError("Value of --delimiter must be a single character");
 			}
-			delimiter = d.charAt(0);
-		}
-		if (hasArg(tabsArg)) {
-			delimiter = '\t';
+			options.setDelimiter(d);
 		}
 		if (hasArg(quoteArg)) {
-			String q = getValue(quoteArg);
-			if (q == null || q.length() != 1) {
-				cmdError("Value of --quotechar must be a single character");
-			}
-			quote = q.charAt(0);
+			options.setQuoteChar(getCharValue(quoteArg));
 		}
 		if (hasArg(escapeArg)) {
-			String e = getValue(escapeArg);
-			if (e == null || e.length() != 1) {
-				cmdError("Value of --escapechar must be a single character");
-			}
-			escape = e.charAt(0);
+			options.setEscapeChar(getCharValue(escapeArg));
 		}
 	}
 
@@ -165,29 +154,13 @@ public class tarql extends CmdGeneral {
 			if (testQuery) {
 				q.makeTest();
 			}
-			CSVOptions options = new CSVOptions();
-			if (header != null) {
-				options.setColumnNamesInFirstRow(header);
-			}
-			if (encoding != null) {
-				options.setEncoding(encoding);
-			}
-			if (delimiter != null) {
-				options.setDelimiter(delimiter);
-			}
-			if (quote != null) {
-				options.setQuoteChar(quote);
-			}
-			if (escape != null) {
-				options.setEscapeChar(escape);
-			}
 			if (csvFiles.isEmpty()) {
 				processResults(TarqlQueryExecutionFactory.create(q, options));
 			} else {
 				for (String csvFile: csvFiles) {
-					ParseResult parseResult = CSVOptions.parseIRI(csvFile);
+					URLOptionsParser parseResult = new URLOptionsParser(csvFile);
 					processResults(TarqlQueryExecutionFactory.create(q, 
-							InputStreamSource.fromFilenameOrIRI(parseResult.getRemainingIRI()), 
+							InputStreamSource.fromFilenameOrIRI(parseResult.getRemainingURL()), 
 							parseResult.getOptions(options)));
 				}
 			}
@@ -208,6 +181,18 @@ public class tarql extends CmdGeneral {
 		}
 	}
 
+	private Character getCharValue(ArgDecl arg) {
+		String value = getValue(arg);
+		if ("".equals(value) || "none".equals(value)) {
+			return null;
+		}
+		if (value != null && value.length() == 1) {
+			return value.charAt(0);
+		}
+		cmdError("Value of --" + arg.getKeyName() + " cannot be more than one character");
+		return null;
+	}
+	
 	private void processResults(TarqlQueryExecution ex) throws IOException {
 		if (testQuery && ex.getFirstQuery().getConstructTemplate() != null) {
 			IndentedWriter out = new IndentedWriter(System.out); 

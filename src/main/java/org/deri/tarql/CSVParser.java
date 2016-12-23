@@ -41,7 +41,7 @@ public class CSVParser implements ClosableIterator<Binding> {
 	private final Reader reader;
 	private final boolean varsFromHeader;
 	private final char delimiter;
-	private final char quote;
+	private final Character quote;
 	private final Character escape;
 	private final List<Var> vars = new ArrayList<Var>();
 	private int rownum;
@@ -67,8 +67,10 @@ public class CSVParser implements ClosableIterator<Binding> {
 		this.reader = reader;
 		this.varsFromHeader = varsFromHeader;
 		this.delimiter = delimiter == null ? ',' : delimiter;
-		this.quote = quote == null ? '"' : quote;
-		this.escape = escape;
+		// OpenCSV insists on a quote character
+		this.quote = quote == null ? '\0' : quote;
+		// OpenCSV insists on an escape character
+		this.escape = escape == null ? '\0' : escape;
 		init();
 	}
 
@@ -182,9 +184,7 @@ public class CSVParser implements ClosableIterator<Binding> {
 	
 	private void init() throws IOException {
 		String[] row;
-		csv = escape == null
-				? new CSVReader(reader, delimiter, quote)
-				: new CSVReader(reader, delimiter, quote, escape);
+		csv = new CSVReader(reader, delimiter, quote, escape);
 		if (varsFromHeader) {
 			while ((row = csv.readNext()) != null) {
 				boolean foundValidColumnName = false;

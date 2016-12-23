@@ -59,9 +59,14 @@ public class LargeInputTest {
 		return i;
 	}
 	
-	protected TarqlQueryExecution prepare(String query, InputStreamSource input) {
+	protected TarqlQueryExecution prepare(String query, CSVOptions options, 
+			InputStreamSource input) {
 		TarqlQuery tq = new TarqlParser(new StringReader(query)).getResult();
-		return TarqlQueryExecutionFactory.create(tq, input);
+		return TarqlQueryExecutionFactory.create(tq, input, options);
+	}
+
+	protected TarqlQueryExecution prepare(String query, InputStreamSource input) {
+		return prepare(query, null, input);
 	}
 	
 	protected class DummyContentSource extends InputStreamSource {
@@ -182,6 +187,25 @@ public class LargeInputTest {
 				throw ex;
 			}
 		}
+	}
+	
+	@Test public void testInput5GBWithRunawayQuoteButNoQuoteChar() {
+		System.out.println("testInput5GBWithRunawayQuoteButNoQuoteChar");
+		final int lines = 50000000;
+		String query = "SELECT * {}";
+		CSVOptions options = new CSVOptions();
+		options.setQuoteChar(null);
+		ResultSet rs = prepare(query, options, new DummyContentSource(lines) {
+			@Override
+			public String generateNonHeaderLine(int lineNumber) {
+				if (lineNumber == 11111) {
+					return super.generateNonHeaderLine(lineNumber) + "\"";
+				}
+				return super.generateNonHeaderLine(lineNumber);
+			}
+		}).execSelect();
+		int results = consume(rs);
+		assertEquals(lines - 1, results);
 	}
 
 	@Ignore("This breaks streaming as of v1.1-SNAPSHOT")

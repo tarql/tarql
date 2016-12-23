@@ -3,10 +3,6 @@ package org.deri.tarql;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Configuration options for describing a CSV file. Also provides
@@ -14,134 +10,17 @@ import java.util.Map;
  * {@link CSVParser}s based on these options.
  */
 public class CSVOptions {
-
-	/**
-	 * Extracts a CSVOptions object from the fragment part of a
-	 * CSV file URL, e.g.,
-	 * <code>http://example.com/file.csv#encoding=utf-8;header=absent</code>
-	 * The remainder of the URL, with anything interpretable
-	 * removed, can also be obtained from the returned
-	 * parse result.
-	 */
-	public static ParseResult parseIRI(String iri) {
+	
+	public static CSVOptions withCSVDefaults() {
 		CSVOptions result = new CSVOptions();
-		int hash = iri.indexOf("#");
-		if (hash == -1 || hash == iri.length() - 1) {
-			return new ParseResult(iri, result);
-		}
-		String fragment = iri.substring(hash + 1);
-		StringBuffer remainingIRI = new StringBuffer(iri.substring(0, hash));
-		boolean hasHash = false;
-		for (String part: fragment.split(";")) {
-			if (part.startsWith(encodingKey)) {
-				result.setEncoding(part.substring(encodingKey.length()));
-				continue;
-			}
-			if (part.startsWith(charsetKey)) {
-				result.setEncoding(part.substring(charsetKey.length()));
-				continue;
-			}
-			if (part.startsWith(headerKey)) {
-				String value = part.substring(headerKey.length());
-				if ("present".equals(value)) {
-					result.setColumnNamesInFirstRow(true);
-					continue;
-				}
-				if ("absent".equals(value)) {
-					result.setColumnNamesInFirstRow(false);
-					continue;
-				}
-			}
-			if (part.startsWith(delimiterKey)) {
-				Character c = parseChar(part.substring(delimiterKey.length()));
-				if (c != null) {
-					result.setDelimiter(c);
-					continue;
-				}
-			}
-			if (part.startsWith(quoteCharKey)) {
-				Character c = parseChar(part.substring(quoteCharKey.length()));
-				if (c != null) {
-					result.setQuoteChar(c);
-					continue;
-				}
-			}
-			if (part.startsWith(escapeCharKey)) {
-				Character c = parseChar(part.substring(escapeCharKey.length()));
-				if (c != null) {
-					result.setEscapeChar(c);
-					continue;
-				}
-			}
-			if (hasHash) {
-				remainingIRI.append(";");
-			} else {
-				remainingIRI.append('#');
-				hasHash = true;
-			}
-			remainingIRI.append(part);
-		}
-		return new ParseResult(remainingIRI.toString(), result);
-	}	
-	private final static String encodingKey = "encoding=";
-	private final static String charsetKey = "charset=";
-	private final static String headerKey = "header=";
-	private final static String delimiterKey = "delimiter=";
-	private final static String quoteCharKey = "quotechar=";
-	private final static String escapeCharKey = "escapechar=";
-	@SuppressWarnings("serial")
-	private final static Map<String, Character> charNames = new HashMap<String, Character>() {{
-		put("tab", '\t');
-		put("tabs", '\t');
-		put("comma", ',');
-		put("semicolon", ';');
-		put("singlequote", '\'');
-		put("doublequote", '"');
-		put("backslash", '\\');
-	}};
-
-	/**
-	 * Interprets argument as a character. Can be a literal single-character
-	 * string, or a %-encoded character (e.g., %09 for tab), or one of the
-	 * pre-defined named characters such as "tab", "backslash", etc.
-	 */
-	private static Character parseChar(String value) {
-		if (charNames.containsKey(value.toLowerCase())) {
-			return charNames.get(value.toLowerCase());
-		}
-		try {
-			value = URLDecoder.decode(value, "utf-8");
-			if (value.length() == 1) {
-				return value.charAt(0);
-			}
-		} catch (UnsupportedEncodingException ex) {
-			// Can't happen, UTF-8 always supported
-		}
-		return null;
+		result.setDefaultsForCSV();
+		return result;
 	}
 	
-	/**
-	 * Helper class for the result of parseIRI(iri)
-	 */
-	public static class ParseResult {
-		private final String iri;
-		private final CSVOptions options;
-		public ParseResult(String iri, CSVOptions options) {
-			this.iri = iri;
-			this.options = options;
-		}
-		public String getRemainingIRI() {
-			return iri;
-		}
-		public CSVOptions getOptions() {
-			return options;
-		}
-		public CSVOptions getOptions(CSVOptions defaults) {
-			CSVOptions result = new CSVOptions();
-			result.overrideWith(defaults);
-			result.overrideWith(options);
-			return result;
-		}
+	public static CSVOptions withTSVDefaults() {
+		CSVOptions result = new CSVOptions();
+		result.setDefaultsForTSV();
+		return result;
 	}
 	
 	private String encoding = null;
@@ -183,6 +62,16 @@ public class CSVOptions {
 		if (other.escape != null) {
 			this.escape = other.escape;
 		}
+	}
+	
+	public void setDefaultsForCSV() {
+		setDelimiter(',');
+		setQuoteChar('"');
+	}
+
+	public void setDefaultsForTSV() {
+		setDelimiter('\t');
+		setQuoteChar(null);
 	}
 	
 	/**
