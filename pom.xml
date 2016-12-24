@@ -4,7 +4,7 @@
   <groupId>org.deri.tarql</groupId>
   <artifactId>tarql</artifactId>
   <packaging>jar</packaging>
-  <version>1.1-SNAPSHOT</version>
+  <version>1.1</version>
 
   <name>Tarql</name>
   <description>Convert CSV files to RDF using SPARQL syntax</description>
@@ -46,10 +46,16 @@
       <artifactId>jena-cmds</artifactId>
       <version>3.1.1</version>
     </dependency>
+    <!-- We use a custom build of OpenCSV with Patch #54. To build:
+
+         git clone https://github.com/cygri/opencsv.git
+         cd opencsv
+         mvn install -Dgpg.skip -Denforcer.skip
+    -->
     <dependency>
       <groupId>com.opencsv</groupId>
       <artifactId>opencsv</artifactId>
-      <version>3.8</version>
+      <version>3.9-cygri</version>
     </dependency>
     <dependency>
       <groupId>net.sourceforge.jchardet</groupId>
