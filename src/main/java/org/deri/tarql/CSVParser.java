@@ -59,7 +59,7 @@ public class CSVParser implements ClosableIterator<Binding> {
 	 *            The quote character used to quote values (typically double or single quote), or <code>null</code> for default
 	 * @param escape
 	 *            The escape character for quotes and delimiters, or <code>null</code> for none 
-	 * @throws IOException
+	 * @throws IOException if an I/O error occurs while reading from the input
 	 */
 	public CSVParser(Reader reader, boolean varsFromHeader, Character delimiter, Character quote, Character escape)
 			throws IOException {

@@ -64,6 +64,9 @@ public abstract class InputStreamSource {
 	
 	/**
 	 * Opens an input stream over the input data.
+	 * 
+	 * @return A fresh input stream over the input, set to the start of the input.
+	 * @throws IOException if an I/O error occurs. 
 	 */
 	public abstract InputStream open() throws IOException; 
 }
