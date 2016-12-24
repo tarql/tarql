@@ -65,12 +65,14 @@ public class tarql extends CmdGeneral {
 	private final ArgDecl tabsArg = new ArgDecl(false, "tabs", "tab", "t");
 	private final ArgDecl quoteArg = new ArgDecl(true, "quotechar");
 	private final ArgDecl escapeArg = new ArgDecl(true, "escapechar", "p");
+	private final ArgDecl baseArg = new ArgDecl(true, "base");
 	
 	private String queryFile;
 	private List<String> csvFiles = new ArrayList<String>();
 	private CSVOptions options = new CSVOptions();
 	private boolean testQuery = false;
 	private boolean writeNTriples = false;
+	private String baseIRI = null;
 
 	private ExtendedIterator<Triple> resultTripleIterator = NullIterator.instance();
 	
@@ -85,6 +87,7 @@ public class tarql extends CmdGeneral {
 		add(encodingArg,      "-e   --encoding", "Override input file encoding (e.g., utf-8 or latin-1)");
 		add(withoutHeaderArg, "-H   --no-header-row", "Input file has no header row; use variable names ?a, ?b, ...");
 		add(withHeaderArg,    "--header-row", "Input file's first row is a header with variable names (default)");
+		add(baseArg,          "--base", "Base IRI for resolving relative IRIs");
 		add(nTriplesArg,      "--ntriples", "Write N-Triples instead of Turtle");
 		getUsage().startCategory("Main arguments");
 		getUsage().addUsage("query.sparql", "File containing a SPARQL query to be applied to an input file");
@@ -144,13 +147,18 @@ public class tarql extends CmdGeneral {
 		if (hasArg(escapeArg)) {
 			options.setEscapeChar(getCharValue(escapeArg));
 		}
+		if (hasArg(baseArg)) {
+			baseIRI = getValue(baseArg);
+		}
 	}
 
 	@Override
 	protected void exec() {
 		initLogging();
 		try {
-			TarqlQuery q = new TarqlParser(queryFile).getResult();
+			TarqlQuery q = baseIRI == null
+					? new TarqlParser(queryFile).getResult()
+					: new TarqlParser(queryFile, baseIRI).getResult();
 			if (testQuery) {
 				q.makeTest();
 			}

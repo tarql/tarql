@@ -38,6 +38,10 @@ public class TarqlParser {
 		this(open(filenameOrURL), FileManager.get().mapURI(filenameOrURL));
 	}
 	
+	public TarqlParser(String filenameOrURL, String baseIRI) {
+		this(open(filenameOrURL), baseIRI);
+	}
+	
 	public TarqlParser(Reader reader) {
 		this(reader, null);
 	}
