@@ -59,7 +59,7 @@ public class StreamingRDFWriter {
 		// Some prefix already registered for the RDF namespace -- good enough
 		if (prefixes.getNsURIPrefix(RDF.getURI()) != null) return prefixes;
 		// rdf: is registered to something else -- give up
-		if (prefixes.getNsPrefixURI("rdf") == null) return prefixes;
+		if (prefixes.getNsPrefixURI("rdf") != null) return prefixes;
 		// Register rdf:
 		PrefixMapping newPrefixes = new PrefixMappingImpl();
 		newPrefixes.setNsPrefixes(prefixes);
