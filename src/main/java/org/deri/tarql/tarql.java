@@ -10,6 +10,7 @@ import java.util.jar.Manifest;
 import org.apache.jena.atlas.io.IndentedWriter;
 import org.apache.jena.atlas.lib.Lib;
 import org.apache.jena.graph.Triple;
+import org.apache.jena.query.QueryParseException;
 import org.apache.jena.query.ResultSetFormatter;
 import org.apache.jena.shared.NotFoundException;
 import org.apache.jena.sparql.serializer.FmtTemplate;
@@ -192,12 +193,25 @@ public class tarql extends CmdGeneral {
 				}
 			}
 		} catch (NotFoundException ex) {
-			cmdError("Not found: " + ex.getMessage());
+			error("Not found", ex);
 		} catch (IOException ioe) {
-			cmdError("IOException: " + ioe.getMessage());
+			error("IOException", ioe);
+		} catch (QueryParseException ex) {
+			error("Error parsing SPARQL query", ex);
+		} catch (TarqlException ex) {
+			error(null, ex);
 		}
 	}
 
+	private void error(String message, Throwable cause) {
+		Logger.getLogger("org.deri.tarql").info(message == null ? "Error" : message, cause);
+		if (message == null) {
+			cmdError(cause.getMessage());
+		} else {
+			cmdError(message + ": " + cause.getMessage());
+		}
+	}
+	
 	private Character getCharValue(ArgDecl arg) {
 		String value = getValue(arg);
 		if ("".equals(value) || "none".equals(value)) {

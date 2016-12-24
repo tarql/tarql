@@ -3,7 +3,6 @@ package org.deri.tarql;
 import java.io.IOException;
 
 import org.apache.jena.query.Query;
-import org.apache.jena.shared.JenaException;
 import org.apache.jena.util.FileManager;
 
 
@@ -52,10 +51,10 @@ public class TarqlQueryExecutionFactory {
 
 	private static String getSingleFromClause(Query query, FileManager fm) {
 		if (query.getGraphURIs() == null || query.getGraphURIs().isEmpty()) {
-			throw new JenaException("No input file provided");
+			throw new TarqlException("No input file provided");
 		}
 		if (query.getGraphURIs().size() > 1) {
-			throw new JenaException("Too many input files: " + query.getGraphURIs());
+			throw new TarqlException("Too many input files: " + query.getGraphURIs());
 		}
 		return query.getGraphURIs().get(0);
 	}

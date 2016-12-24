@@ -6,7 +6,6 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 
 import org.apache.jena.shared.NotFoundException;
-import org.apache.jena.sparql.ARQException;
 import org.apache.jena.util.FileManager;
 
 
@@ -55,7 +54,7 @@ public abstract class InputStreamSource {
 			boolean open = false;
 			public InputStream open() throws IOException {
 				if (open) {
-					throw new ARQException("Cannot use STDIN in mapping requiring multiple read passes");
+					throw new TarqlException("Cannot use STDIN in mapping requiring multiple read passes");
 				}
 				open = true;
 				return System.in;

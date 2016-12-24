@@ -7,7 +7,6 @@ import java.util.List;
 
 import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.graph.NodeFactory;
-import org.apache.jena.sparql.ARQException;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.binding.Binding;
 import org.apache.jena.sparql.engine.binding.BindingHashMap;
@@ -156,7 +155,7 @@ public class CSVParser implements ClosableIterator<Binding> {
 				break;
 			}
 		} catch (IOException e) {
-			throw new ARQException(e.getMessage(), e);
+			throw new TarqlException(e);
 		}
 		return current;
 	}

@@ -134,7 +134,7 @@ public class TarqlTest {
 		try {
 			assertSelect(tq);
 			fail("Expected exception due to lacking input file in query");
-		} catch (JenaException ex) {
+		} catch (TarqlException ex) {
 			// Expected
 		}
 	}
