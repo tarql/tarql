@@ -2,8 +2,6 @@ package org.deri.tarql;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Extracts a CSVOptions object from the fragment part of a
@@ -20,19 +18,6 @@ public class URLOptionsParser {
 	private final static String delimiterKey = "delimiter=";
 	private final static String quoteCharKey = "quotechar=";
 	private final static String escapeCharKey = "escapechar=";
-
-	@SuppressWarnings("serial")
-	private final static Map<String, Character> charNames = new HashMap<String, Character>() {{
-		put("", null);
-		put("none", null);
-		put("tab", '\t');
-		put("tabs", '\t');
-		put("comma", ',');
-		put("semicolon", ';');
-		put("singlequote", '\'');
-		put("doublequote", '"');
-		put("backslash", '\\');
-	}};
 
 	private final StringBuilder remainingURL = new StringBuilder();
 	private final CSVOptions options = new CSVOptions();
@@ -167,8 +152,8 @@ public class URLOptionsParser {
 	 * @throw IllegalArgumentException on unknown multi-char string
 	 */
 	private static Character parseChar(String value) {
-		if (charNames.containsKey(value.toLowerCase())) {
-			return charNames.get(value.toLowerCase());
+		if (CSVOptions.charNames.containsKey(value.toLowerCase())) {
+			return CSVOptions.charNames.get(value.toLowerCase());
 		}
 		try {
 			value = URLDecoder.decode(value, "utf-8");

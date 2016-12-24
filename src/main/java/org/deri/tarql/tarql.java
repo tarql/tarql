@@ -214,8 +214,8 @@ public class tarql extends CmdGeneral {
 	
 	private Character getCharValue(ArgDecl arg) {
 		String value = getValue(arg);
-		if ("".equals(value) || "none".equals(value)) {
-			return null;
+		if (CSVOptions.charNames.containsKey(value)) {
+			return CSVOptions.charNames.get(value);
 		}
 		if (value != null && value.length() == 1) {
 			return value.charAt(0);

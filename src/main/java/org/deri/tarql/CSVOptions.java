@@ -3,6 +3,8 @@ package org.deri.tarql;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Configuration options for describing a CSV file. Also provides
@@ -10,7 +12,19 @@ import java.io.Reader;
  * {@link CSVParser}s based on these options.
  */
 public class CSVOptions {
-	
+	@SuppressWarnings("serial")
+	public final static Map<String, Character> charNames = new HashMap<String, Character>() {{
+		put("", null);
+		put("none", null);
+		put("tab", '\t');
+		put("tabs", '\t');
+		put("comma", ',');
+		put("semicolon", ';');
+		put("singlequote", '\'');
+		put("doublequote", '"');
+		put("backslash", '\\');
+	}};
+
 	public static CSVOptions withCSVDefaults() {
 		CSVOptions result = new CSVOptions();
 		result.setDefaultsForCSV();
@@ -25,9 +39,14 @@ public class CSVOptions {
 	
 	private String encoding = null;
 	private Boolean columnNamesInFirstRow = null;
+	private boolean hasExplicitDelimiter = false; 
 	private Character delimiter = null;
+	private boolean hasExplicitQuote = false;
 	private Character quote = null;
+	private boolean hasExplicitEscape = false;
 	private Character escape = null;
+	private boolean isCSV = false;
+	private boolean isTSV = false;
 
 	/**
 	 * Creates a new instance with default values.
@@ -46,36 +65,57 @@ public class CSVOptions {
 
 	/**
 	 * Override values in this object with those from the other. Anything
-	 * that is <code>null</code> in the other object will be ignored.
+	 * that is not explicitly set in the other object will be ignored.
 	 * 
 	 * @param other The instance whose values to take over
 	 */
 	public void overrideWith(CSVOptions other) {
+		if (!isCSV && !isTSV) {
+			if (other.isCSV) {
+				setDefaultsForCSV();
+			}
+			if (other.isTSV) {
+				setDefaultsForTSV();
+			}
+		}
 		if (other.encoding != null) {
 			this.encoding = other.encoding;
 		}
 		if (other.columnNamesInFirstRow != null) {
 			this.columnNamesInFirstRow = other.columnNamesInFirstRow;
 		}
-		if (other.delimiter != null) {
+		if (other.hasExplicitDelimiter) {
 			this.delimiter = other.delimiter;
+			hasExplicitDelimiter = true;
 		}
-		if (other.quote != null) {
+		if (other.hasExplicitQuote) {
 			this.quote = other.quote;
+			hasExplicitQuote = true;
 		}
-		if (other.escape != null) {
+		if (other.hasExplicitEscape) {
 			this.escape = other.escape;
+			hasExplicitEscape = true;
 		}
 	}
 	
 	public void setDefaultsForCSV() {
-		setDelimiter(',');
-		setQuoteChar('"');
+		if (!hasExplicitDelimiter) {
+			delimiter = ',';
+		}
+		if (!hasExplicitQuote) {
+			quote = '"';
+		}
+		isCSV = true;
 	}
 
 	public void setDefaultsForTSV() {
-		setDelimiter('\t');
-		setQuoteChar(null);
+		if (!hasExplicitDelimiter) {
+			delimiter = '\t';
+		}
+		if (!hasExplicitQuote) {
+			quote = null;
+		}
+		isTSV = true;
 	}
 	
 	/**
@@ -128,6 +168,7 @@ public class CSVOptions {
 	 */
 	public void setDelimiter(Character delimiter) {
 		this.delimiter = delimiter;
+		hasExplicitDelimiter = true;
 	}
 	
 	/**
@@ -147,6 +188,7 @@ public class CSVOptions {
 	 */
 	public void setQuoteChar(Character quote) {
 		this.quote = quote;
+		hasExplicitQuote = true;
 	}
 	
 	/**
@@ -168,6 +210,7 @@ public class CSVOptions {
 	 */
 	public void setEscapeChar(Character escape) {
 		this.escape = escape;
+		hasExplicitEscape = true;
 	}
 	
 	/**
