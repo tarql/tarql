@@ -56,6 +56,7 @@ public class tarql extends CmdGeneral {
 		new tarql(args).mainRun();
 	}
 
+	private final ArgDecl stdinArg = new ArgDecl(false, "stdin");
 	private final ArgDecl testQueryArg = new ArgDecl(false, "test");
 	private final ArgDecl withHeaderArg = new ArgDecl(false, "header-row", "header");
 	private final ArgDecl withoutHeaderArg = new ArgDecl(false, "no-header-row", "no-header", "H");
@@ -69,6 +70,7 @@ public class tarql extends CmdGeneral {
 	
 	private String queryFile;
 	private List<String> csvFiles = new ArrayList<String>();
+	private boolean stdin = false;
 	private CSVOptions options = new CSVOptions();
 	private boolean testQuery = false;
 	private boolean writeNTriples = false;
@@ -79,6 +81,7 @@ public class tarql extends CmdGeneral {
 	public tarql(String[] args) {
 		super(args);
 		getUsage().startCategory("Options");
+		add(stdinArg,         "--stdin", "Read input from STDIN instead of file");
 		add(testQueryArg,     "--test", "Show CONSTRUCT template and first rows only (for query debugging)");
 		add(delimiterArg,     "-d   --delimiter", "Delimiting character of the input file");
 		add(tabsArg,          "-t   --tabs", "Specifies that the input is tab-separagted (TSV)");
@@ -113,6 +116,9 @@ public class tarql extends CmdGeneral {
 		queryFile = getPositionalArg(0);
 		for (int i = 1; i < getPositional().size(); i++) {
 			csvFiles.add(getPositionalArg(i));
+		}
+		if (hasArg(stdinArg)) {
+			stdin = true;
 		}
 		if (hasArg(withHeaderArg)) {
 			options.setColumnNamesInFirstRow(true);
@@ -162,7 +168,10 @@ public class tarql extends CmdGeneral {
 			if (testQuery) {
 				q.makeTest();
 			}
-			if (csvFiles.isEmpty()) {
+			if (stdin) {
+				processResults(TarqlQueryExecutionFactory.create(q, 
+						InputStreamSource.fromStdin(), options));
+			} else if (csvFiles.isEmpty()) {
 				processResults(TarqlQueryExecutionFactory.create(q, options));
 			} else {
 				for (String csvFile: csvFiles) {
