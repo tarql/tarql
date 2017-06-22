@@ -68,6 +68,7 @@ public class tarql extends CmdGeneral {
 	private final ArgDecl quoteArg = new ArgDecl(true, "quotechar");
 	private final ArgDecl escapeArg = new ArgDecl(true, "escapechar", "p");
 	private final ArgDecl baseArg = new ArgDecl(true, "base");
+	private final ArgDecl writeBaseArg = new ArgDecl(false, "write-base");
 	
 	private String queryFile;
 	private List<String> csvFiles = new ArrayList<String>();
@@ -76,6 +77,7 @@ public class tarql extends CmdGeneral {
 	private boolean testQuery = false;
 	private boolean writeNTriples = false;
 	private String baseIRI = null;
+	private boolean writeBase = false;
 
 	private ExtendedIterator<Triple> resultTripleIterator = NullIterator.instance();
 	
@@ -92,6 +94,7 @@ public class tarql extends CmdGeneral {
 		add(withoutHeaderArg, "-H   --no-header-row", "Input file has no header row; use variable names ?a, ?b, ...");
 		add(withHeaderArg,    "--header-row", "Input file's first row is a header with variable names (default)");
 		add(baseArg,          "--base", "Base IRI for resolving relative IRIs");
+		add(writeBaseArg,     "--write-base", "Write @base if output is Turtle");
 		add(nTriplesArg,      "--ntriples", "Write N-Triples instead of Turtle");
 		getUsage().startCategory("Main arguments");
 		getUsage().addUsage("query.sparql", "File containing a SPARQL query to be applied to an input file");
@@ -157,6 +160,9 @@ public class tarql extends CmdGeneral {
 		if (hasArg(baseArg)) {
 			baseIRI = getValue(baseArg);
 		}
+		if (hasArg(writeBaseArg)) {
+			writeBase = true;
+		}
 	}
 
 	@Override
@@ -189,7 +195,7 @@ public class tarql extends CmdGeneral {
 				} else {
 					writer.writeTurtle(
 							q.getPrologue().getBaseURI(),
-							q.getPrologue().getPrefixMapping());
+							q.getPrologue().getPrefixMapping(), writeBase);
 				}
 			}
 		} catch (NotFoundException ex) {

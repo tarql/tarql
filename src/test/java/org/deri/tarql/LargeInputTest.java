@@ -126,7 +126,7 @@ public class LargeInputTest {
 		final int lines = 50000000;
 		Iterator<Triple> triples = prepare(CONSTRUCT_2TRIPLES, new DummyContentSource(lines)).execTriples();
 		DummyOutputStream out = new DummyOutputStream();
-		new StreamingRDFWriter(out, triples).writeTurtle(EX, prefixes);
+		new StreamingRDFWriter(out, triples).writeTurtle(EX, prefixes, false);
 		System.out.println("Done: " + out.getBytesWritten() + " bytes written");
 		assertTrue(out.getBytesWritten() > lines * 100);
 	}

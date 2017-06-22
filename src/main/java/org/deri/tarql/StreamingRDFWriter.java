@@ -6,6 +6,7 @@ import java.util.Map.Entry;
 
 import org.apache.jena.atlas.io.IndentedWriter;
 import org.apache.jena.graph.Triple;
+import org.apache.jena.riot.system.RiotLib;
 import org.apache.jena.riot.system.StreamOps;
 import org.apache.jena.riot.system.StreamRDF;
 import org.apache.jena.riot.writer.WriterStreamRDFBlocks;
@@ -41,10 +42,19 @@ public class StreamingRDFWriter {
 		writer.finish();
 	}
 
-	public void writeTurtle(String baseIRI, PrefixMapping prefixes) {
+	public void writeTurtle(String baseIRI, PrefixMapping prefixes, boolean writeBase) {
 		// Auto-register RDF prefix so that rdf:type is displayed well
 		// All other prefixes come from the query and should be as author intended
 		prefixes = ensureRDFPrefix(prefixes);
+
+		if (writeBase) {
+			// Jena's streaming Turtle writers don't output base even if it is provided,
+			// so we write it directly.
+			IndentedWriter w = new IndentedWriter(out);
+			RiotLib.writeBase(w, baseIRI);
+			w.flush();
+		}
+		
 		WriterStreamRDFBlocks writer = new WriterStreamRDFBlocks(out);
 		writer.start();
 		writer.base(baseIRI);
