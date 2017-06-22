@@ -1,10 +1,14 @@
 package org.deri.tarql;
 
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.jena.graph.Triple;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.binding.Binding;
 import org.apache.jena.sparql.engine.binding.BindingHashMap;
@@ -57,5 +61,19 @@ public class Helpers {
 			result.add(var, binding.get(var));
 		}
 		return result;
+	}
+	
+	public static Triple triple(String tripleAsTurtle) {
+		Model m = ModelFactory.createDefaultModel();
+		m.read(new StringReader(tripleAsTurtle), "urn:x-base:", "TURTLE");
+		return m.listStatements().next().asTriple();
+	}
+	
+	public static List<Triple> triples(String... triples) {
+		List<Triple> results = new ArrayList<>();
+		for (String triple: triples) {
+			results.add(triple(triple));
+		}
+		return results;
 	}
 }

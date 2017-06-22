@@ -29,14 +29,22 @@ import org.apache.jena.vocabulary.RDF;
 public class StreamingRDFWriter {
 	private final OutputStream out;
 	private final Iterator<Triple> triples;
+	private int dedupWindowSize = 10000;
 	
 	public StreamingRDFWriter(OutputStream out, Iterator<Triple> triples) {
 		this.out = out;
 		this.triples = triples;
 	}
 
+	public void setDedupWindowSize(int newSize) {
+		this.dedupWindowSize = newSize;
+	}
+	
 	public void writeNTriples() {
 		StreamRDF writer = new WriterStreamRDFPlain(new IndentedWriter(out));
+		if (dedupWindowSize > 0) {
+			writer = new StreamRDFDedup(writer, dedupWindowSize);
+		}
 		writer.start();
 		StreamOps.sendTriplesToStream(triples, writer);
 		writer.finish();
@@ -55,7 +63,10 @@ public class StreamingRDFWriter {
 			w.flush();
 		}
 		
-		WriterStreamRDFBlocks writer = new WriterStreamRDFBlocks(out);
+		StreamRDF writer = new WriterStreamRDFBlocks(out);
+		if (dedupWindowSize > 0) {
+			writer = new StreamRDFDedup(writer, dedupWindowSize);
+		}
 		writer.start();
 		writer.base(baseIRI);
 		for (Entry<String, String> e : prefixes.getNsPrefixMap().entrySet()) {

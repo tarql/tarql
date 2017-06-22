@@ -69,6 +69,7 @@ public class tarql extends CmdGeneral {
 	private final ArgDecl escapeArg = new ArgDecl(true, "escapechar", "p");
 	private final ArgDecl baseArg = new ArgDecl(true, "base");
 	private final ArgDecl writeBaseArg = new ArgDecl(false, "write-base");
+	private final ArgDecl dedupArg = new ArgDecl(true, "dedup");
 	
 	private String queryFile;
 	private List<String> csvFiles = new ArrayList<String>();
@@ -78,14 +79,21 @@ public class tarql extends CmdGeneral {
 	private boolean writeNTriples = false;
 	private String baseIRI = null;
 	private boolean writeBase = false;
-
+	private int dedupWindowSize = 0;
+	
 	private ExtendedIterator<Triple> resultTripleIterator = NullIterator.instance();
 	
 	public tarql(String[] args) {
 		super(args);
-		getUsage().startCategory("Options");
-		add(stdinArg,         "--stdin", "Read input from STDIN instead of file");
+		
+		getUsage().startCategory("Output options");
 		add(testQueryArg,     "--test", "Show CONSTRUCT template and first rows only (for query debugging)");
+		add(writeBaseArg,     "--write-base", "Write @base if output is Turtle");
+		add(nTriplesArg,      "--ntriples", "Write N-Triples instead of Turtle");
+		add(dedupArg, "--dedup", "Window size in which to remove duplicate triples");
+
+		getUsage().startCategory("Input options");
+		add(stdinArg,         "--stdin", "Read input from STDIN instead of file");
 		add(delimiterArg,     "-d   --delimiter", "Delimiting character of the input file");
 		add(tabsArg,          "-t   --tabs", "Specifies that the input is tab-separagted (TSV)");
 		add(quoteArg,         "--quotechar", "Quote character used in the input file, or \"none\"");
@@ -94,8 +102,7 @@ public class tarql extends CmdGeneral {
 		add(withoutHeaderArg, "-H   --no-header-row", "Input file has no header row; use variable names ?a, ?b, ...");
 		add(withHeaderArg,    "--header-row", "Input file's first row is a header with variable names (default)");
 		add(baseArg,          "--base", "Base IRI for resolving relative IRIs");
-		add(writeBaseArg,     "--write-base", "Write @base if output is Turtle");
-		add(nTriplesArg,      "--ntriples", "Write N-Triples instead of Turtle");
+		
 		getUsage().startCategory("Main arguments");
 		getUsage().addUsage("query.sparql", "File containing a SPARQL query to be applied to an input file");
 		getUsage().addUsage("table.csv", "CSV/TSV file to be processed; can be omitted if specified in FROM clause");
@@ -163,6 +170,19 @@ public class tarql extends CmdGeneral {
 		if (hasArg(writeBaseArg)) {
 			writeBase = true;
 		}
+		if (hasArg(dedupArg)) {
+			if (getValue(dedupArg) == null) {
+				cmdError("--dedup needs an integer value");
+			}
+			try {
+				dedupWindowSize = Integer.parseInt(getValue(dedupArg));
+			} catch (NumberFormatException ex) {
+				dedupWindowSize = -1;
+			}
+			if (dedupWindowSize < 0) {
+				cmdError("Value of --dedup must be integer >= 0");
+			}
+		}
 	}
 
 	@Override
@@ -190,6 +210,7 @@ public class tarql extends CmdGeneral {
 			}
 			if (resultTripleIterator.hasNext()) {
 				StreamingRDFWriter writer = new StreamingRDFWriter(System.out, resultTripleIterator);
+				writer.setDedupWindowSize(dedupWindowSize);
 				if (writeNTriples) {
 					writer.writeNTriples();
 				} else {
