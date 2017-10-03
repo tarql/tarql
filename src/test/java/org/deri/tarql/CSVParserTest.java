@@ -103,6 +103,18 @@ public class CSVParserTest {
 		String csv = "Is-Estimated?\nYes";
 		assertEquals(vars("Is_Estimated_"), getNonPseudoVars(csv, true));
 	}
+
+	@Test
+	public void testHandlePercentInColumnNames() throws IOException {
+		String csv = "Profit%\n80";
+		assertEquals(vars("Profit_"), getNonPseudoVars(csv, true));
+	}
+
+	@Test
+	public void testHandleRoundBracketsInColumnNames() throws IOException {
+		String csv = "Weight(mg)\n0.33";
+		assertEquals(vars("Weight_mg_"), getNonPseudoVars(csv, true));
+	}
 	
 	@Test
 	public void testDuplicateColumnName() throws IOException {
