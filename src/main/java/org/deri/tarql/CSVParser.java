@@ -88,9 +88,10 @@ public class CSVParser implements ClosableIterator<Binding> {
 
         s = s.trim().replaceAll("[^" + pattern + "]", "_");
 
+		//.replaceAll("_+", "_").replaceAll("^_|_$", ""); - suggest to clean-up the variable name
+
 		if ("".equals(s))
 			return null;
-		// FIXME: Handle other characters not allowed in Vars
 		return Var.alloc(s);
 	}
 
