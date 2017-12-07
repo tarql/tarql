@@ -108,7 +108,7 @@ public class CSVParser implements ClosableIterator<Binding> {
 	 * SPARQL value
 	 */
 	private boolean isUnboundValue(String value) {
-		return value == null || "".equals(value);
+		return value == null || value.matches("\\s*");
 	}
 
 	private Binding toBinding(String[] row) {
