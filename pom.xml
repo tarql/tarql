@@ -46,16 +46,10 @@
       <artifactId>jena-cmds</artifactId>
       <version>3.3.0</version>
     </dependency>
-    <!-- We use a custom build of OpenCSV with Patch #54. To build:
-
-         git clone https://github.com/cygri/opencsv.git
-         cd opencsv
-         mvn install -Dgpg.skip -Denforcer.skip
-    -->
     <dependency>
       <groupId>com.opencsv</groupId>
       <artifactId>opencsv</artifactId>
-      <version>3.9-cygri</version>
+      <version>4.0</version>
     </dependency>
     <dependency>
       <groupId>net.sourceforge.jchardet</groupId>
