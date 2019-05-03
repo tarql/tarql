@@ -26,6 +26,7 @@
   </scm>
 
   <properties>
+    <jena.version>3.11.0</jena.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
@@ -39,12 +40,12 @@
     <dependency>
       <groupId>org.apache.jena</groupId>
       <artifactId>jena-arq</artifactId>
-      <version>3.3.0</version>
+      <version>${jena.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.jena</groupId>
       <artifactId>jena-cmds</artifactId>
-      <version>3.3.0</version>
+      <version>${jena.version}</version>
     </dependency>
     <dependency>
       <groupId>com.opencsv</groupId>
@@ -55,12 +56,6 @@
       <groupId>net.sourceforge.jchardet</groupId>
       <artifactId>jchardet</artifactId>
       <version>1.0</version>
-    </dependency>
-    <dependency>
-      <groupId>commons-io</groupId>
-      <artifactId>commons-io</artifactId>
-      <version>2.5</version>
-      <scope>test</scope>
     </dependency>
   </dependencies>
 
