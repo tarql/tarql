@@ -95,7 +95,7 @@ public class tarql extends CmdGeneral {
 		getUsage().startCategory("Input options");
 		add(stdinArg,         "--stdin", "Read input from STDIN instead of file");
 		add(delimiterArg,     "-d   --delimiter", "Delimiting character of the input file");
-		add(tabsArg,          "-t   --tabs", "Specifies that the input is tab-separagted (TSV)");
+		add(tabsArg,          "-t   --tabs", "Specifies that the input is tab-separated (TSV)");
 		add(quoteArg,         "--quotechar", "Quote character used in the input file, or \"none\"");
 		add(escapeArg,        "-p   --escapechar", "Character used to escape quotes in the input file, or \"none\"");
 		add(encodingArg,      "-e   --encoding", "Override input file encoding (e.g., utf-8 or latin-1)");
