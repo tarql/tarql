@@ -12,7 +12,9 @@ import org.apache.jena.sparql.engine.binding.Binding;
 import org.apache.jena.sparql.engine.binding.BindingHashMap;
 import org.apache.jena.util.iterator.ClosableIterator;
 
+import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReader;
+import com.opencsv.CSVReaderBuilder;
 
 
 /**
@@ -193,7 +195,13 @@ public class CSVParser implements ClosableIterator<Binding> {
 	
 	private void init() throws IOException {
 		String[] row;
-		csv = new CSVReader(reader, delimiter, quote, escape);
+		csv = new CSVReaderBuilder(reader).withCSVParser(
+				new CSVParserBuilder()
+						.withSeparator(delimiter)
+						.withQuoteChar(quote)
+						.withEscapeChar(escape)
+						.build())
+				.build();
 		if (varsFromHeader) {
 			while ((row = csv.readNext()) != null) {
 				boolean foundValidColumnName = false;
