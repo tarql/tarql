@@ -14,6 +14,7 @@ import org.apache.jena.shared.JenaException;
 import org.apache.jena.shared.NotFoundException;
 import org.apache.jena.shared.PrefixMapping;
 import org.apache.jena.shared.impl.PrefixMappingImpl;
+import org.apache.jena.sparql.ARQConstants;
 import org.apache.jena.sparql.lang.SyntaxVarScope;
 import org.apache.jena.sparql.lang.sparql_11.ParseException;
 import org.apache.jena.sparql.lang.sparql_11.SPARQLParser11;
@@ -28,6 +29,11 @@ import org.slf4j.LoggerFactory;
  */
 public class TarqlParser {
 	private final static Logger log = LoggerFactory.getLogger(TarqlParser.class);
+	
+	private final static PrefixMapping builtInPrefixes = new PrefixMappingImpl() {{
+		setNsPrefix("tarql", tarql.NS);
+		setNsPrefix("apf", ARQConstants.ARQPropertyFunctionLibraryURI);
+	}};
 	
 	private final Reader reader;
 	private final TarqlQuery result = new TarqlQuery();
@@ -49,7 +55,7 @@ public class TarqlParser {
 	public TarqlParser(Reader reader, String baseIRI) {
 		this.reader = reader;
 		result.getPrologue().setResolver(IRIResolver.create(baseIRI));
-		addTarqlPrefix();
+		addBuiltInPrefixes();
 	}
 	
 	private static Reader open(String filenameOrURL) {
@@ -101,7 +107,7 @@ public class TarqlParser {
 				log.debug(query.toString());
 			}
 		} while (parser.getToken(1).kind != SPARQLParser11.EOF);
-		removeTarqlPrefix();
+		removeBuiltInPrefixes();
 	}
 
 	// Adapted from ARQ ParserSPARQL11.java
@@ -133,17 +139,27 @@ public class TarqlParser {
 		}
 	}
 	
-	private void addTarqlPrefix() {
-		if (result.getPrologue().getPrefix("tarql") == null) {
-			result.getPrologue().getPrefixMapping().setNsPrefix("tarql", tarql.NS);
+	private void addBuiltInPrefixes() {
+		for (String prefix: builtInPrefixes.getNsPrefixMap().keySet()) {
+			if (result.getPrologue().getPrefix(prefix) != null) continue;
+			result.getPrologue().getPrefixMapping().setNsPrefix(prefix, 
+					builtInPrefixes.getNsPrefixURI(prefix));			
 		}
 	}
 	
-	private void removeTarqlPrefix() {
-		if (tarql.NS.equals(result.getPrologue().getPrefix("tarql"))) {
-			PrefixMapping prefixes = new PrefixMappingImpl();
-			prefixes.setNsPrefixes(result.getPrologue().getPrefixMapping());
-			prefixes.removeNsPrefix("tarql");
+	private void removeBuiltInPrefixes() {
+		PrefixMapping prefixes = null;
+		for (String prefix: builtInPrefixes.getNsPrefixMap().keySet()) {
+			String uri = builtInPrefixes.getNsPrefixURI(prefix);
+			if (!uri.equals(result.getPrologue().getPrefix(prefix))) continue;
+			if (prefixes == null) {
+				prefixes = new PrefixMappingImpl();
+				prefixes.setNsPrefixes(result.getPrologue().getPrefixMapping());
+				
+			}
+			prefixes.removeNsPrefix(prefix);
+		}
+		if (prefixes != null) {
 			result.getPrologue().setPrefixMapping(prefixes);
 		}
 	}

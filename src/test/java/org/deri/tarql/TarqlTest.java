@@ -255,9 +255,9 @@ public class TarqlTest {
 		csv = "x";
 		String query = 
 				"SELECT ?ns { BIND (tarql:expandPrefix('tarql') AS ?ns) }";
-				TarqlQuery tq =  new TarqlParser(new StringReader(query), null).getResult();
-				List<Var> vars = vars("ns");
-				assertSelect(tq, binding(vars, "\"" + tarql.NS + "\""));
+		TarqlQuery tq = new TarqlParser(new StringReader(query), null).getResult();
+		List<Var> vars = vars("ns");
+		assertSelect(tq, binding(vars, "\"" + tarql.NS + "\""));
 	}
 	
 	@Test
@@ -267,8 +267,21 @@ public class TarqlTest {
 				"PREFIX ex: <http://example.com/>\n" +
 				"PREFIX aaa: <http://aaa.example.com/>\n" +
 				"SELECT ?uri { BIND (URI(CONCAT(tarql:expandPrefix(STRBEFORE(?a, ':')), STRAFTER(?a, ':'))) AS ?uri) }";
-				TarqlQuery tq =  new TarqlParser(new StringReader(query), null).getResult();
-				List<Var> vars = vars("uri");
-				assertSelect(tq, binding(vars, "<http://example.com/foo>"), binding(vars, "<http://aaa.example.com/bbb>"));
+		TarqlQuery tq = new TarqlParser(new StringReader(query), null).getResult();
+		List<Var> vars = vars("uri");
+		assertSelect(tq, binding(vars, "<http://example.com/foo>"), binding(vars, "<http://aaa.example.com/bbb>"));
+	}
+	
+	
+	@Test
+	public void testBuiltInPrefixes() throws IOException {
+		csv = "x";
+		String query = "SELECT ?prefix ?ns { " +
+				"VALUES (?prefix ?ns) { ('tarql' tarql:) ('apf' apf:) } }";
+		TarqlQuery tq = new TarqlParser(new StringReader(query), null).getResult();
+		List<Var> vars = vars("prefix", "ns");
+		assertSelect(tq, 
+				binding(vars, "'tarql'", "<http://tarql.github.io/tarql#>"), 
+				binding(vars, "'apf'", "<http://jena.apache.org/ARQ/property#>"));
 	}
 }
