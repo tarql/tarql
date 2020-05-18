@@ -22,6 +22,7 @@ import org.apache.log4j.Logger;
 
 import jena.cmd.ArgDecl;
 import jena.cmd.CmdGeneral;
+import riotcmd.json;
 
 
 
@@ -63,6 +64,8 @@ public class tarql extends CmdGeneral {
 	private final ArgDecl withoutHeaderArg = new ArgDecl(false, "no-header-row", "no-header", "H");
 	private final ArgDecl encodingArg = new ArgDecl(true, "encoding", "e");
 	private final ArgDecl nTriplesArg = new ArgDecl(false, "ntriples");
+	private final ArgDecl jsonFormatArg = new ArgDecl(false, "json_format");
+	private final ArgDecl xmlFormatArg = new ArgDecl(false, "xml_format");
 	private final ArgDecl delimiterArg = new ArgDecl(true, "delimiter", "d");
 	private final ArgDecl tabsArg = new ArgDecl(false, "tabs", "tab", "t");
 	private final ArgDecl quoteArg = new ArgDecl(true, "quotechar");
@@ -74,6 +77,8 @@ public class tarql extends CmdGeneral {
 	private String queryFile;
 	private List<String> csvFiles = new ArrayList<String>();
 	private boolean stdin = false;
+	private boolean json_format = false;
+	private boolean xml_format = false;
 	private CSVOptions options = new CSVOptions();
 	private boolean testQuery = false;
 	private boolean writeNTriples = false;
@@ -90,6 +95,8 @@ public class tarql extends CmdGeneral {
 		add(testQueryArg,     "--test", "Show CONSTRUCT template and first rows only (for query debugging)");
 		add(writeBaseArg,     "--write-base", "Write @base if output is Turtle");
 		add(nTriplesArg,      "--ntriples", "Write N-Triples instead of Turtle");
+		add(jsonFormatArg,    "--json-format", "Write the output in JSON Format");
+		add(xmlFormatArg,     "--xml-format", "Write the output in XML Format");
 		add(dedupArg, "--dedup", "Window size in which to remove duplicate triples");
 
 		getUsage().startCategory("Input options");
@@ -130,6 +137,12 @@ public class tarql extends CmdGeneral {
 		}
 		if (hasArg(stdinArg)) {
 			stdin = true;
+		}
+		if (hasArg(jsonFormatArg)) {
+			json_format = true;
+		}
+		if (hasArg(xmlFormatArg)) {
+			xml_format = true;
 		}
 		if (hasArg(withHeaderArg)) {
 			options.setColumnNamesInFirstRow(true);
@@ -258,7 +271,12 @@ public class tarql extends CmdGeneral {
 			out.flush();
 		}
 		if (ex.getFirstQuery().isSelectType()) {
-			System.out.println(ResultSetFormatter.asText(ex.execSelect()));
+			if (json_format)
+				ResultSetFormatter.outputAsJSON(System.out, ex.execSelect());
+			else if ( xml_format )
+				ResultSetFormatter.outputAsXML(System.out, ex.execSelect());
+			else
+				System.out.println(ResultSetFormatter.asText(ex.execSelect()));
 		} else if (ex.getFirstQuery().isAskType()) {
 			System.out.println(ResultSetFormatter.asText(ex.execSelect()));
 		} else if (ex.getFirstQuery().isConstructType()) {
