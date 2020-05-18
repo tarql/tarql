@@ -6,6 +6,10 @@ import java.util.Map.Entry;
 
 import org.apache.jena.atlas.io.IndentedWriter;
 import org.apache.jena.graph.Triple;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.riot.system.RiotLib;
 import org.apache.jena.riot.system.StreamOps;
 import org.apache.jena.riot.system.StreamRDF;
@@ -14,7 +18,6 @@ import org.apache.jena.riot.writer.WriterStreamRDFPlain;
 import org.apache.jena.shared.PrefixMapping;
 import org.apache.jena.shared.impl.PrefixMappingImpl;
 import org.apache.jena.vocabulary.RDF;
-
 
 /**
  * Writes an iterator over triples to N-Triples or Turtle
@@ -49,6 +52,28 @@ public class StreamingRDFWriter {
 		StreamOps.sendTriplesToStream(triples, writer);
 		writer.finish();
 	}
+
+	public void writeJSONLD() {
+
+		StreamRDF writer = new WriterStreamRDFPlain(new IndentedWriter(out));
+		Model model = ModelFactory.createDefaultModel();
+		if (dedupWindowSize > 0) {
+			writer = new StreamRDFDedup(writer, dedupWindowSize);
+		}
+		for ( ; triples.hasNext() ; )
+        {
+            Triple t = triples.next() ;
+			Resource subject = (Resource) model.createResource( t.getSubject().toString() );
+			Property propertyType = (Property) model.createProperty( t.getPredicate().toString() );
+			Resource object = (Resource) model.createResource(t.getObject().toString());
+			model.add(subject, propertyType, object);	
+		}
+		model.write(System.out, "JSONLD");
+		// writer.start();
+		// StreamOps.sendTriplesToStream(triples, writer);
+		// writer.finish();
+	}
+
 
 	public void writeTurtle(String baseIRI, PrefixMapping prefixes, boolean writeBase) {
 		// Auto-register RDF prefix so that rdf:type is displayed well

@@ -63,6 +63,8 @@ public class tarql extends CmdGeneral {
 	private final ArgDecl withoutHeaderArg = new ArgDecl(false, "no-header-row", "no-header", "H");
 	private final ArgDecl encodingArg = new ArgDecl(true, "encoding", "e");
 	private final ArgDecl nTriplesArg = new ArgDecl(false, "ntriples");
+	private final ArgDecl jsonLDArg = new ArgDecl(false, "jsonld");
+
 	private final ArgDecl delimiterArg = new ArgDecl(true, "delimiter", "d");
 	private final ArgDecl tabsArg = new ArgDecl(false, "tabs", "tab", "t");
 	private final ArgDecl quoteArg = new ArgDecl(true, "quotechar");
@@ -77,6 +79,8 @@ public class tarql extends CmdGeneral {
 	private CSVOptions options = new CSVOptions();
 	private boolean testQuery = false;
 	private boolean writeNTriples = false;
+	private boolean writeJSONLD = false;
+
 	private String baseIRI = null;
 	private boolean writeBase = false;
 	private int dedupWindowSize = 0;
@@ -90,6 +94,7 @@ public class tarql extends CmdGeneral {
 		add(testQueryArg,     "--test", "Show CONSTRUCT template and first rows only (for query debugging)");
 		add(writeBaseArg,     "--write-base", "Write @base if output is Turtle");
 		add(nTriplesArg,      "--ntriples", "Write N-Triples instead of Turtle");
+		add(jsonLDArg,        "--josnld", "Write JSON-LD instead of Turtle");
 		add(dedupArg, "--dedup", "Window size in which to remove duplicate triples");
 
 		getUsage().startCategory("Input options");
@@ -145,6 +150,9 @@ public class tarql extends CmdGeneral {
 		}
 		if (hasArg(nTriplesArg)) {
 			writeNTriples = true;
+		}
+		if (hasArg(jsonLDArg)) {
+			writeJSONLD = true;
 		}
 		if (hasArg(tabsArg)) {
 			options.setDefaultsForTSV();
@@ -213,7 +221,11 @@ public class tarql extends CmdGeneral {
 				writer.setDedupWindowSize(dedupWindowSize);
 				if (writeNTriples) {
 					writer.writeNTriples();
-				} else {
+				}
+				else if(writeJSONLD){
+					writer.writeJSONLD();
+				} 
+				else {
 					writer.writeTurtle(
 							q.getPrologue().getBaseURI(),
 							q.getPrologue().getPrefixMapping(), writeBase);
