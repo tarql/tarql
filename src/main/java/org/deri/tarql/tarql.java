@@ -70,6 +70,7 @@ public class tarql extends CmdGeneral {
 	private final ArgDecl baseArg = new ArgDecl(true, "base");
 	private final ArgDecl writeBaseArg = new ArgDecl(false, "write-base");
 	private final ArgDecl dedupArg = new ArgDecl(true, "dedup");
+	private final ArgDecl jsonldArg=new ArgDecl(false,"jsonld");
 	
 	private String queryFile;
 	private List<String> csvFiles = new ArrayList<String>();
@@ -80,6 +81,7 @@ public class tarql extends CmdGeneral {
 	private String baseIRI = null;
 	private boolean writeBase = false;
 	private int dedupWindowSize = 0;
+	private boolean writeJSONLD=false;
 	
 	private ExtendedIterator<Triple> resultTripleIterator = NullIterator.instance();
 	
@@ -90,6 +92,7 @@ public class tarql extends CmdGeneral {
 		add(testQueryArg,     "--test", "Show CONSTRUCT template and first rows only (for query debugging)");
 		add(writeBaseArg,     "--write-base", "Write @base if output is Turtle");
 		add(nTriplesArg,      "--ntriples", "Write N-Triples instead of Turtle");
+		add(jsonldArg,"--jsonld","Write JSONLD instead of Turtle");
 		add(dedupArg, "--dedup", "Window size in which to remove duplicate triples");
 
 		getUsage().startCategory("Input options");
@@ -145,6 +148,9 @@ public class tarql extends CmdGeneral {
 		}
 		if (hasArg(nTriplesArg)) {
 			writeNTriples = true;
+		}
+		if(hasArg(jsonldArg)){
+			writeJSONLD=true;
 		}
 		if (hasArg(tabsArg)) {
 			options.setDefaultsForTSV();
@@ -213,7 +219,11 @@ public class tarql extends CmdGeneral {
 				writer.setDedupWindowSize(dedupWindowSize);
 				if (writeNTriples) {
 					writer.writeNTriples();
-				} else {
+				}
+				else if(writeJSONLD){
+					writer.writeJsonLD();
+				}
+				else {
 					writer.writeTurtle(
 							q.getPrologue().getBaseURI(),
 							q.getPrologue().getPrefixMapping(), writeBase);

@@ -6,6 +6,10 @@ import java.util.Map.Entry;
 
 import org.apache.jena.atlas.io.IndentedWriter;
 import org.apache.jena.graph.Triple;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.riot.system.RiotLib;
 import org.apache.jena.riot.system.StreamOps;
 import org.apache.jena.riot.system.StreamRDF;
@@ -48,6 +52,22 @@ public class StreamingRDFWriter {
 		writer.start();
 		StreamOps.sendTriplesToStream(triples, writer);
 		writer.finish();
+	}
+	public void writeJsonLD(){
+		StreamRDF writer = new WriterStreamRDFPlain(new IndentedWriter(out));
+		Model model=ModelFactory.createDefaultModel();
+		if (dedupWindowSize > 0) {
+			writer = new StreamRDFDedup(writer, dedupWindowSize);
+		}
+		while(triples.hasNext()){
+			Triple t=triples.next();
+			Resource subject=(Resource)model.createResource(t.getSubject().toString());
+			Resource predicate=(Property)model.createProperty(t.getPredicate().toString());
+			Resource object=(Resource)model.createResource(t.getObject().toString());
+			model.add(subject, (Property) predicate,object);
+
+		}
+		model.write(System.out,"JSONLD");
 	}
 
 	public void writeTurtle(String baseIRI, PrefixMapping prefixes, boolean writeBase) {
