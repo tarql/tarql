@@ -2,14 +2,20 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="13c66267-7470-4ab7-b1a1-072075647aa3" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/deri/tarql/StreamingRDFWriter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/deri/tarql/StreamingRDFWriter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/deri/tarql/tarql.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/deri/tarql/tarql.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/org/deri/tarql/functions/StreamRDFwriterTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -27,10 +33,10 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../../Ass1" />
     <property name="settings.editor.selected.configurable" value="configurable.group.build" />
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="JUnit.StreamingRDFWriterTest">
     <configuration name="tarql" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="org.deri.tarql.tarql" />
       <module name="tarql" />
@@ -44,8 +50,24 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="StreamingRDFWriterTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="tarql" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="org.deri.tarql.functions.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="org.deri.tarql.functions" />
+      <option name="MAIN_CLASS_NAME" value="org.deri.tarql.functions.StreamingRDFWriterTest" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="JUnit.StreamingRDFWriterTest" />
         <item itemvalue="Application.tarql" />
       </list>
     </recent_temporary>
@@ -63,7 +85,7 @@
       <workItem from="1590690694530" duration="647000" />
       <workItem from="1590691357967" duration="1927000" />
       <workItem from="1590693885109" duration="154000" />
-      <workItem from="1590694044671" duration="2992000" />
+      <workItem from="1590694044671" duration="3536000" />
     </task>
     <servers />
   </component>
@@ -75,26 +97,26 @@
       <screen x="0" y="0" width="1280" height="680" />
     </state>
     <state x="387" y="143" key="#com.intellij.fileTypes.FileTypeChooser/0.0.1280.680@0.0.1280.680" timestamp="1590691192023" />
-    <state x="421" y="96" key="FileChooserDialogImpl" timestamp="1590694035955">
+    <state x="421" y="96" key="FileChooserDialogImpl" timestamp="1590698802732">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state x="421" y="96" key="FileChooserDialogImpl/0.0.1280.680@0.0.1280.680" timestamp="1590694035955" />
-    <state width="1237" height="25" key="GridCell.Tab.0.bottom" timestamp="1590693883234">
+    <state x="421" y="96" key="FileChooserDialogImpl/0.0.1280.680@0.0.1280.680" timestamp="1590698802732" />
+    <state width="1237" height="246" key="GridCell.Tab.0.bottom" timestamp="1590698577623">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state width="1237" height="25" key="GridCell.Tab.0.bottom/0.0.1280.680@0.0.1280.680" timestamp="1590693883234" />
-    <state width="1237" height="25" key="GridCell.Tab.0.center" timestamp="1590693883234">
+    <state width="1237" height="246" key="GridCell.Tab.0.bottom/0.0.1280.680@0.0.1280.680" timestamp="1590698577623" />
+    <state width="1237" height="246" key="GridCell.Tab.0.center" timestamp="1590698577622">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state width="1237" height="25" key="GridCell.Tab.0.center/0.0.1280.680@0.0.1280.680" timestamp="1590693883234" />
-    <state width="1237" height="25" key="GridCell.Tab.0.left" timestamp="1590693883234">
+    <state width="1237" height="246" key="GridCell.Tab.0.center/0.0.1280.680@0.0.1280.680" timestamp="1590698577622" />
+    <state width="1237" height="246" key="GridCell.Tab.0.left" timestamp="1590698577622">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state width="1237" height="25" key="GridCell.Tab.0.left/0.0.1280.680@0.0.1280.680" timestamp="1590693883234" />
-    <state width="1237" height="25" key="GridCell.Tab.0.right" timestamp="1590693883234">
+    <state width="1237" height="246" key="GridCell.Tab.0.left/0.0.1280.680@0.0.1280.680" timestamp="1590698577622" />
+    <state width="1237" height="246" key="GridCell.Tab.0.right" timestamp="1590698577623">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state width="1237" height="25" key="GridCell.Tab.0.right/0.0.1280.680@0.0.1280.680" timestamp="1590693883234" />
+    <state width="1237" height="246" key="GridCell.Tab.0.right/0.0.1280.680@0.0.1280.680" timestamp="1590698577623" />
     <state x="221" y="76" key="IDE.errors.dialog" timestamp="1590691258912">
       <screen x="0" y="0" width="1280" height="680" />
     </state>

@@ -1,0 +1,10 @@
+{
+  "" : "<http://ex.org/object>",
+  "@id" : "<http://ex.org/subject>",
+  "@context" : {
+    "" : {
+      "@id" : "<http://ex.org/predicate>",
+      "@type" : "@id"
+    }
+  }
+}
