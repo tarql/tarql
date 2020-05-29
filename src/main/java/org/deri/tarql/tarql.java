@@ -22,6 +22,7 @@ import org.apache.log4j.Logger;
 
 import jena.cmd.ArgDecl;
 import jena.cmd.CmdGeneral;
+import riotcmd.json;
 
 
 
@@ -64,7 +65,6 @@ public class tarql extends CmdGeneral {
 	private final ArgDecl encodingArg = new ArgDecl(true, "encoding", "e");
 	private final ArgDecl nTriplesArg = new ArgDecl(false, "ntriples");
 	private final ArgDecl jsonLDArg = new ArgDecl(false, "jsonld");
-
 	private final ArgDecl delimiterArg = new ArgDecl(true, "delimiter", "d");
 	private final ArgDecl tabsArg = new ArgDecl(false, "tabs", "tab", "t");
 	private final ArgDecl quoteArg = new ArgDecl(true, "quotechar");
@@ -72,10 +72,14 @@ public class tarql extends CmdGeneral {
 	private final ArgDecl baseArg = new ArgDecl(true, "base");
 	private final ArgDecl writeBaseArg = new ArgDecl(false, "write-base");
 	private final ArgDecl dedupArg = new ArgDecl(true, "dedup");
+  private final ArgDecl jsonFormatArg = new ArgDecl(false, "json_format");
+	private final ArgDecl xmlFormatArg = new ArgDecl(false, "xml_format");
 	
 	private String queryFile;
 	private List<String> csvFiles = new ArrayList<String>();
 	private boolean stdin = false;
+	private boolean json_format = false;
+	private boolean xml_format = false;
 	private CSVOptions options = new CSVOptions();
 	private boolean testQuery = false;
 	private boolean writeNTriples = false;
@@ -96,7 +100,6 @@ public class tarql extends CmdGeneral {
 		add(nTriplesArg,      "--ntriples", "Write N-Triples instead of Turtle");
 		add(jsonLDArg,        "--josnld", "Write JSON-LD instead of Turtle");
 		add(dedupArg, "--dedup", "Window size in which to remove duplicate triples");
-
 		getUsage().startCategory("Input options");
 		add(stdinArg,         "--stdin", "Read input from STDIN instead of file");
 		add(delimiterArg,     "-d   --delimiter", "Delimiting character of the input file");
@@ -107,7 +110,8 @@ public class tarql extends CmdGeneral {
 		add(withoutHeaderArg, "-H   --no-header-row", "Input file has no header row; use variable names ?a, ?b, ...");
 		add(withHeaderArg,    "--header-row", "Input file's first row is a header with variable names (default)");
 		add(baseArg,          "--base", "Base IRI for resolving relative IRIs");
-		
+		add(jsonFormatArg,    "--json-format", "Write the output in JSON Format");
+		add(xmlFormatArg,     "--xml-format", "Write the output in XML Format");
 		getUsage().startCategory("Main arguments");
 		getUsage().addUsage("query.sparql", "File containing a SPARQL query to be applied to an input file");
 		getUsage().addUsage("table.csv", "CSV/TSV file to be processed; can be omitted if specified in FROM clause");
@@ -135,6 +139,12 @@ public class tarql extends CmdGeneral {
 		}
 		if (hasArg(stdinArg)) {
 			stdin = true;
+		}
+		if (hasArg(jsonFormatArg)) {
+			json_format = true;
+		}
+		if (hasArg(xmlFormatArg)) {
+			xml_format = true;
 		}
 		if (hasArg(withHeaderArg)) {
 			options.setColumnNamesInFirstRow(true);
@@ -270,7 +280,12 @@ public class tarql extends CmdGeneral {
 			out.flush();
 		}
 		if (ex.getFirstQuery().isSelectType()) {
-			System.out.println(ResultSetFormatter.asText(ex.execSelect()));
+			if (json_format)
+				ResultSetFormatter.outputAsJSON(System.out, ex.execSelect());
+			else if ( xml_format )
+				ResultSetFormatter.outputAsXML(System.out, ex.execSelect());
+			else
+				System.out.println(ResultSetFormatter.asText(ex.execSelect()));
 		} else if (ex.getFirstQuery().isAskType()) {
 			System.out.println(ResultSetFormatter.asText(ex.execSelect()));
 		} else if (ex.getFirstQuery().isConstructType()) {
