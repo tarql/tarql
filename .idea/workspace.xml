@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="13c66267-7470-4ab7-b1a1-072075647aa3" name="Default Changelist" comment="" />
+    <list default="true" id="13c66267-7470-4ab7-b1a1-072075647aa3" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -37,7 +39,7 @@
     <property name="last_opened_file_path" value="$PROJECT_DIR$/../../../Ass1" />
     <property name="settings.editor.selected.configurable" value="configurable.group.build" />
   </component>
-  <component name="RunManager" selected="JUnit.StreamingRDFWriterTest">
+  <component name="RunManager" selected="JUnit.StreamingRDFWriterTest.shouldPassThroughTriples">
     <configuration name="tarql" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="org.deri.tarql.tarql" />
       <module name="tarql" />
@@ -66,8 +68,25 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="StreamingRDFWriterTest.shouldPassThroughTriples" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="tarql" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="org.deri.tarql.functions.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="org.deri.tarql.functions" />
+      <option name="MAIN_CLASS_NAME" value="org.deri.tarql.functions.StreamingRDFWriterTest" />
+      <option name="METHOD_NAME" value="shouldPassThroughTriples" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="JUnit.StreamingRDFWriterTest.shouldPassThroughTriples" />
         <item itemvalue="JUnit.StreamingRDFWriterTest" />
         <item itemvalue="Application.tarql" />
       </list>
@@ -86,7 +105,8 @@
       <workItem from="1590690694530" duration="647000" />
       <workItem from="1590691357967" duration="1927000" />
       <workItem from="1590693885109" duration="154000" />
-      <workItem from="1590694044671" duration="3920000" />
+      <workItem from="1590694044671" duration="4910000" />
+      <workItem from="1590740817718" duration="723000" />
     </task>
     <servers />
   </component>
@@ -105,22 +125,38 @@
       <screen x="0" y="0" width="1280" height="680" />
     </state>
     <state x="421" y="96" key="FileChooserDialogImpl/0.0.1280.680@0.0.1280.680" timestamp="1590698802732" />
-    <state width="1237" height="253" key="GridCell.Tab.0.bottom" timestamp="1590699248132">
+    <state width="1237" height="247" key="GridCell.Tab.0.bottom" timestamp="1590701010962">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state width="1237" height="253" key="GridCell.Tab.0.bottom/0.0.1280.680@0.0.1280.680" timestamp="1590699248132" />
-    <state width="1237" height="253" key="GridCell.Tab.0.center" timestamp="1590699248131">
+    <state width="1237" height="247" key="GridCell.Tab.0.bottom/0.0.1280.680@0.0.1280.680" timestamp="1590701010962" />
+    <state width="1237" height="247" key="GridCell.Tab.0.center" timestamp="1590701010962">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state width="1237" height="253" key="GridCell.Tab.0.center/0.0.1280.680@0.0.1280.680" timestamp="1590699248131" />
-    <state width="1237" height="253" key="GridCell.Tab.0.left" timestamp="1590699248131">
+    <state width="1237" height="247" key="GridCell.Tab.0.center/0.0.1280.680@0.0.1280.680" timestamp="1590701010962" />
+    <state width="1237" height="247" key="GridCell.Tab.0.left" timestamp="1590701010962">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state width="1237" height="253" key="GridCell.Tab.0.left/0.0.1280.680@0.0.1280.680" timestamp="1590699248131" />
-    <state width="1237" height="253" key="GridCell.Tab.0.right" timestamp="1590699248131">
+    <state width="1237" height="247" key="GridCell.Tab.0.left/0.0.1280.680@0.0.1280.680" timestamp="1590701010962" />
+    <state width="1237" height="247" key="GridCell.Tab.0.right" timestamp="1590701010962">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state width="1237" height="253" key="GridCell.Tab.0.right/0.0.1280.680@0.0.1280.680" timestamp="1590699248131" />
+    <state width="1237" height="247" key="GridCell.Tab.0.right/0.0.1280.680@0.0.1280.680" timestamp="1590701010962" />
+    <state width="1237" height="247" key="GridCell.Tab.1.bottom" timestamp="1590701010962">
+      <screen x="0" y="0" width="1280" height="680" />
+    </state>
+    <state width="1237" height="247" key="GridCell.Tab.1.bottom/0.0.1280.680@0.0.1280.680" timestamp="1590701010962" />
+    <state width="1237" height="247" key="GridCell.Tab.1.center" timestamp="1590701010962">
+      <screen x="0" y="0" width="1280" height="680" />
+    </state>
+    <state width="1237" height="247" key="GridCell.Tab.1.center/0.0.1280.680@0.0.1280.680" timestamp="1590701010962" />
+    <state width="1237" height="247" key="GridCell.Tab.1.left" timestamp="1590701010962">
+      <screen x="0" y="0" width="1280" height="680" />
+    </state>
+    <state width="1237" height="247" key="GridCell.Tab.1.left/0.0.1280.680@0.0.1280.680" timestamp="1590701010962" />
+    <state width="1237" height="247" key="GridCell.Tab.1.right" timestamp="1590701010962">
+      <screen x="0" y="0" width="1280" height="680" />
+    </state>
+    <state width="1237" height="247" key="GridCell.Tab.1.right/0.0.1280.680@0.0.1280.680" timestamp="1590701010962" />
     <state x="221" y="76" key="IDE.errors.dialog" timestamp="1590691258912">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
@@ -129,5 +165,16 @@
       <screen x="0" y="0" width="1280" height="680" />
     </state>
     <state x="142" y="0" key="SettingsEditor/0.0.1280.680@0.0.1280.680" timestamp="1590693983367" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/test/java/org/deri/tarql/functions/StreamingRDFWriterTest.java</url>
+          <line>44</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>
