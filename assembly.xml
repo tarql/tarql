@@ -12,6 +12,8 @@
         <include>*.bat</include>
       </includes>
       <lineEnding>keep</lineEnding>
+      <fileMode>755</fileMode>
+      <directoryMode>755</directoryMode>
     </fileSet>
     <fileSet>
       <directory>target/appassembler/bin</directory>
@@ -19,8 +21,9 @@
       <excludes>
         <exclude>*.bat</exclude>
       </excludes>
-      <fileMode>744</fileMode>
+      <fileMode>755</fileMode>
       <lineEnding>keep</lineEnding>
+      <directoryMode>755</directoryMode>
     </fileSet>
     <fileSet>
       <directory>${project.basedir}</directory>
@@ -30,11 +33,13 @@
         <include>LICENSE*</include>
         <include>NOTICE*</include>
       </includes>
+      <fileMode>644</fileMode>
     </fileSet>
   </fileSets>
   <dependencySets>
     <dependencySet>
       <outputDirectory>lib</outputDirectory>
+      <fileMode>644</fileMode>
     </dependencySet>
   </dependencySets>
 </assembly>
