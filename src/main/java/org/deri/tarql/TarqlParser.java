@@ -17,9 +17,9 @@ import org.apache.jena.shared.PrefixMapping;
 import org.apache.jena.shared.impl.PrefixMappingImpl;
 import org.apache.jena.sparql.ARQConstants;
 import org.apache.jena.sparql.lang.SyntaxVarScope;
-import org.apache.jena.sparql.lang.sparql_11.ParseException;
-import org.apache.jena.sparql.lang.sparql_11.SPARQLParser11;
-import org.apache.jena.sparql.lang.sparql_11.TokenMgrError;
+import org.apache.jena.sparql.lang.arq.ARQParser;
+import org.apache.jena.sparql.lang.arq.ParseException;
+import org.apache.jena.sparql.lang.arq.TokenMgrError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,7 +75,7 @@ public class TarqlParser {
 		return result;
 	}
 
-	private void parseDo(SPARQLParser11 parser) throws ParseException {
+	private void parseDo(ARQParser parser) throws ParseException {
 		do {
 			int beginLine = parser.getToken(1).beginLine;
 			int beginColumn = parser.getToken(1).beginColumn;
@@ -89,6 +89,7 @@ public class TarqlParser {
 
 			result.addQuery(query);
 			parser.setQuery(query);
+			parser.ByteOrderMark();
 			parser.Query();
 
 			if (query.isSelectType() || query.isAskType()) {
@@ -107,7 +108,7 @@ public class TarqlParser {
 			if (log.isDebugEnabled()) {
 				log.debug(query.toString());
 			}
-		} while (parser.getToken(1).kind != SPARQLParser11.EOF);
+		} while (parser.getToken(1).kind != ARQParser.EOF);
 		removeBuiltInPrefixes();
 	}
 
@@ -115,7 +116,7 @@ public class TarqlParser {
 	private void parse() {
 		if (done) return;
 		done = true;
-		SPARQLParser11 parser = new SPARQLParser11(reader) ;
+		ARQParser parser = new ARQParser(reader) ;
 		try {
 			parseDo(parser);
 		} catch (ParseException ex) {
