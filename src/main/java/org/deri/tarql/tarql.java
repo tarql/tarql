@@ -9,19 +9,21 @@ import java.util.jar.Manifest;
 
 import org.apache.jena.atlas.io.IndentedWriter;
 import org.apache.jena.atlas.lib.Lib;
+import org.apache.jena.atlas.logging.LogCtl;
+import org.apache.jena.cmd.ArgDecl;
+import org.apache.jena.cmd.CmdGeneral;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.query.QueryParseException;
 import org.apache.jena.query.ResultSetFormatter;
+import org.apache.jena.riot.RIOT;
 import org.apache.jena.shared.NotFoundException;
 import org.apache.jena.sparql.serializer.FmtTemplate;
 import org.apache.jena.sparql.serializer.SerializationContext;
+import org.apache.jena.sys.JenaSystem;
 import org.apache.jena.util.iterator.ExtendedIterator;
 import org.apache.jena.util.iterator.NullIterator;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-
-import jena.cmd.ArgDecl;
-import jena.cmd.CmdGeneral;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 
@@ -33,26 +35,27 @@ public class tarql extends CmdGeneral {
 	// This will be displayed by --version
 	public static final String VERSION;
 	public static final String BUILD_DATE;
-	
+
 	public static final String NS = "http://tarql.github.io/tarql#";
-	
+	private static Logger LOG = LoggerFactory.getLogger("org.deri.tarql");
+
 	static {
 		String version = "Unknown";
 		String date = "Unknown";
 		try {
 			URL res = tarql.class.getResource(tarql.class.getSimpleName() + ".class");
 			Manifest mf = ((JarURLConnection) res.openConnection()).getManifest();
-			version = (String) mf.getMainAttributes().getValue("Implementation-Version");
-			date = (String) mf.getMainAttributes().getValue("Built-Date")
+			version = mf.getMainAttributes().getValue("Implementation-Version");
+			date = mf.getMainAttributes().getValue("Built-Date")
 					.replaceFirst("(\\d\\d\\d\\d)(\\d\\d)(\\d\\d)-(\\d\\d)(\\d\\d)", "$1-$2-$3T$4:$5:00Z");
 	    } catch (Exception ex) {
 		}
 		VERSION = version;
 		BUILD_DATE = date;
-		
+
 		TarqlQuery.registerFunctions();
 	}
-	
+
 	public static void main(String... args) {
 		new tarql(args).mainRun();
 	}
@@ -70,7 +73,7 @@ public class tarql extends CmdGeneral {
 	private final ArgDecl baseArg = new ArgDecl(true, "base");
 	private final ArgDecl writeBaseArg = new ArgDecl(false, "write-base");
 	private final ArgDecl dedupArg = new ArgDecl(true, "dedup");
-	
+
 	private String queryFile;
 	private List<String> csvFiles = new ArrayList<String>();
 	private boolean stdin = false;
@@ -80,12 +83,19 @@ public class tarql extends CmdGeneral {
 	private String baseIRI = null;
 	private boolean writeBase = false;
 	private int dedupWindowSize = 0;
-	
+
 	private ExtendedIterator<Triple> resultTripleIterator = NullIterator.instance();
-	
+
+	static {
+	    JenaSystem.init();
+	    LogCtl.setLog4j2();
+	    // Turtle 1.1 style: liek SPARQL, not PREFIX, not @prefix.
+	    RIOT.getContext().set(RIOT.symTurtleDirectiveStyle, "sparql");
+	}
+
 	public tarql(String[] args) {
 		super(args);
-		
+
 		getUsage().startCategory("Output options");
 		add(testQueryArg,     "--test", "Show CONSTRUCT template and first rows only (for query debugging)");
 		add(writeBaseArg,     "--write-base", "Write @base if output is Turtle");
@@ -102,18 +112,18 @@ public class tarql extends CmdGeneral {
 		add(withoutHeaderArg, "-H   --no-header-row", "Input file has no header row; use variable names ?a, ?b, ...");
 		add(withHeaderArg,    "--header-row", "Input file's first row is a header with variable names (default)");
 		add(baseArg,          "--base", "Base IRI for resolving relative IRIs");
-		
+
 		getUsage().startCategory("Main arguments");
 		getUsage().addUsage("query.sparql", "File containing a SPARQL query to be applied to an input file");
 		getUsage().addUsage("table.csv", "CSV/TSV file to be processed; can be omitted if specified in FROM clause");
 		modVersion.addClass(tarql.class);
 	}
-	
+
 	@Override
     protected String getCommandName() {
 		return Lib.className(this);
 	}
-	
+
 	@Override
 	protected String getSummary() {
 		return getCommandName() + " [options] query.sparql [table.csv [...]]";
@@ -196,15 +206,15 @@ public class tarql extends CmdGeneral {
 				q.makeTest();
 			}
 			if (stdin) {
-				processResults(TarqlQueryExecutionFactory.create(q, 
+				processResults(TarqlQueryExecutionFactory.create(q,
 						InputStreamSource.fromStdin(), options));
 			} else if (csvFiles.isEmpty()) {
 				processResults(TarqlQueryExecutionFactory.create(q, options));
 			} else {
 				for (String csvFile: csvFiles) {
 					URLOptionsParser parseResult = new URLOptionsParser(csvFile);
-					processResults(TarqlQueryExecutionFactory.create(q, 
-							InputStreamSource.fromFilenameOrIRI(parseResult.getRemainingURL()), 
+					processResults(TarqlQueryExecutionFactory.create(q,
+							InputStreamSource.fromFilenameOrIRI(parseResult.getRemainingURL()),
 							parseResult.getOptions(options)));
 				}
 			}
@@ -231,14 +241,14 @@ public class tarql extends CmdGeneral {
 	}
 
 	private void error(String message, Throwable cause) {
-		Logger.getLogger("org.deri.tarql").info(message == null ? "Error" : message, cause);
+		LOG.info(message == null ? "Error" : message, cause);
 		if (message == null) {
 			cmdError(cause.getMessage());
 		} else {
 			cmdError(message + ": " + cause.getMessage());
 		}
 	}
-	
+
 	private Character getCharValue(ArgDecl arg) {
 		String value = getValue(arg);
 		if (CSVOptions.charNames.containsKey(value)) {
@@ -250,10 +260,10 @@ public class tarql extends CmdGeneral {
 		cmdError("Value of --" + arg.getKeyName() + " cannot be more than one character");
 		return null;
 	}
-	
+
 	private void processResults(TarqlQueryExecution ex) throws IOException {
 		if (testQuery && ex.getFirstQuery().getConstructTemplate() != null) {
-			IndentedWriter out = new IndentedWriter(System.out); 
+			IndentedWriter out = new IndentedWriter(System.out);
 			new FmtTemplate(out, new SerializationContext(ex.getFirstQuery())).format(ex.getFirstQuery().getConstructTemplate());
 			out.flush();
 		}
@@ -267,17 +277,14 @@ public class tarql extends CmdGeneral {
 			cmdError("Only query forms CONSTRUCT, SELECT and ASK are supported");
 		}
 	}
-	
+
 	// Not sure if this really works...
 	private void initLogging() {
-		if (isQuiet()) {
-			Logger.getRootLogger().setLevel(Level.ERROR);
-		}
-		if (isVerbose()) {
-			Logger.getLogger("org.deri.tarql").setLevel(Level.INFO);
-		}
-		if (isDebug()) {
-			Logger.getLogger("org.deri.tarql").setLevel(Level.DEBUG);
-		}
+		if (isQuiet())
+		    LogCtl.set(LOG, "Error");
+		else if (isVerbose())
+            LogCtl.set(LOG, "Info");
+		else if (isDebug())
+		    LogCtl.set(LOG, "debug");
 	}
 }

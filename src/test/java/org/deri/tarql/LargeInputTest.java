@@ -9,9 +9,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 
-import org.apache.commons.codec.Charsets;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.shared.PrefixMapping;
@@ -29,7 +29,7 @@ import org.junit.Test;
  */
 public class LargeInputTest {
 
-	private final static String DUMMY_CONTENT = 
+	private final static String DUMMY_CONTENT =
 			"Lorem ipsum dolor sit amet. Consectetur adipiscing elit. Ut nec eros vel odio viverra fusce.";
 
 	private final static String EX = "http://example.com/ns";
@@ -59,8 +59,8 @@ public class LargeInputTest {
 		System.out.println("Done: " + i + " results");
 		return i;
 	}
-	
-	protected TarqlQueryExecution prepare(String query, CSVOptions options, 
+
+	protected TarqlQueryExecution prepare(String query, CSVOptions options,
 			InputStreamSource input) {
 		TarqlQuery tq = new TarqlParser(new StringReader(query)).getResult();
 		return TarqlQueryExecutionFactory.create(tq, input, options);
@@ -69,7 +69,7 @@ public class LargeInputTest {
 	protected TarqlQueryExecution prepare(String query, InputStreamSource input) {
 		return prepare(query, null, input);
 	}
-	
+
 	protected class DummyContentSource extends InputStreamSource {
 		private final int totalLines;
 		public DummyContentSource(int totalLines) {
@@ -90,7 +90,7 @@ public class LargeInputTest {
 			return "Line " + lineNumber + "," + DUMMY_CONTENT;
 		}
 	}
-	
+
 	protected class DummyOutputStream extends OutputStream {
 		private long bytesWritten = 0;
 		@Override
@@ -104,18 +104,18 @@ public class LargeInputTest {
 			return bytesWritten;
 		}
 	}
-	
+
 	@Test public void testDummyContentSource() throws IOException {
 		final int lines = 5;
 		BufferedReader r = new BufferedReader(
-				new InputStreamReader(new DummyContentSource(lines).open(), Charsets.UTF_8));
+				new InputStreamReader(new DummyContentSource(lines).open(), StandardCharsets.UTF_8));
 		int readLines = 0;
 		while (r.readLine() != null) {
 			readLines++;
 		}
 		assertEquals(lines, readLines);
 	}
-	
+
 	@Test public void testSmallInput() {
 		final int lines = 5;
 		String query = "SELECT * {}";
@@ -123,7 +123,7 @@ public class LargeInputTest {
 		int results = consume(rs);
 		assertEquals(lines - 1, results);
 	}
-	
+
 	@Ignore
 	@Test public void testInput5GB() {
 		System.out.println("testInput5GB");
@@ -164,7 +164,7 @@ public class LargeInputTest {
 		System.out.println("Done: " + out.getBytesWritten() + " bytes written");
 		assertTrue(out.getBytesWritten() > lines * 100);
 	}
-	
+
 	@Ignore
 	@Test public void testInput5GBWithRunawayQuoteButNoQuoteChar() {
 		System.out.println("testInput5GBWithRunawayQuoteButNoQuoteChar");

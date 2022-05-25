@@ -19,10 +19,10 @@ import org.slf4j.LoggerFactory;
  */
 public class CharsetDetectingReader extends Reader {
 	private final static Logger log = LoggerFactory.getLogger(CharsetDetectingReader.class);
-	
+
 	private final static int DEFAULT_BUFFER_SIZE = 1024;
 	private final static int EOF = -1;
-	
+
 	private final InputStream in;
 	private final byte[] buffer;
 	private final nsDetector detector = new nsDetector();
@@ -30,7 +30,7 @@ public class CharsetDetectingReader extends Reader {
 	private boolean encodingDetected = false;
 	private String detectedEncoding = null;
 	private String guessedEncoding = null;
-	
+
 	public CharsetDetectingReader(InputStream in) {
 		this(in, DEFAULT_BUFFER_SIZE);
 	}
@@ -40,7 +40,8 @@ public class CharsetDetectingReader extends Reader {
 		this.in = in;
 		buffer = new byte[bufferSize];
 		detector.Init(new nsICharsetDetectionObserver() {
-			public void Notify(String encoding) {
+			@Override
+            public void Notify(String encoding) {
 				log.debug("Encoding detected: {}", encoding);
 				detectedEncoding = encoding;
 			}
@@ -66,12 +67,12 @@ public class CharsetDetectingReader extends Reader {
 		}
 		return charsReadTotal;
 	}
-	
+
 	@Override
 	public void close() throws IOException {
 		in.close();
 	}
-	
+
 	private boolean fillBuffer() throws IOException {
 		int bytesRead = in.read(buffer);
 		if (bytesRead == EOF) {
@@ -94,7 +95,7 @@ public class CharsetDetectingReader extends Reader {
 		}
 		InputStream in = new ByteArrayInputStream(buffer, 0, bytesRead);
 		try {
-			reader = new InputStreamReader(in, 
+			reader = new InputStreamReader(in,
 					detectedEncoding == null
 							? (guessedEncoding == null ? "US-ASCII" : guessedEncoding)
 							: detectedEncoding);

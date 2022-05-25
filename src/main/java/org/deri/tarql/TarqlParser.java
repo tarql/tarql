@@ -6,10 +6,11 @@ import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 
 import org.apache.jena.atlas.logging.Log;
+import org.apache.jena.irix.IRIx;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryException;
 import org.apache.jena.query.QueryParseException;
-import org.apache.jena.riot.system.IRIResolver;
+import org.apache.jena.riot.system.stream.StreamManager;
 import org.apache.jena.shared.JenaException;
 import org.apache.jena.shared.NotFoundException;
 import org.apache.jena.shared.PrefixMapping;
@@ -19,7 +20,6 @@ import org.apache.jena.sparql.lang.SyntaxVarScope;
 import org.apache.jena.sparql.lang.sparql_11.ParseException;
 import org.apache.jena.sparql.lang.sparql_11.SPARQLParser11;
 import org.apache.jena.sparql.lang.sparql_11.TokenMgrError;
-import org.apache.jena.util.FileManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,38 +29,39 @@ import org.slf4j.LoggerFactory;
  */
 public class TarqlParser {
 	private final static Logger log = LoggerFactory.getLogger(TarqlParser.class);
-	
+
 	private final static PrefixMapping builtInPrefixes = new PrefixMappingImpl() {{
 		setNsPrefix("tarql", tarql.NS);
 		setNsPrefix("apf", ARQConstants.ARQPropertyFunctionLibraryURI);
 	}};
-	
+
 	private final Reader reader;
 	private final TarqlQuery result = new TarqlQuery();
 	private boolean done = false;
 	private boolean seenSelectOrAsk = false;
-	
+
 	public TarqlParser(String filenameOrURL) {
-		this(open(filenameOrURL), FileManager.get().mapURI(filenameOrURL));
+		this(open(filenameOrURL), StreamManager.get().mapURI(filenameOrURL));
 	}
-	
+
 	public TarqlParser(String filenameOrURL, String baseIRI) {
 		this(open(filenameOrURL), baseIRI);
 	}
-	
+
 	public TarqlParser(Reader reader) {
 		this(reader, null);
 	}
-	
+
 	public TarqlParser(Reader reader, String baseIRI) {
 		this.reader = reader;
-		result.getPrologue().setResolver(IRIResolver.create(baseIRI));
+		if ( baseIRI != null )
+		    result.getPrologue().setBase(IRIx.create(baseIRI));
 		addBuiltInPrefixes();
 	}
-	
+
 	private static Reader open(String filenameOrURL) {
 		try {
-			InputStream in = FileManager.get().open(filenameOrURL);
+			InputStream in = StreamManager.get().open(filenameOrURL);
 			if (in == null) throw new NotFoundException(filenameOrURL);
 			return new InputStreamReader(in, "UTF-8");
 		} catch (UnsupportedEncodingException ex) {
@@ -68,12 +69,12 @@ public class TarqlParser {
 			return null;
 		}
 	}
-	
+
 	public TarqlQuery getResult() {
 		parse();
 		return result;
 	}
-	
+
 	private void parseDo(SPARQLParser11 parser) throws ParseException {
 		do {
 			int beginLine = parser.getToken(1).beginLine;
@@ -84,7 +85,7 @@ public class TarqlParser {
 			// You'd assume that a query initialized via "new Query(prologue)"
 			// has the IRI resolver from prologue.getResolver(), but that doesn't
 			// appear to be the case in Jena 2.12.0, so we set it manually
-			query.getPrologue().setResolver(result.getPrologue().getResolver());
+			query.getPrologue().setBase(result.getPrologue().getBase());
 
 			result.addQuery(query);
 			parser.setQuery(query);
@@ -95,14 +96,14 @@ public class TarqlParser {
 			}
 			if (seenSelectOrAsk && result.getQueries().size() > 1) {
 				throw new QueryParseException("" +
-						"Multiple queries per file are only supported for CONSTRUCT", 
+						"Multiple queries per file are only supported for CONSTRUCT",
 						beginLine, beginColumn);
 			}
-			
+
 			// From Parser.validateParsedQuery, which we can't call directly
 			SyntaxVarScope.check(query);
-			
-			result.getPrologue().usePrologueFrom(query);
+
+			result.setPrologue(query);
 			if (log.isDebugEnabled()) {
 				log.debug(query.toString());
 			}
@@ -117,7 +118,7 @@ public class TarqlParser {
 		SPARQLParser11 parser = new SPARQLParser11(reader) ;
 		try {
 			parseDo(parser);
-		} catch (ParseException ex) { 
+		} catch (ParseException ex) {
 			throw new QueryParseException(ex.getMessage(),
 					ex.currentToken.beginLine,
 					ex.currentToken.beginColumn);
@@ -138,15 +139,15 @@ public class TarqlParser {
 			throw new QueryException(th.getMessage(), th);
 		}
 	}
-	
+
 	private void addBuiltInPrefixes() {
 		for (String prefix: builtInPrefixes.getNsPrefixMap().keySet()) {
 			if (result.getPrologue().getPrefix(prefix) != null) continue;
-			result.getPrologue().getPrefixMapping().setNsPrefix(prefix, 
-					builtInPrefixes.getNsPrefixURI(prefix));			
+			result.getPrologue().getPrefixMapping().setNsPrefix(prefix,
+					builtInPrefixes.getNsPrefixURI(prefix));
 		}
 	}
-	
+
 	private void removeBuiltInPrefixes() {
 		PrefixMapping prefixes = null;
 		for (String prefix: builtInPrefixes.getNsPrefixMap().keySet()) {
@@ -155,7 +156,7 @@ public class TarqlParser {
 			if (prefixes == null) {
 				prefixes = new PrefixMappingImpl();
 				prefixes.setNsPrefixes(result.getPrologue().getPrefixMapping());
-				
+
 			}
 			prefixes.removeNsPrefix(prefix);
 		}
