@@ -3,3 +3,5 @@
 target
 .DS_Store
 .settings
+local/**
+src/main/java/local/**

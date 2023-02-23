@@ -27,7 +27,7 @@
 
   <properties>
     <java.version>11</java.version>
-    <jena.version>4.5.0</jena.version>
+    <jena.version>4.7.0</jena.version>
     <opencsv.version>4.6</opencsv.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
@@ -62,7 +62,7 @@
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-slf4j-impl</artifactId>
-      <version>2.17.2</version>
+      <version>2.20.0</version>
       <optional>true</optional>
     </dependency>
 
