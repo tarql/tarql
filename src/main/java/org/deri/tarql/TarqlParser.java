@@ -6,6 +6,7 @@ import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 
 import org.apache.jena.atlas.logging.Log;
+import org.apache.jena.irix.IRIs;
 import org.apache.jena.irix.IRIx;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryException;
@@ -23,7 +24,6 @@ import org.apache.jena.sparql.lang.arq.TokenMgrError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 /**
  * Parses a {@link TarqlQuery} provided as a string or reader.
  */
@@ -33,6 +33,7 @@ public class TarqlParser {
 	private final static PrefixMapping builtInPrefixes = new PrefixMappingImpl() {{
 		setNsPrefix("tarql", tarql.NS);
 		setNsPrefix("apf", ARQConstants.ARQPropertyFunctionLibraryURI);
+		setNsPrefix("afn", ARQConstants.ARQFunctionLibraryURI);
 	}};
 
 	private final Reader reader;
@@ -41,23 +42,34 @@ public class TarqlParser {
 	private boolean seenSelectOrAsk = false;
 
 	public TarqlParser(String filenameOrURL) {
-		this(open(filenameOrURL), StreamManager.get().mapURI(filenameOrURL));
+		this(open(filenameOrURL), null);
 	}
 
 	public TarqlParser(String filenameOrURL, String baseIRI) {
-		this(open(filenameOrURL), baseIRI);
+		this(open(filenameOrURL), baseIRI(baseIRI, filenameOrURL));
 	}
 
-	public TarqlParser(Reader reader) {
+    public TarqlParser(Reader reader) {
 		this(reader, null);
 	}
 
 	public TarqlParser(Reader reader, String baseIRI) {
 		this.reader = reader;
 		if ( baseIRI != null )
+		    // This causes a BASE in the output.
 		    result.getPrologue().setBase(IRIx.create(baseIRI));
 		addBuiltInPrefixes();
 	}
+
+	// Decide on the base URI
+	// Base URIs are, where possible, resolved, absolute URIs.
+    private static String baseIRI(String baseIRI, String dftBaseURI) {
+        if ( baseIRI != null )
+            return IRIs.resolve(baseIRI);
+        if ( dftBaseURI != null )
+            return IRIs.resolve(dftBaseURI);
+        return null;
+    }
 
 	private static Reader open(String filenameOrURL) {
 		try {
@@ -81,11 +93,6 @@ public class TarqlParser {
 			int beginColumn = parser.getToken(1).beginColumn;
 
 			Query query = new Query(result.getPrologue());
-
-			// You'd assume that a query initialized via "new Query(prologue)"
-			// has the IRI resolver from prologue.getResolver(), but that doesn't
-			// appear to be the case in Jena 2.12.0, so we set it manually
-			query.getPrologue().setBase(result.getPrologue().getBase());
 
 			result.addQuery(query);
 			parser.setQuery(query);
@@ -141,13 +148,13 @@ public class TarqlParser {
 		}
 	}
 
-	private void addBuiltInPrefixes() {
-		for (String prefix: builtInPrefixes.getNsPrefixMap().keySet()) {
-			if (result.getPrologue().getPrefix(prefix) != null) continue;
-			result.getPrologue().getPrefixMapping().setNsPrefix(prefix,
-					builtInPrefixes.getNsPrefixURI(prefix));
-		}
-	}
+    private void addBuiltInPrefixes() {
+        for ( String prefix : builtInPrefixes.getNsPrefixMap().keySet() ) {
+            if ( result.getPrologue().getPrefix(prefix) != null )
+                continue;
+            result.getPrologue().getPrefixMapping().setNsPrefix(prefix, builtInPrefixes.getNsPrefixURI(prefix));
+        }
+    }
 
 	private void removeBuiltInPrefixes() {
 		PrefixMapping prefixes = null;

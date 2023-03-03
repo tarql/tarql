@@ -25,8 +25,6 @@ import org.apache.jena.util.iterator.NullIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
-
 /**
  * The <code>tarql</code> CLI command.
  */
@@ -40,6 +38,11 @@ public class tarql extends CmdGeneral {
 	private static Logger LOG = LoggerFactory.getLogger("org.deri.tarql");
 
 	static {
+	    JenaSystem.init();
+	    LogCtl.setLog4j2();
+	    // Turtle 1.1 style: like SPARQL, PREFIX, not @prefix.
+	    RIOT.getContext().set(RIOT.symTurtleDirectiveStyle, "sparql");
+
 		String version = "Unknown";
 		String date = "Unknown";
 		try {
@@ -85,13 +88,6 @@ public class tarql extends CmdGeneral {
 	private int dedupWindowSize = 0;
 
 	private ExtendedIterator<Triple> resultTripleIterator = NullIterator.instance();
-
-	static {
-	    JenaSystem.init();
-	    LogCtl.setLog4j2();
-	    // Turtle 1.1 style: liek SPARQL, not PREFIX, not @prefix.
-	    RIOT.getContext().set(RIOT.symTurtleDirectiveStyle, "sparql");
-	}
 
 	public tarql(String[] args) {
 		super(args);
@@ -278,13 +274,12 @@ public class tarql extends CmdGeneral {
 		}
 	}
 
-	// Not sure if this really works...
 	private void initLogging() {
 		if (isQuiet())
-		    LogCtl.set(LOG, "Error");
+		    LogCtl.set(LOG, "ERROR");
 		else if (isVerbose())
-            LogCtl.set(LOG, "Info");
+            LogCtl.set(LOG, "INFO");
 		else if (isDebug())
-		    LogCtl.set(LOG, "debug");
+		    LogCtl.set(LOG, "DEBUG");
 	}
 }

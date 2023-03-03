@@ -1,1 +1,1 @@
-SELECT * FROM <../simple.csv> {}
+SELECT * FROM <src/test/resources/simple.csv> {}

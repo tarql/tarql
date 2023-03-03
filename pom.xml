@@ -85,7 +85,6 @@
         <configuration>
           <repositoryLayout>flat</repositoryLayout>
           <repositoryName>lib</repositoryName>
-          <installArtifacts>false</installArtifacts>
           <programs>
             <program>
               <mainClass>org.deri.tarql.tarql</mainClass>
