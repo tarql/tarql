@@ -26,8 +26,8 @@
   </scm>
 
   <properties>
-    <java.version>11</java.version>
-    <jena.version>4.7.0</jena.version>
+    <java.version>17</java.version>
+    <jena.version>4.8.0</jena.version>
     <opencsv.version>4.6</opencsv.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
@@ -134,10 +134,15 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
+        <version>3.5.0</version>
         <configuration>
-          <source>8</source>
+          <source>${java.version}</source>
+          <!-- For producible builds
+               https://maven.apache.org/guides/mini/guide-reproducible-builds.html
+          -->
+          <notimestamp>true</notimestamp>
+          <doclint>none</doclint>
         </configuration>
-        <version>2.10.4</version>
         <executions>
           <execution>
             <id>attach-javadocs</id>
