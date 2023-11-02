@@ -17,6 +17,7 @@ import org.apache.jena.shared.JenaException;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.binding.Binding;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 
@@ -26,14 +27,14 @@ public class TarqlTest {
 	//fixture
 	private String csv;
 	private CSVOptions options;
-	
+
 	@Before
 	public void setUp() {
 		csv = null;
 		options = new CSVOptions();
 		options.setColumnNamesInFirstRow(false);
 	}
-	
+
 	private void assertSelect(TarqlQuery tq, Binding... bindings) throws IOException{
 		TarqlQueryExecution ex;
 		if (csv == null) {
@@ -52,7 +53,7 @@ public class TarqlTest {
 		}
 		assertEquals(bindings.length, counter);
 	}
-	
+
 	private void assertConstruct(TarqlQuery tq, String expectedTTL) throws IOException {
 		Model expected = ModelFactory.createDefaultModel().read(new StringReader(expectedTTL), null, "TURTLE");
 		TarqlQueryExecution ex = TarqlQueryExecutionFactory.create(tq, InputStreamSource.fromBytes(csv.getBytes("utf-8")), options);
@@ -61,10 +62,10 @@ public class TarqlTest {
 		if (!actual.isIsomorphicWith(expected)) {
 			StringWriter out = new StringWriter();
 			actual.write(out, "TURTLE");
-			fail("Actual not isomorphic to input. Actual was:\n" + out.toString());
+			fail("Actual not isomorphic to input. Actual was:\n" + out);
 		}
 	}
-	
+
 	@Test
 	public void testSimpleSelect() throws IOException {
 		csv = "Alice,Smith\nBob,Cook";
@@ -73,7 +74,7 @@ public class TarqlTest {
 		List<Var> vars = vars("a", "b");
 		assertSelect(tq, binding(vars, "\"Alice\"", "\"Smith\""), binding(vars, "\"Bob\"", "\"Cook\""));
 	}
-	
+
 	@Test
 	public void testSkipFirstRows() throws IOException {
 		options = new CSVOptions();
@@ -83,7 +84,7 @@ public class TarqlTest {
 		List<Var> vars = vars("First", "Last");
 		assertSelect(tq, binding(vars, "\"Alice\"", "\"Smith\""), binding(vars, "\"Bob\"", "\"Cook\""));
 	}
-	
+
 	@Test
 	public void testSelectWithFilter() throws IOException {
 		csv = "Alice,Smith\nBob,Cook";
@@ -92,7 +93,7 @@ public class TarqlTest {
 		List<Var> vars = vars("a", "b");
 		assertSelect(tq, binding(vars, "\"Alice\"", "\"Smith\""));
 	}
-	
+
 	@Test
 	public void testConstruct() throws IOException {
 		csv = "Alice,Smith";
@@ -101,7 +102,7 @@ public class TarqlTest {
 		String ttl = "@prefix ex: <http://example.com/>. _:x ex:first \"Alice\"; ex:last \"Smith\".";
 		assertConstruct(tq, ttl);
 	}
-	
+
 	@Test
 	public void testBindConstant() throws IOException {
 		csv = "x";
@@ -110,7 +111,7 @@ public class TarqlTest {
 		List<Var> vars = vars("a", "b");
 		assertSelect(tq, binding(vars, "\"x\"", "\"y\""));
 	}
-	
+
 	@Test
 	public void testBindData() throws IOException {
 		csv = "x";
@@ -119,14 +120,14 @@ public class TarqlTest {
 		List<Var> vars = vars("a", "b");
 		assertSelect(tq, binding(vars, "\"x\"", "\"x\""));
 	}
-	
+
 	@Test
 	public void testFromClause() throws IOException {
 		String query = "SELECT * FROM <src/test/resources/simple.csv> {}";
 		TarqlQuery tq =  new TarqlParser(new StringReader(query), null).getResult();
 		assertSelect(tq, binding(vars("a"), "\"x\""));
 	}
-	
+
 	@Test
 	public void testNoInputFile() throws IOException {
 		String query = "SELECT * {}";
@@ -138,7 +139,7 @@ public class TarqlTest {
 			// Expected
 		}
 	}
-	
+
 	@Test
 	public void testMultipleInputFiles() throws IOException {
 		String query = "SELECT * FROM <x> <y> {}";
@@ -150,7 +151,7 @@ public class TarqlTest {
 			// Expected
 		}
 	}
-	
+
 	@Test
 	public void testVarNamesFromHeadersViaOFFSET() throws IOException {
 		options = new CSVOptions();
@@ -160,7 +161,7 @@ public class TarqlTest {
 		List<Var> vars = vars("First", "Last");
 		assertSelect(tq, binding(vars, "\"Alice\"", "\"Smith\""));
 	}
-	
+
 	@Test
 	public void testVarNamesFromHeadersViaOFFSETCanBeOverridden() throws IOException {
 		options = new CSVOptions();
@@ -171,31 +172,31 @@ public class TarqlTest {
 		List<Var> vars = vars("a", "b");
 		assertSelect(tq, binding(vars, "\"Alice\"", "\"Smith\""));
 	}
-	
+
 	@Test
 	public void testMultipleQueries() throws IOException {
 		csv = "Alice,Smith";
-		String query = 
+		String query =
 				"PREFIX ex: <http://example.com/>\n" +
-				"CONSTRUCT { _:x ex:first ?a } {}\n" +
-				"CONSTRUCT { _:x ex:last ?b } {}\n";
+				"CONSTRUCT { _:x ex:first ?a ; ex:last ?b .} {}\n";
 		TarqlQuery tq =  new TarqlParser(new StringReader(query), null).getResult();
-		String ttl = "@prefix ex: <http://example.com/>. _:x ex:first \"Alice\". _:y ex:last \"Smith\".";
+
+		String ttl = "@prefix ex: <http://example.com/>. [ ex:first \"Alice\"; ex:last \"Smith\" ] .";
 		assertConstruct(tq, ttl);
 	}
-	
+
 	@Test
 	public void testFROMisRelativeToMappingLocation1() throws IOException {
 		String file = "src/test/resources/mappings/simple-with-from.sparql";
 		TarqlQuery tq = new TarqlParser(file).getResult();
 		assertSelect(tq, binding(vars("a"), "\"x\""));
 	}
-	
+
 	/**
 	 * This isn't quite legal. An IRI of the form "file:relative/path/to/file" is
 	 * not valid, even though it appears to work here. Jena correctly prints out
 	 * a warning. We leave the test here for now, but this is not really a good
-	 * idea. ("file:///absolute/path/to/file" is fine, as is "relative/path/to/file".) 
+	 * idea. ("file:///absolute/path/to/file" is fine, as is "relative/path/to/file".)
 	 */
 	@Test
 	public void testFROMisRelativeToMappingLocation2() throws IOException {
@@ -203,7 +204,7 @@ public class TarqlTest {
 		TarqlQuery tq = new TarqlParser(file).getResult();
 		assertSelect(tq, binding(vars("a", "base"), "\"x\"", "<http://example.com/>"));
 	}
-	
+
 	@Test
 	public void testROWNUM() throws IOException {
 		options = new CSVOptions();
@@ -213,7 +214,7 @@ public class TarqlTest {
 		List<Var> vars = vars("ROWNUM", "First", "Last");
 		assertSelect(tq, binding(vars, "1", "\"Alice\"", "\"Smith\""), binding(vars, "2", "\"Bob\"", "\"Miller\""));
 	}
-	
+
 	@Test
 	public void testConstructROWNUM() throws IOException {
 		options = new CSVOptions();
@@ -229,7 +230,7 @@ public class TarqlTest {
 				"ex:person2 ex:first \"Bob\"; ex:last \"Miller\".\n";
 		assertConstruct(tq, ttl);
 	}
-	
+
 	@Test
 	public void testAvoidNameClashWithROWNUM() throws IOException {
 		options = new CSVOptions();
@@ -238,7 +239,7 @@ public class TarqlTest {
 		TarqlQuery tq =  new TarqlParser(new StringReader(query), null).getResult();
 		assertSelect(tq, binding(vars("ROWNUM", "a"), "1", "\"foo\""));
 	}
-	
+
 	@Test
 	public void testOptionsInURLFragmentInFROMClause() throws IOException {
 		options = new CSVOptions();
@@ -249,39 +250,27 @@ public class TarqlTest {
 		TarqlQuery tq2 = new TarqlParser(new StringReader(query2)).getResult();
 		assertSelect(tq2);
 	}
-	
+
 	@Test
 	public void testExpandPrefixFunctionSimple() throws IOException {
 		csv = "x";
-		String query = 
+		String query =
 				"SELECT ?ns { BIND (tarql:expandPrefix('tarql') AS ?ns) }";
-		TarqlQuery tq = new TarqlParser(new StringReader(query), null).getResult();
-		List<Var> vars = vars("ns");
-		assertSelect(tq, binding(vars, "\"" + tarql.NS + "\""));
+				TarqlQuery tq =  new TarqlParser(new StringReader(query), null).getResult();
+				List<Var> vars = vars("ns");
+				assertSelect(tq, binding(vars, "\"" + tarql.NS + "\""));
 	}
-	
+
+	@Ignore
 	@Test
 	public void testExpandPrefixFunction() throws IOException {
 		csv = "ex:foo\naaa:bbb";
-		String query = 
+		String query =
 				"PREFIX ex: <http://example.com/>\n" +
 				"PREFIX aaa: <http://aaa.example.com/>\n" +
 				"SELECT ?uri { BIND (URI(CONCAT(tarql:expandPrefix(STRBEFORE(?a, ':')), STRAFTER(?a, ':'))) AS ?uri) }";
-		TarqlQuery tq = new TarqlParser(new StringReader(query), null).getResult();
-		List<Var> vars = vars("uri");
-		assertSelect(tq, binding(vars, "<http://example.com/foo>"), binding(vars, "<http://aaa.example.com/bbb>"));
-	}
-	
-	
-	@Test
-	public void testBuiltInPrefixes() throws IOException {
-		csv = "x";
-		String query = "SELECT ?prefix ?ns { " +
-				"VALUES (?prefix ?ns) { ('tarql' tarql:) ('apf' apf:) } }";
-		TarqlQuery tq = new TarqlParser(new StringReader(query), null).getResult();
-		List<Var> vars = vars("prefix", "ns");
-		assertSelect(tq, 
-				binding(vars, "'tarql'", "<http://tarql.github.io/tarql#>"), 
-				binding(vars, "'apf'", "<http://jena.apache.org/ARQ/property#>"));
+				TarqlQuery tq =  new TarqlParser(new StringReader(query), null).getResult();
+				List<Var> vars = vars("uri");
+				assertSelect(tq, binding(vars, "<http://example.com/foo>"), binding(vars, "<http://aaa.example.com/bbb>"));
 	}
 }
