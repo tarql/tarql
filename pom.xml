@@ -4,7 +4,7 @@
   <groupId>org.deri.tarql</groupId>
   <artifactId>tarql</artifactId>
   <packaging>jar</packaging>
-  <version>1.2</version>
+  <version>2.0-SNAPSHOT</version>
 
   <name>Tarql</name>
   <description>Convert CSV files to RDF using SPARQL syntax</description>
@@ -26,8 +26,6 @@
   </scm>
 
   <properties>
-    <jena.version>3.11.0</jena.version>
-    <opencsv.version>4.6</opencsv.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
@@ -35,28 +33,45 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.12</version>
+      <version>4.13.1</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.jena</groupId>
       <artifactId>jena-arq</artifactId>
-      <version>${jena.version}</version>
+      <version>4.9.0</version>
     </dependency>
     <dependency>
       <groupId>org.apache.jena</groupId>
       <artifactId>jena-cmds</artifactId>
-      <version>${jena.version}</version>
+      <version>4.9.0</version>
     </dependency>
+    <!-- We use a custom build of OpenCSV with Patch #54. To build:
+
+         git clone https://github.com/cygri/opencsv.git
+         cd opencsv
+         mvn install -Dgpg.skip -Denforcer.skip
+    -->
     <dependency>
       <groupId>com.opencsv</groupId>
       <artifactId>opencsv</artifactId>
-      <version>${opencsv.version}</version>
+      <version>3.9-cygri</version>
     </dependency>
     <dependency>
       <groupId>net.sourceforge.jchardet</groupId>
       <artifactId>jchardet</artifactId>
       <version>1.0</version>
+    </dependency>
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <version>2.7</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+      <version>1.2.17</version>
     </dependency>
   </dependencies>
 
@@ -67,8 +82,8 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.6.0</version>
         <configuration>
-          <source>1.8</source>
-          <target>1.8</target>
+          <source>11</source>
+          <target>11</target>
         </configuration>
       </plugin>
       <plugin>
@@ -128,9 +143,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <configuration>
-          <source>8</source>
-        </configuration>
         <version>2.10.4</version>
         <executions>
           <execution>

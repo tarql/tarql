@@ -11,7 +11,7 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.binding.Binding;
-import org.apache.jena.sparql.engine.binding.BindingHashMap;
+import org.apache.jena.sparql.engine.binding.BindingBuilder;
 import org.apache.jena.sparql.util.NodeFactoryExtra;
 
 
@@ -24,7 +24,7 @@ public class Helpers {
 		}
 		return result;
 	}
-	
+
 	public static List<Binding> bindings(Binding... bindings) {
 		return Arrays.asList(bindings);
 	}
@@ -36,39 +36,39 @@ public class Helpers {
 		}
 		return vars;
 	}
-	
+
 	public static Binding binding(List<Var> header, String... values) {
 		if (header.size() != values.length) {
 			throw new IllegalArgumentException(
-					"header and values must have same length: " + 
+					"header and values must have same length: " +
 							header + ", " + Arrays.toString(values));
 		}
-		BindingHashMap result = new BindingHashMap();
+		BindingBuilder bindingBuilder = BindingBuilder.create();
 		for (int i = 0; i < header.size(); i++) {
-			result.add(header.get(i), NodeFactoryExtra.parseNode(values[i]));
+			bindingBuilder.add(header.get(i), NodeFactoryExtra.parseNode(values[i]));
 		}
-		return result;
+		return bindingBuilder.build();
 	}
 
 	private Helpers() {} // Only static methods
-	
+
 	public static Binding removePseudoVars(Binding binding) {
-		BindingHashMap result = new BindingHashMap();
+		BindingBuilder bindingBuilder = BindingBuilder.create();
 		Iterator<Var> it = binding.vars();
 		while (it.hasNext()) {
 			Var var = it.next();
 			if (var.equals(TarqlQuery.ROWNUM)) continue;
-			result.add(var, binding.get(var));
+			bindingBuilder.add(var, binding.get(var));
 		}
-		return result;
+		return bindingBuilder.build();
 	}
-	
+
 	public static Triple triple(String tripleAsTurtle) {
 		Model m = ModelFactory.createDefaultModel();
 		m.read(new StringReader(tripleAsTurtle), "urn:x-base:", "TURTLE");
 		return m.listStatements().next().asTriple();
 	}
-	
+
 	public static List<Triple> triples(String... triples) {
 		List<Triple> results = new ArrayList<>();
 		for (String triple: triples) {
