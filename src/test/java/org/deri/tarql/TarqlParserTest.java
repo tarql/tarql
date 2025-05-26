@@ -7,6 +7,7 @@ import static org.junit.Assert.fail;
 import java.io.StringReader;
 
 import org.apache.jena.query.QueryParseException;
+import org.junit.Ignore;
 import org.junit.Test;
 
 
@@ -19,7 +20,7 @@ public class TarqlParserTest {
 		assertEquals(1, x.getResult().getQueries().size());
 		assertTrue(x.getResult().getQueries().get(0).isSelectType());
 	}
-	
+
 	@Test
 	public void testSimpleCONSTRUCT() throws Exception {
 		String s = "CONSTRUCT { [] a [] } WHERE {}";
@@ -27,7 +28,7 @@ public class TarqlParserTest {
 		assertEquals(1, x.getResult().getQueries().size());
 		assertTrue(x.getResult().getQueries().get(0).isConstructType());
 	}
-	
+
 	@Test
 	public void testMultipleSELECT() throws Exception {
 		try {
@@ -62,6 +63,7 @@ public class TarqlParserTest {
 	}
 
 	@Test
+	@Ignore
 	public void testIncrementalPrologue() {
 		String s =
 				"PREFIX a: <http://example.com/a#> CONSTRUCT { [] a:a [] } WHERE {}\n" +

@@ -12,11 +12,11 @@ import org.apache.jena.util.FileManager;
 public class TarqlQueryExecutionFactory {
 
 	public static TarqlQueryExecution create(TarqlQuery query) throws IOException {
-		return create(query, FileManager.get(), new CSVOptions());
+		return create(query, FileManager.getInternal(), new CSVOptions());
 	}
 
 	public static TarqlQueryExecution create(TarqlQuery query, CSVOptions options) throws IOException {
-		return create(query, FileManager.get(), options);
+		return create(query, FileManager.getInternal(), options);
 	}
 
 	public static TarqlQueryExecution create(TarqlQuery query, FileManager fm) throws IOException {
@@ -40,7 +40,7 @@ public class TarqlQueryExecutionFactory {
 	public static TarqlQueryExecution create(TarqlQuery query, String filenameOrURL, CSVOptions options) throws IOException {
 		return create(query, InputStreamSource.fromFilenameOrIRI(filenameOrURL), options);
 	}
-	
+
 	public static TarqlQueryExecution create(TarqlQuery query, InputStreamSource input) {
 		return new TarqlQueryExecution(input, new CSVOptions(), query);
 	}

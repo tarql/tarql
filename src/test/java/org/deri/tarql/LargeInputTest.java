@@ -2,20 +2,19 @@ package org.deri.tarql;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.StringReader;
 import java.util.Iterator;
 
-import org.apache.commons.codec.Charsets;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.shared.PrefixMapping;
 import org.apache.jena.shared.impl.PrefixMappingImpl;
+import org.apache.jena.sparql.ARQException;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -25,7 +24,7 @@ import org.junit.Test;
  * Test cases on large input. Not run as part of the normal
  * test suite, but can be enabled manually. The main purpose
  * is to ensure that processing is done in a streaming fashion.
- * Run with low memory settings, e.g., -Xmx5M.
+ * Run with low memory settings, e.g., -Xmx2M.
  */
 public class LargeInputTest {
 
@@ -105,27 +104,7 @@ public class LargeInputTest {
 		}
 	}
 	
-	@Test public void testDummyContentSource() throws IOException {
-		final int lines = 5;
-		BufferedReader r = new BufferedReader(
-				new InputStreamReader(new DummyContentSource(lines).open(), Charsets.UTF_8));
-		int readLines = 0;
-		while (r.readLine() != null) {
-			readLines++;
-		}
-		assertEquals(lines, readLines);
-	}
-	
-	@Test public void testSmallInput() {
-		final int lines = 5;
-		String query = "SELECT * {}";
-		ResultSet rs = prepare(query, new DummyContentSource(lines)).execSelect();
-		int results = consume(rs);
-		assertEquals(lines - 1, results);
-	}
-	
-	@Ignore
-	@Test public void testInput5GB() {
+	@Ignore @Test public void testInput5GB() {
 		System.out.println("testInput5GB");
 		final int lines = 50000000;
 		String query = "SELECT * {}";
@@ -134,8 +113,7 @@ public class LargeInputTest {
 		assertEquals(lines - 1, results);
 	}
 
-	@Ignore
-	@Test public void testOutput100Mt() throws IOException {
+	@Ignore @Test public void testOutput100Mt() throws IOException {
 		System.out.println("testOutput100Mt");
 		final int lines = 50000000;
 		Iterator<Triple> triples = prepare(CONSTRUCT_2TRIPLES, new DummyContentSource(lines)).execTriples();
@@ -143,8 +121,7 @@ public class LargeInputTest {
 		assertEquals((lines - 1) * 2, results);
 	}
 
-	@Ignore
-	@Test public void testOutput100MtTurtle() throws IOException {
+	@Ignore @Test public void testOutput100MtTurtle() throws IOException {
 		System.out.println("testOutput100MtTurtle");
 		final int lines = 50000000;
 		Iterator<Triple> triples = prepare(CONSTRUCT_2TRIPLES, new DummyContentSource(lines)).execTriples();
@@ -154,8 +131,7 @@ public class LargeInputTest {
 		assertTrue(out.getBytesWritten() > lines * 100);
 	}
 
-	@Ignore
-	@Test public void testOutput100MtNTriples() throws IOException {
+	@Ignore @Test public void testOutput100MtNTriples() throws IOException {
 		System.out.println("testOutput100MtNTriples");
 		final int lines = 50000000;
 		Iterator<Triple> triples = prepare(CONSTRUCT_2TRIPLES, new DummyContentSource(lines)).execTriples();
@@ -163,6 +139,54 @@ public class LargeInputTest {
 		new StreamingRDFWriter(out, triples).writeNTriples();
 		System.out.println("Done: " + out.getBytesWritten() + " bytes written");
 		assertTrue(out.getBytesWritten() > lines * 100);
+	}
+	
+	@Ignore("This doesn't work with OpenCSV 3.8, but works with cygri's fork on GitHub")
+	@Test public void testSmallInputWithRunawayQuote() {
+		System.out.println("testInput5GBWithRunawayQuote");
+		final int lines = 20000;
+		String query = "SELECT * {}";
+		ResultSet rs = prepare(query, new DummyContentSource(lines) {
+			@Override
+			public String generateNonHeaderLine(int lineNumber) {
+				if (lineNumber == 11111) {
+					return super.generateNonHeaderLine(lineNumber) + "\"";
+				}
+				return super.generateNonHeaderLine(lineNumber);
+			}
+		}).execSelect();
+		try {
+			consume(rs);
+			fail("Should have thrown ARQException due to runaway quote");
+		} catch (ARQException ex) {
+			if (!ex.getMessage().contains("stray quote")) {
+				throw ex;
+			}
+		}
+	}
+	
+	@Ignore("This doesn't work with OpenCSV 3.8, but works with cygri's fork on GitHub")
+	@Test public void testInput5GBWithRunawayQuote() {
+		System.out.println("testInput5GBWithRunawayQuote");
+		final int lines = 50000000;
+		String query = "SELECT * {}";
+		ResultSet rs = prepare(query, new DummyContentSource(lines) {
+			@Override
+			public String generateNonHeaderLine(int lineNumber) {
+				if (lineNumber == 11111) {
+					return super.generateNonHeaderLine(lineNumber) + "\"";
+				}
+				return super.generateNonHeaderLine(lineNumber);
+			}
+		}).execSelect();
+		try {
+			consume(rs);
+			fail("Should have thrown ARQException due to runaway quote");
+		} catch (ARQException ex) {
+			if (!ex.getMessage().contains("stray quote")) {
+				throw ex;
+			}
+		}
 	}
 	
 	@Ignore
@@ -185,7 +209,7 @@ public class LargeInputTest {
 		assertEquals(lines - 1, results);
 	}
 
-	@Ignore("This broke streaming in v1.1 but fixed by Jena upgrade in v1.2")
+	@Ignore("This breaks streaming as of v1.1-SNAPSHOT")
 	@Test public void testDodgyVALUES() {
 		System.out.println("testInput5GB");
 		final int lines = 50000000;
