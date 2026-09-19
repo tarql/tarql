@@ -1,0 +1,79 @@
+# ============================================================
+# TARQL Transformation: EmployeePositions
+# ============================================================
+# Input: employeepositions.csv
+# Output: RDF triples conforming to hr:EmployeePosition SHACL shape
+# ============================================================
+
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX hr: <http://example.com/hr/>
+PREFIX hrres: <http://example.com/hr/resource/>
+
+CONSTRUCT {
+  # EmployeePosition resource
+  ?empPositionURI a hr:EmployeePosition ;
+    hr:employeePositionID ?empPositionID ;
+    hr:startDate ?startDate ;
+    hr:endDate ?endDate ;
+    hr:isCurrent ?isCurrent ;
+    hr:reasonForChange ?reasonForChange ;
+    hr:createdDate ?createdDateTime ;
+    rdfs:label ?empPositionLabel .
+  
+  # Link to Employee
+  ?empPositionURI hr:forEmployee ?employeeURI .
+  ?employeeURI hr:hasPositionAssignment ?empPositionURI .
+  
+  # Link to Department
+  ?empPositionURI hr:inDepartment ?departmentURI .
+  ?departmentURI hr:hasEmployeeInPosition ?empPositionURI .
+  
+  # Link to Position
+  ?empPositionURI hr:hasPosition ?positionURI .
+  ?positionURI hr:heldBy ?empPositionURI .
+  
+  # Current position shortcuts (if current)
+  ?employeeURI hr:currentDepartment ?departmentURI .
+  ?employeeURI hr:currentPosition ?positionURI .
+  ?employeeURI hr:currentPositionAssignment ?empPositionURI .
+}
+WHERE {
+  BIND(URI(CONCAT("http://example.com/hr/resource/employeeposition/", ?EmployeePositionID)) AS ?empPositionURI)
+  
+  # Basic fields
+  BIND(xsd:integer(?EmployeePositionID) AS ?empPositionID)
+  BIND(xsd:date(?StartDate) AS ?startDate)
+  
+  # End date (optional)
+  BIND(IF(BOUND(?EndDate) && ?EndDate != "" && ?EndDate != "NULL",
+          xsd:date(?EndDate),
+          ?UNDEF) AS ?endDate)
+  
+  # Current flag
+  BIND(IF(?IsCurrent = "1" || ?IsCurrent = "true" || ?IsCurrent = "True",
+          true,
+          false) AS ?isCurrent)
+  
+  # Reason for change (optional)
+  BIND(IF(BOUND(?ReasonForChange) && ?ReasonForChange != "" && ?ReasonForChange != "NULL",
+          xsd:string(?ReasonForChange),
+          ?UNDEF) AS ?reasonForChange)
+  
+  # Created date
+  BIND(xsd:dateTime(?CreatedDate) AS ?createdDateTime)
+  
+  # Foreign key URIs
+  BIND(URI(CONCAT("http://example.com/hr/resource/employee/", ?EmployeeID)) AS ?employeeURI)
+  BIND(URI(CONCAT("http://example.com/hr/resource/department/", ?DepartmentID)) AS ?departmentURI)
+  BIND(URI(CONCAT("http://example.com/hr/resource/position/", ?PositionID)) AS ?positionURI)
+  
+  # Label
+  BIND(CONCAT("Position Assignment #", ?EmployeePositionID, 
+              " - Employee ", ?EmployeeID,
+              IF(?isCurrent, " (Current)", " (Historical)")) AS ?empPositionLabel)
+  
+  # Only create current shortcuts if this is the current position
+  FILTER(?isCurrent)
+}

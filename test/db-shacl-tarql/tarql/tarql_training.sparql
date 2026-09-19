@@ -1,0 +1,145 @@
+# ============================================================
+# TARQL Transformation: TrainingCourses
+# ============================================================
+# Input: trainingcourses.csv
+# Output: RDF triples conforming to hr:TrainingCourse SHACL shape
+# ============================================================
+
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX hr: <http://example.com/hr/>
+PREFIX hrres: <http://example.com/hr/resource/>
+
+CONSTRUCT {
+  # TrainingCourse resource
+  ?courseURI a hr:TrainingCourse ;
+    hr:courseID ?courseID ;
+    hr:courseName ?courseName ;
+    hr:courseCode ?courseCode ;
+    hr:provider ?provider ;
+    hr:description ?description ;
+    hr:durationHours ?durationHours ;
+    hr:cost ?cost ;
+    hr:isActive ?isActive ;
+    hr:createdDate ?createdDateTime ;
+    rdfs:label ?courseLabel .
+}
+WHERE {
+  BIND(URI(CONCAT("http://example.com/hr/resource/trainingcourse/", ?CourseID)) AS ?courseURI)
+  
+  # Basic fields
+  BIND(xsd:integer(?CourseID) AS ?courseID)
+  BIND(xsd:string(?CourseName) AS ?courseName)
+  BIND(xsd:string(?CourseCode) AS ?courseCode)
+  
+  # Provider (optional)
+  BIND(IF(BOUND(?Provider) && ?Provider != "" && ?Provider != "NULL",
+          xsd:string(?Provider),
+          ?UNDEF) AS ?provider)
+  
+  # Description (optional)
+  BIND(IF(BOUND(?Description) && ?Description != "" && ?Description != "NULL",
+          xsd:string(?Description),
+          ?UNDEF) AS ?description)
+  
+  # Duration and cost
+  BIND(xsd:decimal(?DurationHours) AS ?durationHours)
+  BIND(IF(BOUND(?Cost) && ?Cost != "" && ?Cost != "NULL",
+          xsd:decimal(?Cost),
+          ?UNDEF) AS ?cost)
+  
+  # Active flag
+  BIND(IF(?IsActive = "1" || ?IsActive = "true" || ?IsActive = "True",
+          true,
+          false) AS ?isActive)
+  
+  # Created date
+  BIND(xsd:dateTime(?CreatedDate) AS ?createdDateTime)
+  
+  # Label
+  BIND(CONCAT("Training Course: ", ?CourseName, " (", ?CourseCode, ") - ", 
+              STR(?durationHours), " hours") AS ?courseLabel)
+}
+
+# ============================================================
+# TARQL Transformation: EmployeeTraining
+# ============================================================
+# Input: employeetraining.csv
+# Output: RDF triples conforming to hr:EmployeeTraining SHACL shape
+# ============================================================
+
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX hr: <http://example.com/hr/>
+PREFIX hrres: <http://example.com/hr/resource/>
+
+CONSTRUCT {
+  # EmployeeTraining resource
+  ?empTrainingURI a hr:EmployeeTraining ;
+    hr:employeeTrainingID ?empTrainingID ;
+    hr:enrollmentDate ?enrollmentDate ;
+    hr:completionDate ?completionDate ;
+    hr:status ?status ;
+    hr:score ?score ;
+    hr:certificationNumber ?certificationNumber ;
+    hr:expirationDate ?expirationDate ;
+    hr:comments ?comments ;
+    hr:createdDate ?createdDateTime ;
+    rdfs:label ?empTrainingLabel .
+  
+  # Link to Employee
+  ?empTrainingURI hr:trainee ?employeeURI .
+  ?employeeURI hr:hasTrainingRecord ?empTrainingURI .
+  
+  # Link to Course
+  ?empTrainingURI hr:course ?courseURI .
+  ?courseURI hr:takenBy ?empTrainingURI .
+}
+WHERE {
+  BIND(URI(CONCAT("http://example.com/hr/resource/employeetraining/", ?EmployeeTrainingID)) AS ?empTrainingURI)
+  
+  # Basic fields
+  BIND(xsd:integer(?EmployeeTrainingID) AS ?empTrainingID)
+  BIND(xsd:date(?EnrollmentDate) AS ?enrollmentDate)
+  
+  # Completion date (optional)
+  BIND(IF(BOUND(?CompletionDate) && ?CompletionDate != "" && ?CompletionDate != "NULL",
+          xsd:date(?CompletionDate),
+          ?UNDEF) AS ?completionDate)
+  
+  # Status
+  BIND(xsd:string(?Status) AS ?status)
+  
+  # Score (optional)
+  BIND(IF(BOUND(?Score) && ?Score != "" && ?Score != "NULL",
+          xsd:decimal(?Score),
+          ?UNDEF) AS ?score)
+  
+  # Certification info (optional)
+  BIND(IF(BOUND(?CertificationNumber) && ?CertificationNumber != "" && ?CertificationNumber != "NULL",
+          xsd:string(?CertificationNumber),
+          ?UNDEF) AS ?certificationNumber)
+  BIND(IF(BOUND(?ExpirationDate) && ?ExpirationDate != "" && ?ExpirationDate != "NULL",
+          xsd:date(?ExpirationDate),
+          ?UNDEF) AS ?expirationDate)
+  
+  # Comments (optional)
+  BIND(IF(BOUND(?Comments) && ?Comments != "" && ?Comments != "NULL",
+          xsd:string(?Comments),
+          ?UNDEF) AS ?comments)
+  
+  # Created date
+  BIND(xsd:dateTime(?CreatedDate) AS ?createdDateTime)
+  
+  # Foreign key URIs
+  BIND(URI(CONCAT("http://example.com/hr/resource/employee/", ?EmployeeID)) AS ?employeeURI)
+  BIND(URI(CONCAT("http://example.com/hr/resource/trainingcourse/", ?CourseID)) AS ?courseURI)
+  
+  # Label
+  BIND(CONCAT("Training Record #", ?EmployeeTrainingID,
+              " - Employee ", ?EmployeeID,
+              " - Status: ", ?status,
+              IF(BOUND(?score), CONCAT(" (Score: ", STR(?score), ")"), "")) AS ?empTrainingLabel)
+}

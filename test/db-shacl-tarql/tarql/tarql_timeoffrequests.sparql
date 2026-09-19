@@ -1,0 +1,73 @@
+# ============================================================
+# TARQL Transformation: TimeOffRequests
+# ============================================================
+# Input: timeoffrequests.csv
+# Output: RDF triples conforming to hr:TimeOffRequest SHACL shape
+# ============================================================
+
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX hr: <http://example.com/hr/>
+PREFIX hrres: <http://example.com/hr/resource/>
+
+CONSTRUCT {
+  # TimeOffRequest resource
+  ?requestURI a hr:TimeOffRequest ;
+    hr:timeOffRequestID ?requestID ;
+    hr:requestType ?requestType ;
+    hr:startDate ?startDate ;
+    hr:endDate ?endDate ;
+    hr:totalDays ?totalDays ;
+    hr:requestStatus ?requestStatus ;
+    hr:requestDate ?requestDateTime ;
+    hr:approvalDate ?approvalDateTime ;
+    hr:comments ?comments ;
+    rdfs:label ?requestLabel .
+  
+  # Link to Employee (requester)
+  ?requestURI hr:requestedBy ?employeeURI .
+  ?employeeURI hr:hasTimeOffRequest ?requestURI .
+  
+  # Link to Approver (if exists)
+  ?requestURI hr:approvedBy ?approverURI .
+  ?approverURI hr:approved ?requestURI .
+}
+WHERE {
+  BIND(URI(CONCAT("http://example.com/hr/resource/timeoffrequest/", ?TimeOffRequestID)) AS ?requestURI)
+  
+  # Basic fields
+  BIND(xsd:integer(?TimeOffRequestID) AS ?requestID)
+  BIND(xsd:string(?RequestType) AS ?requestType)
+  BIND(xsd:date(?StartDate) AS ?startDate)
+  BIND(xsd:date(?EndDate) AS ?endDate)
+  BIND(xsd:decimal(?TotalDays) AS ?totalDays)
+  BIND(xsd:string(?RequestStatus) AS ?requestStatus)
+  
+  # Request date
+  BIND(xsd:dateTime(?RequestDate) AS ?requestDateTime)
+  
+  # Approval date (optional)
+  BIND(IF(BOUND(?ApprovalDate) && ?ApprovalDate != "" && ?ApprovalDate != "NULL",
+          xsd:dateTime(?ApprovalDate),
+          ?UNDEF) AS ?approvalDateTime)
+  
+  # Comments (optional)
+  BIND(IF(BOUND(?Comments) && ?Comments != "" && ?Comments != "NULL",
+          xsd:string(?Comments),
+          ?UNDEF) AS ?comments)
+  
+  # Foreign key URIs
+  BIND(URI(CONCAT("http://example.com/hr/resource/employee/", ?EmployeeID)) AS ?employeeURI)
+  
+  BIND(IF(BOUND(?ApprovedBy) && ?ApprovedBy != "" && ?ApprovedBy != "NULL",
+          URI(CONCAT("http://example.com/hr/resource/employee/", ?ApprovedBy)),
+          ?UNDEF) AS ?approverURI)
+  
+  # Label
+  BIND(CONCAT("Time Off Request #", ?TimeOffRequestID,
+              " - Employee ", ?EmployeeID,
+              " - ", ?requestType,
+              " (", STR(?startDate), " to ", STR(?endDate), ")",
+              " - Status: ", ?requestStatus) AS ?requestLabel)
+}

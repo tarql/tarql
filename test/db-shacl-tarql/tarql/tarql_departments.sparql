@@ -1,0 +1,57 @@
+# ============================================================
+# TARQL Transformation: Departments
+# ============================================================
+# Input: departments.csv
+# Output: RDF triples conforming to hr:Department SHACL shape
+# ============================================================
+
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX hr: <http://example.com/hr/>
+PREFIX hrres: <http://example.com/hr/resource/>
+
+CONSTRUCT {
+  # Department resource
+  ?departmentURI a hr:Department ;
+    hr:departmentID ?departmentID ;
+    hr:departmentName ?departmentName ;
+    hr:departmentCode ?departmentCode ;
+    hr:budget ?budgetDecimal ;
+    hr:createdDate ?createdDateTime ;
+    hr:modifiedDate ?modifiedDateTime ;
+    rdfs:label ?departmentLabel ;
+    rdfs:comment ?departmentComment .
+  
+  # Manager relationship (if exists)
+  ?departmentURI hr:hasManager ?managerURI .
+  
+  # Inverse relationship for manager
+  ?managerURI hr:managesTeam ?departmentURI .
+}
+WHERE {
+  BIND(URI(CONCAT("http://example.com/hr/resource/department/", ?DepartmentID)) AS ?departmentURI)
+  
+  # Basic fields
+  BIND(xsd:integer(?DepartmentID) AS ?departmentID)
+  BIND(xsd:string(?DepartmentName) AS ?departmentName)
+  BIND(xsd:string(?DepartmentCode) AS ?departmentCode)
+  
+  # Budget (handle NULL)
+  BIND(IF(BOUND(?Budget) && ?Budget != "" && ?Budget != "NULL",
+          xsd:decimal(?Budget),
+          ?UNDEF) AS ?budgetDecimal)
+  
+  # Dates
+  BIND(xsd:dateTime(?CreatedDate) AS ?createdDateTime)
+  BIND(xsd:dateTime(?ModifiedDate) AS ?modifiedDateTime)
+  
+  # Manager relationship (handle NULL)
+  BIND(IF(BOUND(?ManagerEmployeeID) && ?ManagerEmployeeID != "" && ?ManagerEmployeeID != "NULL",
+          URI(CONCAT("http://example.com/hr/resource/employee/", ?ManagerEmployeeID)),
+          ?UNDEF) AS ?managerURI)
+  
+  # Labels and comments
+  BIND(CONCAT("Department: ", ?DepartmentName) AS ?departmentLabel)
+  BIND(CONCAT("Organizational department with code ", ?DepartmentCode) AS ?departmentComment)
+}

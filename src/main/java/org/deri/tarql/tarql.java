@@ -20,15 +20,15 @@ import org.apache.jena.util.iterator.NullIterator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
-import jena.cmd.ArgDecl;
-import jena.cmd.CmdGeneral;
+import org.apache.jena.cmd.ArgDecl;
+import org.apache.jena.cmd.CmdMain;
 
 
 
 /**
  * The <code>tarql</code> CLI command.
  */
-public class tarql extends CmdGeneral {
+public class tarql extends CmdMain {
 
 	// This will be displayed by --version
 	public static final String VERSION;

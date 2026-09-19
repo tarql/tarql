@@ -1,0 +1,21 @@
+PositionID,PositionTitle,PositionCode,JobLevel,MinSalary,MaxSalary,Description,CreatedDate
+1,Junior Software Developer,JR-SWE,2,55000.00,75000.00,Entry-level software development position,2020-01-01T09:00:00
+2,Software Developer,SWE,3,70000.00,95000.00,Mid-level software development position,2020-01-01T09:00:00
+3,Senior Software Developer,SR-SWE,5,95000.00,130000.00,Senior software development position with team leadership,2020-01-01T09:00:00
+4,Lead Software Engineer,LEAD-SWE,6,120000.00,160000.00,Technical lead for development teams,2020-01-01T09:00:00
+5,Engineering Manager,ENG-MGR,7,130000.00,180000.00,Manages engineering department and teams,2020-01-01T09:00:00
+6,HR Specialist,HR-SPEC,3,50000.00,70000.00,Human resources specialist for recruitment and employee relations,2020-01-01T09:00:00
+7,HR Manager,HR-MGR,6,80000.00,110000.00,Manages HR department operations,2020-01-01T09:00:00
+8,Financial Analyst,FIN-ANALYST,4,65000.00,90000.00,Analyzes financial data and prepares reports,2020-01-01T09:00:00
+9,Senior Financial Analyst,SR-FIN-ANALYST,5,85000.00,115000.00,Senior financial analysis and strategic planning,2020-01-01T09:00:00
+10,Finance Director,FIN-DIR,7,120000.00,170000.00,Directs all finance operations,2020-01-01T09:00:00
+11,Sales Representative,SALES-REP,2,45000.00,70000.00,Client-facing sales position with commission,2020-01-01T09:00:00
+12,Senior Sales Representative,SR-SALES-REP,4,65000.00,95000.00,Senior sales with major account management,2020-01-01T09:00:00
+13,Sales Manager,SALES-MGR,6,90000.00,130000.00,Manages sales team and territory,2020-01-01T09:00:00
+14,Marketing Specialist,MKT-SPEC,3,55000.00,80000.00,Digital marketing and campaign management,2020-01-01T09:00:00
+15,Marketing Manager,MKT-MGR,6,85000.00,120000.00,Oversees marketing strategy and team,2020-01-01T09:00:00
+16,Operations Coordinator,OPS-COORD,3,50000.00,70000.00,Coordinates operational activities,2020-01-01T09:00:00
+17,Operations Manager,OPS-MGR,6,80000.00,115000.00,Manages operations and logistics,2020-01-01T09:00:00
+18,Customer Support Specialist,CS-SPEC,2,40000.00,55000.00,Provides customer support via phone and email,2020-01-01T09:00:00
+19,Research Scientist,RESEARCH-SCI,5,90000.00,130000.00,Conducts research and development projects,2020-01-01T09:00:00
+20,Data Analyst,DATA-ANALYST,3,60000.00,85000.00,Analyzes data and creates visualizations,2020-01-01T09:00:00

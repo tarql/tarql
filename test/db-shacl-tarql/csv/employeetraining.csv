@@ -1,0 +1,21 @@
+EmployeeTrainingID,EmployeeID,CourseID,EnrollmentDate,CompletionDate,Status,Score,CertificationNumber,ExpirationDate,Comments,CreatedDate
+1,1,2,2023-01-15,2023-02-28,Completed,92.50,CERT-PY-2023-001,NULL,Excellent performance,2023-01-15T09:00:00
+2,1,8,2023-06-01,2023-07-15,Completed,88.00,CERT-AWS-2023-045,2026-07-15,Passed certification exam,2023-06-01T09:00:00
+3,2,3,2023-09-01,2023-10-15,Completed,95.00,NULL,NULL,Outstanding leadership skills demonstrated,2023-09-01T09:00:00
+4,2,7,2023-03-10,2023-04-02,Completed,90.00,NULL,NULL,Great communication improvements,2023-03-10T09:00:00
+5,3,1,2024-01-10,2024-02-20,Completed,85.50,CERT-SQL-2024-012,NULL,Good foundation established,2024-01-10T09:00:00
+6,3,4,2024-03-01,2024-03-08,Completed,100.00,CERT-SAFE-2024-089,2027-03-08,Perfect score on safety assessment,2024-03-01T09:00:00
+7,4,2,2023-05-15,2023-07-01,Completed,87.00,CERT-PY-2023-034,NULL,NULL,2023-05-15T09:00:00
+8,5,5,2022-08-01,2022-10-30,Completed,91.00,PMP-2022-1234,2027-10-30,PMP certification achieved,2022-08-01T09:00:00
+9,5,3,2023-02-01,2023-03-20,Completed,93.50,NULL,NULL,Excellent leadership qualities,2023-02-01T09:00:00
+10,6,1,2024-05-01,NULL,InProgress,NULL,NULL,NULL,Currently enrolled,2024-05-01T09:00:00
+11,7,7,2024-04-15,2024-05-30,Completed,88.50,NULL,NULL,Improved presentation skills,2024-04-15T09:00:00
+12,8,15,2023-01-10,2023-03-15,Completed,94.00,CERT-FIN-2023-067,NULL,Advanced financial modeling mastery,2023-01-10T09:00:00
+13,9,6,2024-02-01,2024-03-10,Completed,89.00,NULL,NULL,Excel skills significantly improved,2024-02-01T09:00:00
+14,10,6,2023-11-01,2024-01-05,Completed,86.50,NULL,NULL,Good progress in Excel,2023-11-01T09:00:00
+15,11,13,2024-06-01,2024-07-15,Completed,82.00,NULL,NULL,Sales techniques improved,2024-06-01T09:00:00
+16,12,13,2023-03-01,2023-04-20,Completed,90.50,NULL,NULL,Excellent sales methodology understanding,2023-03-01T09:00:00
+17,13,13,2024-08-01,NULL,InProgress,NULL,NULL,NULL,NULL,2024-08-01T09:00:00
+18,14,13,2023-09-01,2023-10-25,Completed,88.00,NULL,NULL,Strong sales techniques developed,2023-09-01T09:00:00
+19,15,14,2023-07-01,2023-08-20,Completed,93.00,CERT-MKT-2023-145,NULL,Outstanding digital marketing knowledge,2023-07-01T09:00:00
+20,16,14,2024-01-15,2024-03-01,Completed,87.50,CERT-MKT-2024-023,NULL,Good understanding of digital strategies,2024-01-15T09:00:00

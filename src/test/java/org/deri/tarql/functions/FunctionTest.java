@@ -37,6 +37,6 @@ public abstract class FunctionTest {
 	}
 
 	protected Node stringNode(String s) {
-		return NodeFactory.createLiteral(s);
+		return NodeFactory.createLiteralString(s);
 	}
 }

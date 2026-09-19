@@ -1,0 +1,134 @@
+# ============================================================
+# TARQL Transformation: Employees
+# ============================================================
+# Input: employees.csv
+# Output: RDF triples conforming to hr:Employee SHACL shape
+# ============================================================
+
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>
+PREFIX hr: <http://example.com/hr/>
+PREFIX hrres: <http://example.com/hr/resource/>
+
+CONSTRUCT {
+  # Employee resource
+  ?employeeURI a hr:Employee, foaf:Person ;
+    hr:employeeID ?employeeID ;
+    hr:firstName ?firstName ;
+    hr:lastName ?lastName ;
+    hr:middleName ?middleName ;
+    hr:email ?email ;
+    hr:phone ?phone ;
+    hr:dateOfBirth ?dateOfBirth ;
+    hr:hireDate ?hireDate ;
+    hr:terminationDate ?terminationDate ;
+    hr:employeeStatus ?employeeStatus ;
+    hr:ssn ?ssn ;
+    hr:address ?address ;
+    hr:city ?city ;
+    hr:state ?state ;
+    hr:zipCode ?zipCode ;
+    hr:emergencyContactName ?emergencyContactName ;
+    hr:emergencyContactPhone ?emergencyContactPhone ;
+    hr:createdDate ?createdDateTime ;
+    hr:modifiedDate ?modifiedDateTime ;
+    rdfs:label ?employeeLabel ;
+    foaf:name ?fullName ;
+    foaf:givenName ?firstName ;
+    foaf:familyName ?lastName ;
+    foaf:mbox ?emailURI .
+  
+  # vCard for structured contact info
+  ?employeeURI vcard:hasEmail ?vcardEmail ;
+    vcard:hasTelephone ?vcardPhone ;
+    vcard:hasAddress ?vcardAddress .
+  
+  ?vcardEmail a vcard:Email ;
+    vcard:hasValue ?emailURI .
+  
+  ?vcardPhone a vcard:Voice ;
+    vcard:hasValue ?phoneURI .
+  
+  ?vcardAddress a vcard:Address ;
+    vcard:street-address ?address ;
+    vcard:locality ?city ;
+    vcard:region ?state ;
+    vcard:postal-code ?zipCode .
+}
+WHERE {
+  BIND(URI(CONCAT("http://example.com/hr/resource/employee/", ?EmployeeID)) AS ?employeeURI)
+  
+  # Basic identifiers
+  BIND(xsd:integer(?EmployeeID) AS ?employeeID)
+  BIND(xsd:string(?FirstName) AS ?firstName)
+  BIND(xsd:string(?LastName) AS ?lastName)
+  
+  # Middle name (optional)
+  BIND(IF(BOUND(?MiddleName) && ?MiddleName != "" && ?MiddleName != "NULL",
+          xsd:string(?MiddleName),
+          ?UNDEF) AS ?middleName)
+  
+  # Contact information
+  BIND(xsd:string(?Email) AS ?email)
+  BIND(URI(CONCAT("mailto:", ?Email)) AS ?emailURI)
+  
+  BIND(IF(BOUND(?Phone) && ?Phone != "" && ?Phone != "NULL",
+          xsd:string(?Phone),
+          ?UNDEF) AS ?phone)
+  BIND(IF(BOUND(?Phone) && ?Phone != "" && ?Phone != "NULL",
+          URI(CONCAT("tel:", REPLACE(?Phone, "[^0-9]", ""))),
+          ?UNDEF) AS ?phoneURI)
+  
+  # Dates
+  BIND(xsd:date(?DateOfBirth) AS ?dateOfBirth)
+  BIND(xsd:date(?HireDate) AS ?hireDate)
+  BIND(IF(BOUND(?TerminationDate) && ?TerminationDate != "" && ?TerminationDate != "NULL",
+          xsd:date(?TerminationDate),
+          ?UNDEF) AS ?terminationDate)
+  
+  # Status
+  BIND(xsd:string(?EmployeeStatus) AS ?employeeStatus)
+  
+  # SSN (sensitive - optional)
+  BIND(IF(BOUND(?SSN) && ?SSN != "" && ?SSN != "NULL",
+          xsd:string(?SSN),
+          ?UNDEF) AS ?ssn)
+  
+  # Address fields (all optional)
+  BIND(IF(BOUND(?Address) && ?Address != "" && ?Address != "NULL",
+          xsd:string(?Address),
+          ?UNDEF) AS ?address)
+  BIND(IF(BOUND(?City) && ?City != "" && ?City != "NULL",
+          xsd:string(?City),
+          ?UNDEF) AS ?city)
+  BIND(IF(BOUND(?State) && ?State != "" && ?State != "NULL",
+          xsd:string(?State),
+          ?UNDEF) AS ?state)
+  BIND(IF(BOUND(?ZipCode) && ?ZipCode != "" && ?ZipCode != "NULL",
+          xsd:string(?ZipCode),
+          ?UNDEF) AS ?zipCode)
+  
+  # Emergency contact (optional)
+  BIND(IF(BOUND(?EmergencyContactName) && ?EmergencyContactName != "" && ?EmergencyContactName != "NULL",
+          xsd:string(?EmergencyContactName),
+          ?UNDEF) AS ?emergencyContactName)
+  BIND(IF(BOUND(?EmergencyContactPhone) && ?EmergencyContactPhone != "" && ?EmergencyContactPhone != "NULL",
+          xsd:string(?EmergencyContactPhone),
+          ?UNDEF) AS ?emergencyContactPhone)
+  
+  # System dates
+  BIND(xsd:dateTime(?CreatedDate) AS ?createdDateTime)
+  BIND(xsd:dateTime(?ModifiedDate) AS ?modifiedDateTime)
+  
+  # Computed fields
+  BIND(CONCAT(?FirstName, " ", ?LastName) AS ?fullName)
+  BIND(CONCAT("Employee: ", ?FirstName, " ", ?LastName, " (", ?EmployeeID, ")") AS ?employeeLabel)
+  
+  # vCard URIs
+  BIND(URI(CONCAT(STR(?employeeURI), "/vcard/email")) AS ?vcardEmail)
+  BIND(URI(CONCAT(STR(?employeeURI), "/vcard/phone")) AS ?vcardPhone)
+  BIND(URI(CONCAT(STR(?employeeURI), "/vcard/address")) AS ?vcardAddress)
+}

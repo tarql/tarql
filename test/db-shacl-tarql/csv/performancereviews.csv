@@ -1,0 +1,21 @@
+ReviewID,EmployeeID,ReviewerID,ReviewDate,ReviewPeriodStart,ReviewPeriodEnd,OverallRating,StrengthsComments,ImprovementComments,Goals,EmployeeAcknowledged,AcknowledgedDate,CreatedDate
+1,1,5,2024-06-15,2023-06-01,2024-05-31,4.50,Excellent technical skills and leadership. Great mentor to junior developers.,Could improve documentation practices.,Lead major architecture redesign project,1,2024-06-20T14:30:00,2024-06-15T10:00:00
+2,2,5,2024-03-20,2023-03-01,2024-02-29,4.20,Outstanding people management and strategic thinking.,NULL,Implement new HRIS system,1,2024-03-25T11:00:00,2024-03-20T09:00:00
+3,3,5,2024-09-15,2023-09-01,2024-08-31,3.80,Strong coding fundamentals and eagerness to learn.,Needs to improve time management on large projects.,Complete two major feature implementations,1,2024-09-18T15:00:00,2024-09-15T10:00:00
+4,4,5,2024-02-25,2023-02-01,2024-01-31,4.00,Reliable team player with solid technical abilities.,Could take more initiative on complex problems.,Lead API integration project,1,2024-02-28T13:30:00,2024-02-25T09:00:00
+5,6,5,2024-01-20,2023-07-01,2023-12-31,3.50,Good technical foundation and collaborative approach.,Needs to work on code quality and testing practices.,Improve test coverage to 80%,1,2024-01-22T10:00:00,2024-01-20T09:00:00
+6,7,2,2024-04-10,2023-10-01,2024-03-31,4.30,Excellent at employee relations and conflict resolution.,NULL,Develop comprehensive training program,1,2024-04-15T14:00:00,2024-04-10T10:00:00
+7,9,8,2024-10-15,2023-10-01,2024-09-30,4.10,Strong analytical skills and attention to detail.,Could improve presentation skills.,Lead quarterly financial reporting process,1,2024-10-18T11:30:00,2024-10-15T09:00:00
+8,10,8,2024-03-05,2023-03-01,2024-02-29,3.90,Solid financial analysis and reliable work product.,Needs to be more proactive in identifying issues.,Develop forecasting model,1,2024-03-10T15:00:00,2024-03-05T10:00:00
+9,11,12,2024-08-20,2024-02-01,2024-07-31,3.60,Enthusiastic and good customer relationship building.,Needs to improve closing techniques and follow-up.,Achieve 120% of sales target,0,NULL,2024-08-20T10:00:00
+10,13,12,2024-02-10,2023-08-01,2024-01-31,3.75,Good prospecting skills and product knowledge.,Could improve negotiation skills.,Expand territory by 25%,1,2024-02-15T14:00:00,2024-02-10T09:00:00
+11,14,12,2024-11-25,2023-11-01,2024-10-31,4.20,Excellent client management and consistent performer.,NULL,Mentor two junior sales representatives,1,2024-11-28T10:30:00,2024-11-25T09:00:00
+12,16,15,2024-09-20,2023-09-01,2024-08-31,3.85,Creative approach and good understanding of market.,Could improve campaign analytics and ROI tracking.,Launch three major campaigns,1,2024-09-25T13:00:00,2024-09-20T10:00:00
+13,17,NULL,2024-07-10,2024-01-01,2024-06-30,3.50,Friendly demeanor and good problem-solving.,Needs to reduce response times.,Improve customer satisfaction scores,1,2024-07-15T11:00:00,2024-07-10T09:00:00
+14,1,5,2023-06-15,2022-06-01,2023-05-31,4.30,Strong technical leadership and project management.,Could delegate more effectively.,Establish best practices documentation,1,2023-06-20T15:00:00,2023-06-15T10:00:00
+15,2,5,2023-03-20,2022-03-01,2023-02-28,4.00,Effective communication and team building.,NULL,Reduce employee turnover by 15%,1,2023-03-25T10:00:00,2023-03-20T09:00:00
+16,4,5,2023-02-25,2022-02-01,2023-01-31,3.90,Consistent quality and good collaboration.,Could take on more challenging assignments.,Complete certification in cloud technologies,1,2023-02-28T14:00:00,2023-02-25T09:00:00
+17,9,8,2023-10-15,2022-10-01,2023-09-30,3.95,Accurate analysis and thorough reporting.,NULL,Automate monthly reporting process,1,2023-10-20T11:00:00,2023-10-15T09:00:00
+18,11,12,2023-08-20,2023-02-01,2023-07-31,3.40,Shows promise and eagerness to learn.,Needs to improve product knowledge and sales techniques.,Complete sales training program,1,2023-08-25T13:30:00,2023-08-20T10:00:00
+19,14,12,2023-11-25,2022-11-01,2023-10-31,4.10,Strong performer with excellent client relationships.,NULL,Expand into new market segment,1,2023-11-30T09:30:00,2023-11-25T09:00:00
+20,16,15,2023-09-20,2022-09-01,2023-08-31,3.70,Good creative skills and team collaboration.,Could improve project management abilities.,Lead major product launch campaign,1,2023-09-25T14:30:00,2023-09-20T10:00:00

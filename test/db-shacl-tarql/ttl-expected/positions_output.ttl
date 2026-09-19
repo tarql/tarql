@@ -1,0 +1,244 @@
+@prefix hr: <http://example.com/hr/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://example.com/hr/resource/position/1> a hr:Position ;
+    rdfs:label "Position: Junior Software Developer (Level 2)" ;
+    hr:createdDate "2020-01-01T09:00:00"^^xsd:dateTime ;
+    hr:description "Entry-level software development position" ;
+    hr:jobLevel 2 ;
+    hr:maxSalary 75000.00 ;
+    hr:minSalary 55000.00 ;
+    hr:positionCode "JR-SWE" ;
+    hr:positionID 1 ;
+    hr:positionTitle "Junior Software Developer" ;
+    rdfs:comment "Job position JR-SWE with salary range $55000.00 - $75000.00" .
+
+<http://example.com/hr/resource/position/10> a hr:Position ;
+    rdfs:label "Position: Finance Director (Level 7)" ;
+    hr:createdDate "2020-01-01T09:00:00"^^xsd:dateTime ;
+    hr:description "Directs all finance operations" ;
+    hr:jobLevel 7 ;
+    hr:maxSalary 170000.00 ;
+    hr:minSalary 120000.00 ;
+    hr:positionCode "FIN-DIR" ;
+    hr:positionID 10 ;
+    hr:positionTitle "Finance Director" ;
+    rdfs:comment "Job position FIN-DIR with salary range $120000.00 - $170000.00" .
+
+<http://example.com/hr/resource/position/11> a hr:Position ;
+    rdfs:label "Position: Sales Representative (Level 2)" ;
+    hr:createdDate "2020-01-01T09:00:00"^^xsd:dateTime ;
+    hr:description "Client-facing sales position with commission" ;
+    hr:jobLevel 2 ;
+    hr:maxSalary 70000.00 ;
+    hr:minSalary 45000.00 ;
+    hr:positionCode "SALES-REP" ;
+    hr:positionID 11 ;
+    hr:positionTitle "Sales Representative" ;
+    rdfs:comment "Job position SALES-REP with salary range $45000.00 - $70000.00" .
+
+<http://example.com/hr/resource/position/12> a hr:Position ;
+    rdfs:label "Position: Senior Sales Representative (Level 4)" ;
+    hr:createdDate "2020-01-01T09:00:00"^^xsd:dateTime ;
+    hr:description "Senior sales with major account management" ;
+    hr:jobLevel 4 ;
+    hr:maxSalary 95000.00 ;
+    hr:minSalary 65000.00 ;
+    hr:positionCode "SR-SALES-REP" ;
+    hr:positionID 12 ;
+    hr:positionTitle "Senior Sales Representative" ;
+    rdfs:comment "Job position SR-SALES-REP with salary range $65000.00 - $95000.00" .
+
+<http://example.com/hr/resource/position/13> a hr:Position ;
+    rdfs:label "Position: Sales Manager (Level 6)" ;
+    hr:createdDate "2020-01-01T09:00:00"^^xsd:dateTime ;
+    hr:description "Manages sales team and territory" ;
+    hr:jobLevel 6 ;
+    hr:maxSalary 130000.00 ;
+    hr:minSalary 90000.00 ;
+    hr:positionCode "SALES-MGR" ;
+    hr:positionID 13 ;
+    hr:positionTitle "Sales Manager" ;
+    rdfs:comment "Job position SALES-MGR with salary range $90000.00 - $130000.00" .
+
+<http://example.com/hr/resource/position/14> a hr:Position ;
+    rdfs:label "Position: Marketing Specialist (Level 3)" ;
+    hr:createdDate "2020-01-01T09:00:00"^^xsd:dateTime ;
+    hr:description "Digital marketing and campaign management" ;
+    hr:jobLevel 3 ;
+    hr:maxSalary 80000.00 ;
+    hr:minSalary 55000.00 ;
+    hr:positionCode "MKT-SPEC" ;
+    hr:positionID 14 ;
+    hr:positionTitle "Marketing Specialist" ;
+    rdfs:comment "Job position MKT-SPEC with salary range $55000.00 - $80000.00" .
+
+<http://example.com/hr/resource/position/15> a hr:Position ;
+    rdfs:label "Position: Marketing Manager (Level 6)" ;
+    hr:createdDate "2020-01-01T09:00:00"^^xsd:dateTime ;
+    hr:description "Oversees marketing strategy and team" ;
+    hr:jobLevel 6 ;
+    hr:maxSalary 120000.00 ;
+    hr:minSalary 85000.00 ;
+    hr:positionCode "MKT-MGR" ;
+    hr:positionID 15 ;
+    hr:positionTitle "Marketing Manager" ;
+    rdfs:comment "Job position MKT-MGR with salary range $85000.00 - $120000.00" .
+
+<http://example.com/hr/resource/position/16> a hr:Position ;
+    rdfs:label "Position: Operations Coordinator (Level 3)" ;
+    hr:createdDate "2020-01-01T09:00:00"^^xsd:dateTime ;
+    hr:description "Coordinates operational activities" ;
+    hr:jobLevel 3 ;
+    hr:maxSalary 70000.00 ;
+    hr:minSalary 50000.00 ;
+    hr:positionCode "OPS-COORD" ;
+    hr:positionID 16 ;
+    hr:positionTitle "Operations Coordinator" ;
+    rdfs:comment "Job position OPS-COORD with salary range $50000.00 - $70000.00" .
+
+<http://example.com/hr/resource/position/17> a hr:Position ;
+    rdfs:label "Position: Operations Manager (Level 6)" ;
+    hr:createdDate "2020-01-01T09:00:00"^^xsd:dateTime ;
+    hr:description "Manages operations and logistics" ;
+    hr:jobLevel 6 ;
+    hr:maxSalary 115000.00 ;
+    hr:minSalary 80000.00 ;
+    hr:positionCode "OPS-MGR" ;
+    hr:positionID 17 ;
+    hr:positionTitle "Operations Manager" ;
+    rdfs:comment "Job position OPS-MGR with salary range $80000.00 - $115000.00" .
+
+<http://example.com/hr/resource/position/18> a hr:Position ;
+    rdfs:label "Position: Customer Support Specialist (Level 2)" ;
+    hr:createdDate "2020-01-01T09:00:00"^^xsd:dateTime ;
+    hr:description "Provides customer support via phone and email" ;
+    hr:jobLevel 2 ;
+    hr:maxSalary 55000.00 ;
+    hr:minSalary 40000.00 ;
+    hr:positionCode "CS-SPEC" ;
+    hr:positionID 18 ;
+    hr:positionTitle "Customer Support Specialist" ;
+    rdfs:comment "Job position CS-SPEC with salary range $40000.00 - $55000.00" .
+
+<http://example.com/hr/resource/position/19> a hr:Position ;
+    rdfs:label "Position: Research Scientist (Level 5)" ;
+    hr:createdDate "2020-01-01T09:00:00"^^xsd:dateTime ;
+    hr:description "Conducts research and development projects" ;
+    hr:jobLevel 5 ;
+    hr:maxSalary 130000.00 ;
+    hr:minSalary 90000.00 ;
+    hr:positionCode "RESEARCH-SCI" ;
+    hr:positionID 19 ;
+    hr:positionTitle "Research Scientist" ;
+    rdfs:comment "Job position RESEARCH-SCI with salary range $90000.00 - $130000.00" .
+
+<http://example.com/hr/resource/position/2> a hr:Position ;
+    rdfs:label "Position: Software Developer (Level 3)" ;
+    hr:createdDate "2020-01-01T09:00:00"^^xsd:dateTime ;
+    hr:description "Mid-level software development position" ;
+    hr:jobLevel 3 ;
+    hr:maxSalary 95000.00 ;
+    hr:minSalary 70000.00 ;
+    hr:positionCode "SWE" ;
+    hr:positionID 2 ;
+    hr:positionTitle "Software Developer" ;
+    rdfs:comment "Job position SWE with salary range $70000.00 - $95000.00" .
+
+<http://example.com/hr/resource/position/20> a hr:Position ;
+    rdfs:label "Position: Data Analyst (Level 3)" ;
+    hr:createdDate "2020-01-01T09:00:00"^^xsd:dateTime ;
+    hr:description "Analyzes data and creates visualizations" ;
+    hr:jobLevel 3 ;
+    hr:maxSalary 85000.00 ;
+    hr:minSalary 60000.00 ;
+    hr:positionCode "DATA-ANALYST" ;
+    hr:positionID 20 ;
+    hr:positionTitle "Data Analyst" ;
+    rdfs:comment "Job position DATA-ANALYST with salary range $60000.00 - $85000.00" .
+
+<http://example.com/hr/resource/position/3> a hr:Position ;
+    rdfs:label "Position: Senior Software Developer (Level 5)" ;
+    hr:createdDate "2020-01-01T09:00:00"^^xsd:dateTime ;
+    hr:description "Senior software development position with team leadership" ;
+    hr:jobLevel 5 ;
+    hr:maxSalary 130000.00 ;
+    hr:minSalary 95000.00 ;
+    hr:positionCode "SR-SWE" ;
+    hr:positionID 3 ;
+    hr:positionTitle "Senior Software Developer" ;
+    rdfs:comment "Job position SR-SWE with salary range $95000.00 - $130000.00" .
+
+<http://example.com/hr/resource/position/4> a hr:Position ;
+    rdfs:label "Position: Lead Software Engineer (Level 6)" ;
+    hr:createdDate "2020-01-01T09:00:00"^^xsd:dateTime ;
+    hr:description "Technical lead for development teams" ;
+    hr:jobLevel 6 ;
+    hr:maxSalary 160000.00 ;
+    hr:minSalary 120000.00 ;
+    hr:positionCode "LEAD-SWE" ;
+    hr:positionID 4 ;
+    hr:positionTitle "Lead Software Engineer" ;
+    rdfs:comment "Job position LEAD-SWE with salary range $120000.00 - $160000.00" .
+
+<http://example.com/hr/resource/position/5> a hr:Position ;
+    rdfs:label "Position: Engineering Manager (Level 7)" ;
+    hr:createdDate "2020-01-01T09:00:00"^^xsd:dateTime ;
+    hr:description "Manages engineering department and teams" ;
+    hr:jobLevel 7 ;
+    hr:maxSalary 180000.00 ;
+    hr:minSalary 130000.00 ;
+    hr:positionCode "ENG-MGR" ;
+    hr:positionID 5 ;
+    hr:positionTitle "Engineering Manager" ;
+    rdfs:comment "Job position ENG-MGR with salary range $130000.00 - $180000.00" .
+
+<http://example.com/hr/resource/position/6> a hr:Position ;
+    rdfs:label "Position: HR Specialist (Level 3)" ;
+    hr:createdDate "2020-01-01T09:00:00"^^xsd:dateTime ;
+    hr:description "Human resources specialist for recruitment and employee relations" ;
+    hr:jobLevel 3 ;
+    hr:maxSalary 70000.00 ;
+    hr:minSalary 50000.00 ;
+    hr:positionCode "HR-SPEC" ;
+    hr:positionID 6 ;
+    hr:positionTitle "HR Specialist" ;
+    rdfs:comment "Job position HR-SPEC with salary range $50000.00 - $70000.00" .
+
+<http://example.com/hr/resource/position/7> a hr:Position ;
+    rdfs:label "Position: HR Manager (Level 6)" ;
+    hr:createdDate "2020-01-01T09:00:00"^^xsd:dateTime ;
+    hr:description "Manages HR department operations" ;
+    hr:jobLevel 6 ;
+    hr:maxSalary 110000.00 ;
+    hr:minSalary 80000.00 ;
+    hr:positionCode "HR-MGR" ;
+    hr:positionID 7 ;
+    hr:positionTitle "HR Manager" ;
+    rdfs:comment "Job position HR-MGR with salary range $80000.00 - $110000.00" .
+
+<http://example.com/hr/resource/position/8> a hr:Position ;
+    rdfs:label "Position: Financial Analyst (Level 4)" ;
+    hr:createdDate "2020-01-01T09:00:00"^^xsd:dateTime ;
+    hr:description "Analyzes financial data and prepares reports" ;
+    hr:jobLevel 4 ;
+    hr:maxSalary 90000.00 ;
+    hr:minSalary 65000.00 ;
+    hr:positionCode "FIN-ANALYST" ;
+    hr:positionID 8 ;
+    hr:positionTitle "Financial Analyst" ;
+    rdfs:comment "Job position FIN-ANALYST with salary range $65000.00 - $90000.00" .
+
+<http://example.com/hr/resource/position/9> a hr:Position ;
+    rdfs:label "Position: Senior Financial Analyst (Level 5)" ;
+    hr:createdDate "2020-01-01T09:00:00"^^xsd:dateTime ;
+    hr:description "Senior financial analysis and strategic planning" ;
+    hr:jobLevel 5 ;
+    hr:maxSalary 115000.00 ;
+    hr:minSalary 85000.00 ;
+    hr:positionCode "SR-FIN-ANALYST" ;
+    hr:positionID 9 ;
+    hr:positionTitle "Senior Financial Analyst" ;
+    rdfs:comment "Job position SR-FIN-ANALYST with salary range $85000.00 - $115000.00" .
+

@@ -1,0 +1,840 @@
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix hr: <http://example.com/hr/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcard: <http://www.w3.org/2006/vcard/ns#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://example.com/hr/resource/employee/1> a hr:Employee,
+        foaf:Person ;
+    rdfs:label "Employee: Alice Johnson (1)" ;
+    hr:address "123 Maple Street" ;
+    hr:city "Seattle" ;
+    hr:createdDate "2018-06-01T09:00:00"^^xsd:dateTime ;
+    hr:dateOfBirth "1985-03-15"^^xsd:date ;
+    hr:email "alice.johnson@example.com" ;
+    hr:emergencyContactName "Bob Johnson" ;
+    hr:emergencyContactPhone "555-0201" ;
+    hr:employeeID 1 ;
+    hr:employeeStatus "Active" ;
+    hr:firstName "Alice" ;
+    hr:hireDate "2018-06-01"^^xsd:date ;
+    hr:lastName "Johnson" ;
+    hr:middleName "Marie" ;
+    hr:modifiedDate "2024-01-10T14:30:00"^^xsd:dateTime ;
+    hr:phone "555-0101" ;
+    hr:ssn "123-45-6789" ;
+    hr:state "WA" ;
+    hr:zipCode "98101" ;
+    vcard:hasAddress <http://example.com/hr/resource/employee/1/vcard/address> ;
+    vcard:hasEmail <http://example.com/hr/resource/employee/1/vcard/email> ;
+    vcard:hasTelephone <http://example.com/hr/resource/employee/1/vcard/phone> ;
+    foaf:familyName "Johnson" ;
+    foaf:givenName "Alice" ;
+    foaf:mbox <mailto:alice.johnson@example.com> ;
+    foaf:name "Alice Johnson" ;
+    foaf:phone <tel:5550101> .
+
+<http://example.com/hr/resource/employee/10> a hr:Employee,
+        foaf:Person ;
+    rdfs:label "Employee: Paul Taylor (10)" ;
+    hr:address "741 Maple Avenue" ;
+    hr:city "Seattle" ;
+    hr:createdDate "2018-03-01T09:00:00"^^xsd:dateTime ;
+    hr:dateOfBirth "1984-02-14"^^xsd:date ;
+    hr:email "paul.taylor@example.com" ;
+    hr:emergencyContactName "Emily Taylor" ;
+    hr:emergencyContactPhone "555-0210" ;
+    hr:employeeID 10 ;
+    hr:employeeStatus "Active" ;
+    hr:firstName "Paul" ;
+    hr:hireDate "2018-03-01"^^xsd:date ;
+    hr:lastName "Taylor" ;
+    hr:middleName "Robert" ;
+    hr:modifiedDate "2024-08-20T10:25:00"^^xsd:dateTime ;
+    hr:phone "555-0110" ;
+    hr:ssn "012-34-5678" ;
+    hr:state "WA" ;
+    hr:zipCode "98105" ;
+    vcard:hasAddress <http://example.com/hr/resource/employee/10/vcard/address> ;
+    vcard:hasEmail <http://example.com/hr/resource/employee/10/vcard/email> ;
+    vcard:hasTelephone <http://example.com/hr/resource/employee/10/vcard/phone> ;
+    foaf:familyName "Taylor" ;
+    foaf:givenName "Paul" ;
+    foaf:mbox <mailto:paul.taylor@example.com> ;
+    foaf:name "Paul Taylor" ;
+    foaf:phone <tel:5550110> .
+
+<http://example.com/hr/resource/employee/11> a hr:Employee,
+        foaf:Person ;
+    rdfs:label "Employee: Emily Thomas (11)" ;
+    hr:address "852 Oak Boulevard" ;
+    hr:city "Tacoma" ;
+    hr:createdDate "2020-08-15T09:00:00"^^xsd:dateTime ;
+    hr:dateOfBirth "1991-10-28"^^xsd:date ;
+    hr:email "emily.thomas@example.com" ;
+    hr:emergencyContactName "John Thomas" ;
+    hr:emergencyContactPhone "555-0211" ;
+    hr:employeeID 11 ;
+    hr:employeeStatus "Active" ;
+    hr:firstName "Emily" ;
+    hr:hireDate "2020-08-15"^^xsd:date ;
+    hr:lastName "Thomas" ;
+    hr:middleName "Grace" ;
+    hr:modifiedDate "2024-10-05T16:30:00"^^xsd:dateTime ;
+    hr:phone "555-0111" ;
+    hr:ssn "112-34-5679" ;
+    hr:state "WA" ;
+    hr:zipCode "98402" ;
+    vcard:hasAddress <http://example.com/hr/resource/employee/11/vcard/address> ;
+    vcard:hasEmail <http://example.com/hr/resource/employee/11/vcard/email> ;
+    vcard:hasTelephone <http://example.com/hr/resource/employee/11/vcard/phone> ;
+    foaf:familyName "Thomas" ;
+    foaf:givenName "Emily" ;
+    foaf:mbox <mailto:emily.thomas@example.com> ;
+    foaf:name "Emily Thomas" ;
+    foaf:phone <tel:5550111> .
+
+<http://example.com/hr/resource/employee/12> a hr:Employee,
+        foaf:Person ;
+    rdfs:label "Employee: John White (12)" ;
+    hr:address "963 Pine Street" ;
+    hr:city "Seattle" ;
+    hr:createdDate "2016-05-10T09:00:00"^^xsd:dateTime ;
+    hr:dateOfBirth "1979-06-05"^^xsd:date ;
+    hr:email "john.white@example.com" ;
+    hr:emergencyContactName "Mary White" ;
+    hr:emergencyContactPhone "555-0212" ;
+    hr:employeeID 12 ;
+    hr:employeeStatus "Active" ;
+    hr:firstName "John" ;
+    hr:hireDate "2016-05-10"^^xsd:date ;
+    hr:lastName "White" ;
+    hr:modifiedDate "2024-04-12T13:15:00"^^xsd:dateTime ;
+    hr:phone "555-0112" ;
+    hr:ssn "213-45-6780" ;
+    hr:state "WA" ;
+    hr:zipCode "98106" ;
+    vcard:hasAddress <http://example.com/hr/resource/employee/12/vcard/address> ;
+    vcard:hasEmail <http://example.com/hr/resource/employee/12/vcard/email> ;
+    vcard:hasTelephone <http://example.com/hr/resource/employee/12/vcard/phone> ;
+    foaf:familyName "White" ;
+    foaf:givenName "John" ;
+    foaf:mbox <mailto:john.white@example.com> ;
+    foaf:name "John White" ;
+    foaf:phone <tel:5550112> .
+
+<http://example.com/hr/resource/employee/13> a hr:Employee,
+        foaf:Person ;
+    rdfs:label "Employee: Mary Harris (13)" ;
+    hr:address "159 Cedar Road" ;
+    hr:city "Redmond" ;
+    hr:createdDate "2019-02-01T09:00:00"^^xsd:dateTime ;
+    hr:dateOfBirth "1986-11-19"^^xsd:date ;
+    hr:email "mary.harris@example.com" ;
+    hr:emergencyContactName "Richard Harris" ;
+    hr:emergencyContactPhone "555-0213" ;
+    hr:employeeID 13 ;
+    hr:employeeStatus "Active" ;
+    hr:firstName "Mary" ;
+    hr:hireDate "2019-02-01"^^xsd:date ;
+    hr:lastName "Harris" ;
+    hr:middleName "Jane" ;
+    hr:modifiedDate "2024-12-01T09:50:00"^^xsd:dateTime ;
+    hr:phone "555-0113" ;
+    hr:ssn "314-56-7891" ;
+    hr:state "WA" ;
+    hr:zipCode "98053" ;
+    vcard:hasAddress <http://example.com/hr/resource/employee/13/vcard/address> ;
+    vcard:hasEmail <http://example.com/hr/resource/employee/13/vcard/email> ;
+    vcard:hasTelephone <http://example.com/hr/resource/employee/13/vcard/phone> ;
+    foaf:familyName "Harris" ;
+    foaf:givenName "Mary" ;
+    foaf:mbox <mailto:mary.harris@example.com> ;
+    foaf:name "Mary Harris" ;
+    foaf:phone <tel:5550113> .
+
+<http://example.com/hr/resource/employee/14> a hr:Employee,
+        foaf:Person ;
+    rdfs:label "Employee: Richard Clark (14)" ;
+    hr:address "357 Elm Avenue" ;
+    hr:city "Bellevue" ;
+    hr:createdDate "2017-11-20T09:00:00"^^xsd:dateTime ;
+    hr:dateOfBirth "1983-09-07"^^xsd:date ;
+    hr:email "richard.clark@example.com" ;
+    hr:emergencyContactName "Susan Clark" ;
+    hr:emergencyContactPhone "555-0214" ;
+    hr:employeeID 14 ;
+    hr:employeeStatus "Active" ;
+    hr:firstName "Richard" ;
+    hr:hireDate "2017-11-20"^^xsd:date ;
+    hr:lastName "Clark" ;
+    hr:modifiedDate "2024-06-08T14:40:00"^^xsd:dateTime ;
+    hr:phone "555-0114" ;
+    hr:ssn "415-67-8902" ;
+    hr:state "WA" ;
+    hr:zipCode "98006" ;
+    vcard:hasAddress <http://example.com/hr/resource/employee/14/vcard/address> ;
+    vcard:hasEmail <http://example.com/hr/resource/employee/14/vcard/email> ;
+    vcard:hasTelephone <http://example.com/hr/resource/employee/14/vcard/phone> ;
+    foaf:familyName "Clark" ;
+    foaf:givenName "Richard" ;
+    foaf:mbox <mailto:richard.clark@example.com> ;
+    foaf:name "Richard Clark" ;
+    foaf:phone <tel:5550114> .
+
+<http://example.com/hr/resource/employee/15> a hr:Employee,
+        foaf:Person ;
+    rdfs:label "Employee: Susan Lewis (15)" ;
+    hr:address "486 Birch Lane" ;
+    hr:city "Seattle" ;
+    hr:createdDate "2020-06-01T09:00:00"^^xsd:dateTime ;
+    hr:dateOfBirth "1989-03-22"^^xsd:date ;
+    hr:email "susan.lewis@example.com" ;
+    hr:emergencyContactName "Thomas Lewis" ;
+    hr:emergencyContactPhone "555-0215" ;
+    hr:employeeID 15 ;
+    hr:employeeStatus "Active" ;
+    hr:firstName "Susan" ;
+    hr:hireDate "2020-06-01"^^xsd:date ;
+    hr:lastName "Lewis" ;
+    hr:middleName "Marie" ;
+    hr:modifiedDate "2024-11-15T11:05:00"^^xsd:dateTime ;
+    hr:phone "555-0115" ;
+    hr:ssn "516-78-9013" ;
+    hr:state "WA" ;
+    hr:zipCode "98107" ;
+    vcard:hasAddress <http://example.com/hr/resource/employee/15/vcard/address> ;
+    vcard:hasEmail <http://example.com/hr/resource/employee/15/vcard/email> ;
+    vcard:hasTelephone <http://example.com/hr/resource/employee/15/vcard/phone> ;
+    foaf:familyName "Lewis" ;
+    foaf:givenName "Susan" ;
+    foaf:mbox <mailto:susan.lewis@example.com> ;
+    foaf:name "Susan Lewis" ;
+    foaf:phone <tel:5550115> .
+
+<http://example.com/hr/resource/employee/16> a hr:Employee,
+        foaf:Person ;
+    rdfs:label "Employee: Thomas Walker (16)" ;
+    hr:address "597 Spruce Court" ;
+    hr:city "Kirkland" ;
+    hr:createdDate "2017-09-15T09:00:00"^^xsd:dateTime ;
+    hr:dateOfBirth "1981-07-11"^^xsd:date ;
+    hr:email "thomas.walker@example.com" ;
+    hr:emergencyContactName "Nancy Walker" ;
+    hr:emergencyContactPhone "555-0216" ;
+    hr:employeeID 16 ;
+    hr:employeeStatus "Active" ;
+    hr:firstName "Thomas" ;
+    hr:hireDate "2017-09-15"^^xsd:date ;
+    hr:lastName "Walker" ;
+    hr:modifiedDate "2024-03-28T15:20:00"^^xsd:dateTime ;
+    hr:phone "555-0116" ;
+    hr:ssn "617-89-0124" ;
+    hr:state "WA" ;
+    hr:zipCode "98034" ;
+    vcard:hasAddress <http://example.com/hr/resource/employee/16/vcard/address> ;
+    vcard:hasEmail <http://example.com/hr/resource/employee/16/vcard/email> ;
+    vcard:hasTelephone <http://example.com/hr/resource/employee/16/vcard/phone> ;
+    foaf:familyName "Walker" ;
+    foaf:givenName "Thomas" ;
+    foaf:mbox <mailto:thomas.walker@example.com> ;
+    foaf:name "Thomas Walker" ;
+    foaf:phone <tel:5550116> .
+
+<http://example.com/hr/resource/employee/17> a hr:Employee,
+        foaf:Person ;
+    rdfs:label "Employee: Nancy Hall (17)" ;
+    hr:address "624 Willow Street" ;
+    hr:city "Seattle" ;
+    hr:createdDate "2021-07-01T09:00:00"^^xsd:dateTime ;
+    hr:dateOfBirth "1993-01-26"^^xsd:date ;
+    hr:email "nancy.hall@example.com" ;
+    hr:emergencyContactName "Steven Hall" ;
+    hr:emergencyContactPhone "555-0217" ;
+    hr:employeeID 17 ;
+    hr:employeeStatus "Active" ;
+    hr:firstName "Nancy" ;
+    hr:hireDate "2021-07-01"^^xsd:date ;
+    hr:lastName "Hall" ;
+    hr:middleName "Lee" ;
+    hr:modifiedDate "2024-09-22T10:35:00"^^xsd:dateTime ;
+    hr:phone "555-0117" ;
+    hr:ssn "718-90-1235" ;
+    hr:state "WA" ;
+    hr:zipCode "98108" ;
+    vcard:hasAddress <http://example.com/hr/resource/employee/17/vcard/address> ;
+    vcard:hasEmail <http://example.com/hr/resource/employee/17/vcard/email> ;
+    vcard:hasTelephone <http://example.com/hr/resource/employee/17/vcard/phone> ;
+    foaf:familyName "Hall" ;
+    foaf:givenName "Nancy" ;
+    foaf:mbox <mailto:nancy.hall@example.com> ;
+    foaf:name "Nancy Hall" ;
+    foaf:phone <tel:5550117> .
+
+<http://example.com/hr/resource/employee/18> a hr:Employee,
+        foaf:Person ;
+    rdfs:label "Employee: Steven Allen (18)" ;
+    hr:address "735 Aspen Drive" ;
+    hr:city "Tacoma" ;
+    hr:createdDate "2013-04-10T09:00:00"^^xsd:dateTime ;
+    hr:dateOfBirth "1977-12-08"^^xsd:date ;
+    hr:email "steven.allen@example.com" ;
+    hr:emergencyContactName "Karen Allen" ;
+    hr:emergencyContactPhone "555-0218" ;
+    hr:employeeID 18 ;
+    hr:employeeStatus "Active" ;
+    hr:firstName "Steven" ;
+    hr:hireDate "2013-04-10"^^xsd:date ;
+    hr:lastName "Allen" ;
+    hr:middleName "Paul" ;
+    hr:modifiedDate "2024-01-30T13:45:00"^^xsd:dateTime ;
+    hr:phone "555-0118" ;
+    hr:ssn "819-01-2346" ;
+    hr:state "WA" ;
+    hr:zipCode "98403" ;
+    vcard:hasAddress <http://example.com/hr/resource/employee/18/vcard/address> ;
+    vcard:hasEmail <http://example.com/hr/resource/employee/18/vcard/email> ;
+    vcard:hasTelephone <http://example.com/hr/resource/employee/18/vcard/phone> ;
+    foaf:familyName "Allen" ;
+    foaf:givenName "Steven" ;
+    foaf:mbox <mailto:steven.allen@example.com> ;
+    foaf:name "Steven Allen" ;
+    foaf:phone <tel:5550118> .
+
+<http://example.com/hr/resource/employee/19> a hr:Employee,
+        foaf:Person ;
+    rdfs:label "Employee: Karen Young (19)" ;
+    hr:address "846 Maple Court" ;
+    hr:city "Bellevue" ;
+    hr:createdDate "2019-12-01T09:00:00"^^xsd:dateTime ;
+    hr:dateOfBirth "1990-08-30"^^xsd:date ;
+    hr:email "karen.young@example.com" ;
+    hr:emergencyContactName "Brian Young" ;
+    hr:emergencyContactPhone "555-0219" ;
+    hr:employeeID 19 ;
+    hr:employeeStatus "OnLeave" ;
+    hr:firstName "Karen" ;
+    hr:hireDate "2019-12-01"^^xsd:date ;
+    hr:lastName "Young" ;
+    hr:modifiedDate "2024-10-18T16:00:00"^^xsd:dateTime ;
+    hr:phone "555-0119" ;
+    hr:ssn "920-12-3457" ;
+    hr:state "WA" ;
+    hr:zipCode "98007" ;
+    vcard:hasAddress <http://example.com/hr/resource/employee/19/vcard/address> ;
+    vcard:hasEmail <http://example.com/hr/resource/employee/19/vcard/email> ;
+    vcard:hasTelephone <http://example.com/hr/resource/employee/19/vcard/phone> ;
+    foaf:familyName "Young" ;
+    foaf:givenName "Karen" ;
+    foaf:mbox <mailto:karen.young@example.com> ;
+    foaf:name "Karen Young" ;
+    foaf:phone <tel:5550119> .
+
+<http://example.com/hr/resource/employee/2> a hr:Employee,
+        foaf:Person ;
+    rdfs:label "Employee: Robert Chen (2)" ;
+    hr:address "456 Oak Avenue" ;
+    hr:city "Seattle" ;
+    hr:createdDate "2015-03-15T09:00:00"^^xsd:dateTime ;
+    hr:dateOfBirth "1978-11-22"^^xsd:date ;
+    hr:email "robert.chen@example.com" ;
+    hr:emergencyContactName "Linda Chen" ;
+    hr:emergencyContactPhone "555-0202" ;
+    hr:employeeID 2 ;
+    hr:employeeStatus "Active" ;
+    hr:firstName "Robert" ;
+    hr:hireDate "2015-03-15"^^xsd:date ;
+    hr:lastName "Chen" ;
+    hr:modifiedDate "2023-12-05T11:20:00"^^xsd:dateTime ;
+    hr:phone "555-0102" ;
+    hr:ssn "234-56-7890" ;
+    hr:state "WA" ;
+    hr:zipCode "98102" ;
+    vcard:hasAddress <http://example.com/hr/resource/employee/2/vcard/address> ;
+    vcard:hasEmail <http://example.com/hr/resource/employee/2/vcard/email> ;
+    vcard:hasTelephone <http://example.com/hr/resource/employee/2/vcard/phone> ;
+    foaf:familyName "Chen" ;
+    foaf:givenName "Robert" ;
+    foaf:mbox <mailto:robert.chen@example.com> ;
+    foaf:name "Robert Chen" ;
+    foaf:phone <tel:5550102> .
+
+<http://example.com/hr/resource/employee/20> a hr:Employee,
+        foaf:Person ;
+    rdfs:label "Employee: Brian King (20)" ;
+    hr:address "957 Oak Place" ;
+    hr:city "Seattle" ;
+    hr:createdDate "2018-08-20T09:00:00"^^xsd:dateTime ;
+    hr:dateOfBirth "1985-05-16"^^xsd:date ;
+    hr:email "brian.king@example.com" ;
+    hr:emergencyContactName "Laura King" ;
+    hr:emergencyContactPhone "555-0220" ;
+    hr:employeeID 20 ;
+    hr:employeeStatus "Terminated" ;
+    hr:firstName "Brian" ;
+    hr:hireDate "2018-08-20"^^xsd:date ;
+    hr:lastName "King" ;
+    hr:middleName "Michael" ;
+    hr:modifiedDate "2024-12-01T09:00:00"^^xsd:dateTime ;
+    hr:phone "555-0120" ;
+    hr:ssn "021-23-4568" ;
+    hr:state "WA" ;
+    hr:terminationDate "2024-11-30"^^xsd:date ;
+    hr:zipCode "98109" ;
+    vcard:hasAddress <http://example.com/hr/resource/employee/20/vcard/address> ;
+    vcard:hasEmail <http://example.com/hr/resource/employee/20/vcard/email> ;
+    vcard:hasTelephone <http://example.com/hr/resource/employee/20/vcard/phone> ;
+    foaf:familyName "King" ;
+    foaf:givenName "Brian" ;
+    foaf:mbox <mailto:brian.king@example.com> ;
+    foaf:name "Brian King" ;
+    foaf:phone <tel:5550120> .
+
+<http://example.com/hr/resource/employee/3> a hr:Employee,
+        foaf:Person ;
+    rdfs:label "Employee: Maria Garcia (3)" ;
+    hr:address "789 Pine Road" ;
+    hr:city "Bellevue" ;
+    hr:createdDate "2019-09-10T09:00:00"^^xsd:dateTime ;
+    hr:dateOfBirth "1990-07-08"^^xsd:date ;
+    hr:email "maria.garcia@example.com" ;
+    hr:emergencyContactName "Carlos Garcia" ;
+    hr:emergencyContactPhone "555-0203" ;
+    hr:employeeID 3 ;
+    hr:employeeStatus "Active" ;
+    hr:firstName "Maria" ;
+    hr:hireDate "2019-09-10"^^xsd:date ;
+    hr:lastName "Garcia" ;
+    hr:middleName "Elena" ;
+    hr:modifiedDate "2024-06-22T16:15:00"^^xsd:dateTime ;
+    hr:phone "555-0103" ;
+    hr:ssn "345-67-8901" ;
+    hr:state "WA" ;
+    hr:zipCode "98004" ;
+    vcard:hasAddress <http://example.com/hr/resource/employee/3/vcard/address> ;
+    vcard:hasEmail <http://example.com/hr/resource/employee/3/vcard/email> ;
+    vcard:hasTelephone <http://example.com/hr/resource/employee/3/vcard/phone> ;
+    foaf:familyName "Garcia" ;
+    foaf:givenName "Maria" ;
+    foaf:mbox <mailto:maria.garcia@example.com> ;
+    foaf:name "Maria Garcia" ;
+    foaf:phone <tel:5550103> .
+
+<http://example.com/hr/resource/employee/4> a hr:Employee,
+        foaf:Person ;
+    rdfs:label "Employee: James Smith (4)" ;
+    hr:address "321 Elm Street" ;
+    hr:city "Tacoma" ;
+    hr:createdDate "2017-02-20T09:00:00"^^xsd:dateTime ;
+    hr:dateOfBirth "1982-01-30"^^xsd:date ;
+    hr:email "james.smith@example.com" ;
+    hr:emergencyContactName "Sarah Smith" ;
+    hr:emergencyContactPhone "555-0204" ;
+    hr:employeeID 4 ;
+    hr:employeeStatus "Active" ;
+    hr:firstName "James" ;
+    hr:hireDate "2017-02-20"^^xsd:date ;
+    hr:lastName "Smith" ;
+    hr:modifiedDate "2024-03-15T10:45:00"^^xsd:dateTime ;
+    hr:phone "555-0104" ;
+    hr:ssn "456-78-9012" ;
+    hr:state "WA" ;
+    hr:zipCode "98401" ;
+    vcard:hasAddress <http://example.com/hr/resource/employee/4/vcard/address> ;
+    vcard:hasEmail <http://example.com/hr/resource/employee/4/vcard/email> ;
+    vcard:hasTelephone <http://example.com/hr/resource/employee/4/vcard/phone> ;
+    foaf:familyName "Smith" ;
+    foaf:givenName "James" ;
+    foaf:mbox <mailto:james.smith@example.com> ;
+    foaf:name "James Smith" ;
+    foaf:phone <tel:5550104> .
+
+<http://example.com/hr/resource/employee/5> a hr:Employee,
+        foaf:Person ;
+    rdfs:label "Employee: Sarah Williams (5)" ;
+    hr:address "654 Cedar Lane" ;
+    hr:city "Seattle" ;
+    hr:createdDate "2014-11-05T09:00:00"^^xsd:dateTime ;
+    hr:dateOfBirth "1980-09-12"^^xsd:date ;
+    hr:email "sarah.williams@example.com" ;
+    hr:emergencyContactName "Michael Williams" ;
+    hr:emergencyContactPhone "555-0205" ;
+    hr:employeeID 5 ;
+    hr:employeeStatus "Active" ;
+    hr:firstName "Sarah" ;
+    hr:hireDate "2014-11-05"^^xsd:date ;
+    hr:lastName "Williams" ;
+    hr:middleName "Ann" ;
+    hr:modifiedDate "2024-11-30T13:20:00"^^xsd:dateTime ;
+    hr:phone "555-0105" ;
+    hr:ssn "567-89-0123" ;
+    hr:state "WA" ;
+    hr:zipCode "98103" ;
+    vcard:hasAddress <http://example.com/hr/resource/employee/5/vcard/address> ;
+    vcard:hasEmail <http://example.com/hr/resource/employee/5/vcard/email> ;
+    vcard:hasTelephone <http://example.com/hr/resource/employee/5/vcard/phone> ;
+    foaf:familyName "Williams" ;
+    foaf:givenName "Sarah" ;
+    foaf:mbox <mailto:sarah.williams@example.com> ;
+    foaf:name "Sarah Williams" ;
+    foaf:phone <tel:5550105> .
+
+<http://example.com/hr/resource/employee/6> a hr:Employee,
+        foaf:Person ;
+    rdfs:label "Employee: Michael Brown (6)" ;
+    hr:address "987 Birch Court" ;
+    hr:city "Redmond" ;
+    hr:createdDate "2020-01-15T09:00:00"^^xsd:dateTime ;
+    hr:dateOfBirth "1988-05-25"^^xsd:date ;
+    hr:email "michael.brown@example.com" ;
+    hr:emergencyContactName "Jennifer Brown" ;
+    hr:emergencyContactPhone "555-0206" ;
+    hr:employeeID 6 ;
+    hr:employeeStatus "Active" ;
+    hr:firstName "Michael" ;
+    hr:hireDate "2020-01-15"^^xsd:date ;
+    hr:lastName "Brown" ;
+    hr:middleName "James" ;
+    hr:modifiedDate "2024-07-18T09:30:00"^^xsd:dateTime ;
+    hr:phone "555-0106" ;
+    hr:ssn "678-90-1234" ;
+    hr:state "WA" ;
+    hr:zipCode "98052" ;
+    vcard:hasAddress <http://example.com/hr/resource/employee/6/vcard/address> ;
+    vcard:hasEmail <http://example.com/hr/resource/employee/6/vcard/email> ;
+    vcard:hasTelephone <http://example.com/hr/resource/employee/6/vcard/phone> ;
+    foaf:familyName "Brown" ;
+    foaf:givenName "Michael" ;
+    foaf:mbox <mailto:michael.brown@example.com> ;
+    foaf:name "Michael Brown" ;
+    foaf:phone <tel:5550106> .
+
+<http://example.com/hr/resource/employee/7> a hr:Employee,
+        foaf:Person ;
+    rdfs:label "Employee: Jennifer Davis (7)" ;
+    hr:address "147 Spruce Drive" ;
+    hr:city "Kirkland" ;
+    hr:createdDate "2021-04-01T09:00:00"^^xsd:dateTime ;
+    hr:dateOfBirth "1992-12-03"^^xsd:date ;
+    hr:email "jennifer.davis@example.com" ;
+    hr:emergencyContactName "David Davis" ;
+    hr:emergencyContactPhone "555-0207" ;
+    hr:employeeID 7 ;
+    hr:employeeStatus "Active" ;
+    hr:firstName "Jennifer" ;
+    hr:hireDate "2021-04-01"^^xsd:date ;
+    hr:lastName "Davis" ;
+    hr:modifiedDate "2024-09-10T15:00:00"^^xsd:dateTime ;
+    hr:phone "555-0107" ;
+    hr:ssn "789-01-2345" ;
+    hr:state "WA" ;
+    hr:zipCode "98033" ;
+    vcard:hasAddress <http://example.com/hr/resource/employee/7/vcard/address> ;
+    vcard:hasEmail <http://example.com/hr/resource/employee/7/vcard/email> ;
+    vcard:hasTelephone <http://example.com/hr/resource/employee/7/vcard/phone> ;
+    foaf:familyName "Davis" ;
+    foaf:givenName "Jennifer" ;
+    foaf:mbox <mailto:jennifer.davis@example.com> ;
+    foaf:name "Jennifer Davis" ;
+    foaf:phone <tel:5550107> .
+
+<http://example.com/hr/resource/employee/8> a hr:Employee,
+        foaf:Person ;
+    rdfs:label "Employee: David Martinez (8)" ;
+    hr:address "258 Willow Way" ;
+    hr:city "Seattle" ;
+    hr:createdDate "2012-07-20T09:00:00"^^xsd:dateTime ;
+    hr:dateOfBirth "1975-08-17"^^xsd:date ;
+    hr:email "david.martinez@example.com" ;
+    hr:emergencyContactName "Carmen Martinez" ;
+    hr:emergencyContactPhone "555-0208" ;
+    hr:employeeID 8 ;
+    hr:employeeStatus "Active" ;
+    hr:firstName "David" ;
+    hr:hireDate "2012-07-20"^^xsd:date ;
+    hr:lastName "Martinez" ;
+    hr:middleName "Luis" ;
+    hr:modifiedDate "2024-02-28T11:45:00"^^xsd:dateTime ;
+    hr:phone "555-0108" ;
+    hr:ssn "890-12-3456" ;
+    hr:state "WA" ;
+    hr:zipCode "98104" ;
+    vcard:hasAddress <http://example.com/hr/resource/employee/8/vcard/address> ;
+    vcard:hasEmail <http://example.com/hr/resource/employee/8/vcard/email> ;
+    vcard:hasTelephone <http://example.com/hr/resource/employee/8/vcard/phone> ;
+    foaf:familyName "Martinez" ;
+    foaf:givenName "David" ;
+    foaf:mbox <mailto:david.martinez@example.com> ;
+    foaf:name "David Martinez" ;
+    foaf:phone <tel:5550108> .
+
+<http://example.com/hr/resource/employee/9> a hr:Employee,
+        foaf:Person ;
+    rdfs:label "Employee: Linda Anderson (9)" ;
+    hr:address "369 Aspen Place" ;
+    hr:city "Bellevue" ;
+    hr:createdDate "2019-10-10T09:00:00"^^xsd:dateTime ;
+    hr:dateOfBirth "1987-04-09"^^xsd:date ;
+    hr:email "linda.anderson@example.com" ;
+    hr:emergencyContactName "Paul Anderson" ;
+    hr:emergencyContactPhone "555-0209" ;
+    hr:employeeID 9 ;
+    hr:employeeStatus "Active" ;
+    hr:firstName "Linda" ;
+    hr:hireDate "2019-10-10"^^xsd:date ;
+    hr:lastName "Anderson" ;
+    hr:middleName "Kay" ;
+    hr:modifiedDate "2024-05-14T14:10:00"^^xsd:dateTime ;
+    hr:phone "555-0109" ;
+    hr:ssn "901-23-4567" ;
+    hr:state "WA" ;
+    hr:zipCode "98005" ;
+    vcard:hasAddress <http://example.com/hr/resource/employee/9/vcard/address> ;
+    vcard:hasEmail <http://example.com/hr/resource/employee/9/vcard/email> ;
+    vcard:hasTelephone <http://example.com/hr/resource/employee/9/vcard/phone> ;
+    foaf:familyName "Anderson" ;
+    foaf:givenName "Linda" ;
+    foaf:mbox <mailto:linda.anderson@example.com> ;
+    foaf:name "Linda Anderson" ;
+    foaf:phone <tel:5550109> .
+
+<http://example.com/hr/resource/employee/1/vcard/address> a vcard:Address ;
+    vcard:locality "Seattle" ;
+    vcard:postal-code "98101" ;
+    vcard:region "WA" ;
+    vcard:street-address "123 Maple Street" .
+
+<http://example.com/hr/resource/employee/1/vcard/email> a vcard:Email ;
+    vcard:hasValue <mailto:alice.johnson@example.com> .
+
+<http://example.com/hr/resource/employee/1/vcard/phone> a vcard:Voice ;
+    vcard:hasValue <tel:5550101> .
+
+<http://example.com/hr/resource/employee/10/vcard/address> a vcard:Address ;
+    vcard:locality "Seattle" ;
+    vcard:postal-code "98105" ;
+    vcard:region "WA" ;
+    vcard:street-address "741 Maple Avenue" .
+
+<http://example.com/hr/resource/employee/10/vcard/email> a vcard:Email ;
+    vcard:hasValue <mailto:paul.taylor@example.com> .
+
+<http://example.com/hr/resource/employee/10/vcard/phone> a vcard:Voice ;
+    vcard:hasValue <tel:5550110> .
+
+<http://example.com/hr/resource/employee/11/vcard/address> a vcard:Address ;
+    vcard:locality "Tacoma" ;
+    vcard:postal-code "98402" ;
+    vcard:region "WA" ;
+    vcard:street-address "852 Oak Boulevard" .
+
+<http://example.com/hr/resource/employee/11/vcard/email> a vcard:Email ;
+    vcard:hasValue <mailto:emily.thomas@example.com> .
+
+<http://example.com/hr/resource/employee/11/vcard/phone> a vcard:Voice ;
+    vcard:hasValue <tel:5550111> .
+
+<http://example.com/hr/resource/employee/12/vcard/address> a vcard:Address ;
+    vcard:locality "Seattle" ;
+    vcard:postal-code "98106" ;
+    vcard:region "WA" ;
+    vcard:street-address "963 Pine Street" .
+
+<http://example.com/hr/resource/employee/12/vcard/email> a vcard:Email ;
+    vcard:hasValue <mailto:john.white@example.com> .
+
+<http://example.com/hr/resource/employee/12/vcard/phone> a vcard:Voice ;
+    vcard:hasValue <tel:5550112> .
+
+<http://example.com/hr/resource/employee/13/vcard/address> a vcard:Address ;
+    vcard:locality "Redmond" ;
+    vcard:postal-code "98053" ;
+    vcard:region "WA" ;
+    vcard:street-address "159 Cedar Road" .
+
+<http://example.com/hr/resource/employee/13/vcard/email> a vcard:Email ;
+    vcard:hasValue <mailto:mary.harris@example.com> .
+
+<http://example.com/hr/resource/employee/13/vcard/phone> a vcard:Voice ;
+    vcard:hasValue <tel:5550113> .
+
+<http://example.com/hr/resource/employee/14/vcard/address> a vcard:Address ;
+    vcard:locality "Bellevue" ;
+    vcard:postal-code "98006" ;
+    vcard:region "WA" ;
+    vcard:street-address "357 Elm Avenue" .
+
+<http://example.com/hr/resource/employee/14/vcard/email> a vcard:Email ;
+    vcard:hasValue <mailto:richard.clark@example.com> .
+
+<http://example.com/hr/resource/employee/14/vcard/phone> a vcard:Voice ;
+    vcard:hasValue <tel:5550114> .
+
+<http://example.com/hr/resource/employee/15/vcard/address> a vcard:Address ;
+    vcard:locality "Seattle" ;
+    vcard:postal-code "98107" ;
+    vcard:region "WA" ;
+    vcard:street-address "486 Birch Lane" .
+
+<http://example.com/hr/resource/employee/15/vcard/email> a vcard:Email ;
+    vcard:hasValue <mailto:susan.lewis@example.com> .
+
+<http://example.com/hr/resource/employee/15/vcard/phone> a vcard:Voice ;
+    vcard:hasValue <tel:5550115> .
+
+<http://example.com/hr/resource/employee/16/vcard/address> a vcard:Address ;
+    vcard:locality "Kirkland" ;
+    vcard:postal-code "98034" ;
+    vcard:region "WA" ;
+    vcard:street-address "597 Spruce Court" .
+
+<http://example.com/hr/resource/employee/16/vcard/email> a vcard:Email ;
+    vcard:hasValue <mailto:thomas.walker@example.com> .
+
+<http://example.com/hr/resource/employee/16/vcard/phone> a vcard:Voice ;
+    vcard:hasValue <tel:5550116> .
+
+<http://example.com/hr/resource/employee/17/vcard/address> a vcard:Address ;
+    vcard:locality "Seattle" ;
+    vcard:postal-code "98108" ;
+    vcard:region "WA" ;
+    vcard:street-address "624 Willow Street" .
+
+<http://example.com/hr/resource/employee/17/vcard/email> a vcard:Email ;
+    vcard:hasValue <mailto:nancy.hall@example.com> .
+
+<http://example.com/hr/resource/employee/17/vcard/phone> a vcard:Voice ;
+    vcard:hasValue <tel:5550117> .
+
+<http://example.com/hr/resource/employee/18/vcard/address> a vcard:Address ;
+    vcard:locality "Tacoma" ;
+    vcard:postal-code "98403" ;
+    vcard:region "WA" ;
+    vcard:street-address "735 Aspen Drive" .
+
+<http://example.com/hr/resource/employee/18/vcard/email> a vcard:Email ;
+    vcard:hasValue <mailto:steven.allen@example.com> .
+
+<http://example.com/hr/resource/employee/18/vcard/phone> a vcard:Voice ;
+    vcard:hasValue <tel:5550118> .
+
+<http://example.com/hr/resource/employee/19/vcard/address> a vcard:Address ;
+    vcard:locality "Bellevue" ;
+    vcard:postal-code "98007" ;
+    vcard:region "WA" ;
+    vcard:street-address "846 Maple Court" .
+
+<http://example.com/hr/resource/employee/19/vcard/email> a vcard:Email ;
+    vcard:hasValue <mailto:karen.young@example.com> .
+
+<http://example.com/hr/resource/employee/19/vcard/phone> a vcard:Voice ;
+    vcard:hasValue <tel:5550119> .
+
+<http://example.com/hr/resource/employee/2/vcard/address> a vcard:Address ;
+    vcard:locality "Seattle" ;
+    vcard:postal-code "98102" ;
+    vcard:region "WA" ;
+    vcard:street-address "456 Oak Avenue" .
+
+<http://example.com/hr/resource/employee/2/vcard/email> a vcard:Email ;
+    vcard:hasValue <mailto:robert.chen@example.com> .
+
+<http://example.com/hr/resource/employee/2/vcard/phone> a vcard:Voice ;
+    vcard:hasValue <tel:5550102> .
+
+<http://example.com/hr/resource/employee/20/vcard/address> a vcard:Address ;
+    vcard:locality "Seattle" ;
+    vcard:postal-code "98109" ;
+    vcard:region "WA" ;
+    vcard:street-address "957 Oak Place" .
+
+<http://example.com/hr/resource/employee/20/vcard/email> a vcard:Email ;
+    vcard:hasValue <mailto:brian.king@example.com> .
+
+<http://example.com/hr/resource/employee/20/vcard/phone> a vcard:Voice ;
+    vcard:hasValue <tel:5550120> .
+
+<http://example.com/hr/resource/employee/3/vcard/address> a vcard:Address ;
+    vcard:locality "Bellevue" ;
+    vcard:postal-code "98004" ;
+    vcard:region "WA" ;
+    vcard:street-address "789 Pine Road" .
+
+<http://example.com/hr/resource/employee/3/vcard/email> a vcard:Email ;
+    vcard:hasValue <mailto:maria.garcia@example.com> .
+
+<http://example.com/hr/resource/employee/3/vcard/phone> a vcard:Voice ;
+    vcard:hasValue <tel:5550103> .
+
+<http://example.com/hr/resource/employee/4/vcard/address> a vcard:Address ;
+    vcard:locality "Tacoma" ;
+    vcard:postal-code "98401" ;
+    vcard:region "WA" ;
+    vcard:street-address "321 Elm Street" .
+
+<http://example.com/hr/resource/employee/4/vcard/email> a vcard:Email ;
+    vcard:hasValue <mailto:james.smith@example.com> .
+
+<http://example.com/hr/resource/employee/4/vcard/phone> a vcard:Voice ;
+    vcard:hasValue <tel:5550104> .
+
+<http://example.com/hr/resource/employee/5/vcard/address> a vcard:Address ;
+    vcard:locality "Seattle" ;
+    vcard:postal-code "98103" ;
+    vcard:region "WA" ;
+    vcard:street-address "654 Cedar Lane" .
+
+<http://example.com/hr/resource/employee/5/vcard/email> a vcard:Email ;
+    vcard:hasValue <mailto:sarah.williams@example.com> .
+
+<http://example.com/hr/resource/employee/5/vcard/phone> a vcard:Voice ;
+    vcard:hasValue <tel:5550105> .
+
+<http://example.com/hr/resource/employee/6/vcard/address> a vcard:Address ;
+    vcard:locality "Redmond" ;
+    vcard:postal-code "98052" ;
+    vcard:region "WA" ;
+    vcard:street-address "987 Birch Court" .
+
+<http://example.com/hr/resource/employee/6/vcard/email> a vcard:Email ;
+    vcard:hasValue <mailto:michael.brown@example.com> .
+
+<http://example.com/hr/resource/employee/6/vcard/phone> a vcard:Voice ;
+    vcard:hasValue <tel:5550106> .
+
+<http://example.com/hr/resource/employee/7/vcard/address> a vcard:Address ;
+    vcard:locality "Kirkland" ;
+    vcard:postal-code "98033" ;
+    vcard:region "WA" ;
+    vcard:street-address "147 Spruce Drive" .
+
+<http://example.com/hr/resource/employee/7/vcard/email> a vcard:Email ;
+    vcard:hasValue <mailto:jennifer.davis@example.com> .
+
+<http://example.com/hr/resource/employee/7/vcard/phone> a vcard:Voice ;
+    vcard:hasValue <tel:5550107> .
+
+<http://example.com/hr/resource/employee/8/vcard/address> a vcard:Address ;
+    vcard:locality "Seattle" ;
+    vcard:postal-code "98104" ;
+    vcard:region "WA" ;
+    vcard:street-address "258 Willow Way" .
+
+<http://example.com/hr/resource/employee/8/vcard/email> a vcard:Email ;
+    vcard:hasValue <mailto:david.martinez@example.com> .
+
+<http://example.com/hr/resource/employee/8/vcard/phone> a vcard:Voice ;
+    vcard:hasValue <tel:5550108> .
+
+<http://example.com/hr/resource/employee/9/vcard/address> a vcard:Address ;
+    vcard:locality "Bellevue" ;
+    vcard:postal-code "98005" ;
+    vcard:region "WA" ;
+    vcard:street-address "369 Aspen Place" .
+
+<http://example.com/hr/resource/employee/9/vcard/email> a vcard:Email ;
+    vcard:hasValue <mailto:linda.anderson@example.com> .
+
+<http://example.com/hr/resource/employee/9/vcard/phone> a vcard:Voice ;
+    vcard:hasValue <tel:5550109> .
+

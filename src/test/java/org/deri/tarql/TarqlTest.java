@@ -8,6 +8,9 @@ import static org.junit.Assert.fail;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import org.apache.jena.query.ResultSet;
@@ -73,7 +76,37 @@ public class TarqlTest {
 		List<Var> vars = vars("a", "b");
 		assertSelect(tq, binding(vars, "\"Alice\"", "\"Smith\""), binding(vars, "\"Bob\"", "\"Cook\""));
 	}
-	
+	@Test
+	public void testConstructWithGeneratedIRI() throws IOException {
+		options = new CSVOptions();
+		options.setColumnNamesInFirstRow(true);
+
+		csv =
+				"id,name,age\n" +
+						"1,Alice,25\n" +
+						"2,Bob,31";
+
+		String query =
+				"PREFIX ex: <http://example.com/>\n" +
+						"CONSTRUCT {\n" +
+						"  ?person a ex:Person ;\n" +
+						"          ex:name ?name ;\n" +
+						"          ex:age ?age .\n" +
+						"}\n" +
+						"{\n" +
+						"  BIND(IRI(CONCAT(\"http://example.com/person/\", ?id)) AS ?person)\n" +
+						"}";
+
+		TarqlQuery tq = new TarqlParser(new StringReader(query), null).getResult();
+
+		String ttl =
+				"@prefix ex: <http://example.com/>.\n" +
+						"<http://example.com/person/1> a ex:Person ; ex:name \"Alice\" ; ex:age \"25\".\n" +
+						"<http://example.com/person/2> a ex:Person ; ex:name \"Bob\" ; ex:age \"31\".\n";
+
+		assertConstruct(tq, ttl);
+	}
+
 	@Test
 	public void testSkipFirstRows() throws IOException {
 		options = new CSVOptions();
@@ -283,5 +316,62 @@ public class TarqlTest {
 		assertSelect(tq, 
 				binding(vars, "'tarql'", "<http://tarql.github.io/tarql#>"), 
 				binding(vars, "'apf'", "<http://jena.apache.org/ARQ/property#>"));
+	}
+	@Test
+	public void testExternalPositions() throws IOException {
+		String mappingPath = "test/db-shacl-tarql/tarql/tarql_positions.sparql";
+		String csvPath = "test/db-shacl-tarql/csv/positions.csv";
+		String expectedPath = "test/db-shacl-tarql/ttl-expected/positions_output.ttl";
+
+		String csvContent = Files.readString(Path.of(csvPath));
+		String expectedTTL = Files.readString(Path.of(expectedPath));
+
+		options = new CSVOptions();
+		options.setColumnNamesInFirstRow(true);
+		csv = csvContent;
+
+		TarqlQuery tq = new TarqlParser(mappingPath).getResult();
+
+		assertConstruct(tq, expectedTTL);
+	}
+	@Test
+	public void testExternalHobbitsUnstructured() throws IOException {
+		String mappingPath = "test/sparql-with-hobbits/tarql/convert_farming_csv_unstructured.rq";
+		String csvPath = "test/sparql-with-hobbits/csv/farming.csv";
+		String expectedPath = "test/sparql-with-hobbits/ttl-expected/farming_unstructured.rdf";
+
+		String csvContent = Files.readString(Path.of(csvPath));
+		String expectedTTL = Files.readString(
+				Path.of(expectedPath),
+				StandardCharsets.UTF_16
+		);
+
+		options = new CSVOptions();
+		options.setColumnNamesInFirstRow(true);
+		csv = csvContent;
+
+		TarqlQuery tq = new TarqlParser(mappingPath).getResult();
+
+		assertConstruct(tq, expectedTTL);
+	}
+	@Test
+	public void testExternalHobbitsStructured() throws IOException {
+		String mappingPath = "test/sparql-with-hobbits/tarql/convert_farming_csv_structured.rq";
+		String csvPath = "test/sparql-with-hobbits/csv/farming.csv";
+		String expectedPath = "test/sparql-with-hobbits/ttl-expected/farming_structured.rdf";
+
+		String csvContent = Files.readString(Path.of(csvPath));
+		String expectedTTL = Files.readString(
+				Path.of(expectedPath),
+				StandardCharsets.UTF_16
+		);
+
+		options = new CSVOptions();
+		options.setColumnNamesInFirstRow(true);
+		csv = csvContent;
+
+		TarqlQuery tq = new TarqlParser(mappingPath).getResult();
+
+		assertConstruct(tq, expectedTTL);
 	}
 }

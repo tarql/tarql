@@ -4,21 +4,19 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
-
 import org.apache.jena.atlas.logging.Log;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryException;
 import org.apache.jena.query.QueryParseException;
-import org.apache.jena.riot.system.IRIResolver;
 import org.apache.jena.shared.JenaException;
 import org.apache.jena.shared.NotFoundException;
 import org.apache.jena.shared.PrefixMapping;
+import org.apache.jena.sparql.lang.sparql_11.javacc.ParseException;
+import org.apache.jena.sparql.lang.sparql_11.javacc.SPARQLParser11;
+import org.apache.jena.sparql.lang.sparql_11.javacc.TokenMgrError;
 import org.apache.jena.shared.impl.PrefixMappingImpl;
 import org.apache.jena.sparql.ARQConstants;
 import org.apache.jena.sparql.lang.SyntaxVarScope;
-import org.apache.jena.sparql.lang.sparql_11.ParseException;
-import org.apache.jena.sparql.lang.sparql_11.SPARQLParser11;
-import org.apache.jena.sparql.lang.sparql_11.TokenMgrError;
 import org.apache.jena.util.FileManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,10 +49,10 @@ public class TarqlParser {
 	public TarqlParser(Reader reader) {
 		this(reader, null);
 	}
-	
+
 	public TarqlParser(Reader reader, String baseIRI) {
 		this.reader = reader;
-		result.getPrologue().setResolver(IRIResolver.create(baseIRI));
+		result.getPrologue().setBaseURI(baseIRI);
 		addBuiltInPrefixes();
 	}
 	
@@ -81,10 +79,8 @@ public class TarqlParser {
 
 			Query query = new Query(result.getPrologue());
 
-			// You'd assume that a query initialized via "new Query(prologue)"
-			// has the IRI resolver from prologue.getResolver(), but that doesn't
-			// appear to be the case in Jena 2.12.0, so we set it manually
-			query.getPrologue().setResolver(result.getPrologue().getResolver());
+
+
 
 			result.addQuery(query);
 			parser.setQuery(query);
@@ -101,8 +97,15 @@ public class TarqlParser {
 			
 			// From Parser.validateParsedQuery, which we can't call directly
 			SyntaxVarScope.check(query);
-			
-			result.getPrologue().usePrologueFrom(query);
+			// Carry prefixes and base IRI forward to subsequent TARQL queries.
+			result.getPrologue()
+					.getPrefixMapping()
+					.setNsPrefixes(query.getPrefixMapping());
+
+			if (query.getBaseURI() != null) {
+				result.getPrologue().setBaseURI(query.getBaseURI());
+			}
+
 			if (log.isDebugEnabled()) {
 				log.debug(query.toString());
 			}

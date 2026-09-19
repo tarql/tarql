@@ -11,7 +11,7 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.binding.Binding;
-import org.apache.jena.sparql.engine.binding.BindingHashMap;
+import org.apache.jena.sparql.engine.binding.BindingBuilder;
 import org.apache.jena.sparql.util.NodeFactoryExtra;
 
 
@@ -43,24 +43,24 @@ public class Helpers {
 					"header and values must have same length: " + 
 							header + ", " + Arrays.toString(values));
 		}
-		BindingHashMap result = new BindingHashMap();
+		BindingBuilder builder = BindingBuilder.create();
 		for (int i = 0; i < header.size(); i++) {
-			result.add(header.get(i), NodeFactoryExtra.parseNode(values[i]));
+			builder.add(header.get(i), NodeFactoryExtra.parseNode(values[i]));
 		}
-		return result;
+		return builder.build();
 	}
 
 	private Helpers() {} // Only static methods
 	
 	public static Binding removePseudoVars(Binding binding) {
-		BindingHashMap result = new BindingHashMap();
+		BindingBuilder builder = BindingBuilder.create();
 		Iterator<Var> it = binding.vars();
 		while (it.hasNext()) {
 			Var var = it.next();
 			if (var.equals(TarqlQuery.ROWNUM)) continue;
-			result.add(var, binding.get(var));
+			builder.add(var, binding.get(var));
 		}
-		return result;
+		return builder.build();
 	}
 	
 	public static Triple triple(String tripleAsTurtle) {

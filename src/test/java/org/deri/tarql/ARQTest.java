@@ -42,6 +42,7 @@ public class ARQTest extends TestCase {
 
 		Query q = QueryFactory.create("SELECT * {}");
 		q.setValuesDataBlock(header, bindings(b1, b2));
+		q.resetResultVars();
 		ResultSet rs = QueryExecutionFactory.create(q, 
 				ModelFactory.createDefaultModel()).execSelect();
 
@@ -69,6 +70,8 @@ public class ARQTest extends TestCase {
 		group.addElement(q.getQueryPattern());
 		group.addElement(table);
 		q.setQueryPattern(group);
+		q.resetResultVars();
+
 		ResultSet rs = QueryExecutionFactory.create(q, 
 				ModelFactory.createDefaultModel()).execSelect();
 

@@ -1,0 +1,20 @@
+PREFIX ex: <http://www.hobbiton.com/schema>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
+CONSTRUCT {
+  # Generate IRI for produce and add associated columns
+  # The shorthand ; is used for triples which share the same subject 
+  ?product_iri ex:product ?Product ;
+    ex:farmer ?Farmer ;
+    ex:date ?date ;
+    ex:count ?count .
+}
+
+FROM <file:farming.csv>
+
+WHERE {
+  BIND(REPLACE(STR(?Product),"[ ]","_") AS ?product)
+  BIND(IRI(CONCAT('http://www.hobbiton.com/schema/product#', ?product)) AS ?product_iri)
+  BIND(xsd:integer(?Count) AS ?count)
+  BIND(xsd:date(?Date) AS ?date)
+}

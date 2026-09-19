@@ -1,0 +1,79 @@
+# ============================================================
+# TARQL Transformation: Salaries
+# ============================================================
+# Input: salaries.csv
+# Output: RDF triples conforming to hr:Salary SHACL shape
+# ============================================================
+
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX hr: <http://example.com/hr/>
+PREFIX hrres: <http://example.com/hr/resource/>
+
+CONSTRUCT {
+  # Salary resource
+  ?salaryURI a hr:Salary ;
+    hr:salaryID ?salaryID ;
+    hr:salaryAmount ?salaryAmount ;
+    hr:effectiveDate ?effectiveDate ;
+    hr:endDate ?endDate ;
+    hr:salaryType ?salaryType ;
+    hr:changeReason ?changeReason ;
+    hr:createdDate ?createdDateTime ;
+    rdfs:label ?salaryLabel .
+  
+  # Link to Employee
+  ?salaryURI hr:forEmployee ?employeeURI .
+  ?employeeURI hr:hasSalaryRecord ?salaryURI .
+  
+  # Link to Approver (if exists)
+  ?salaryURI hr:approvedBy ?approverURI .
+  ?approverURI hr:approvedSalary ?salaryURI .
+  
+  # Current salary shortcut (if current)
+  ?employeeURI hr:currentSalary ?salaryURI .
+  ?employeeURI hr:currentSalaryAmount ?salaryAmount .
+}
+WHERE {
+  BIND(URI(CONCAT("http://example.com/hr/resource/salary/", ?SalaryID)) AS ?salaryURI)
+  
+  # Basic fields
+  BIND(xsd:integer(?SalaryID) AS ?salaryID)
+  BIND(xsd:decimal(?SalaryAmount) AS ?salaryAmount)
+  BIND(xsd:date(?EffectiveDate) AS ?effectiveDate)
+  
+  # End date (optional - NULL means current)
+  BIND(IF(BOUND(?EndDate) && ?EndDate != "" && ?EndDate != "NULL",
+          xsd:date(?EndDate),
+          ?UNDEF) AS ?endDate)
+  
+  # Salary type
+  BIND(xsd:string(?SalaryType) AS ?salaryType)
+  
+  # Change reason (optional)
+  BIND(IF(BOUND(?ChangeReason) && ?ChangeReason != "" && ?ChangeReason != "NULL",
+          xsd:string(?ChangeReason),
+          ?UNDEF) AS ?changeReason)
+  
+  # Created date
+  BIND(xsd:dateTime(?CreatedDate) AS ?createdDateTime)
+  
+  # Foreign key URIs
+  BIND(URI(CONCAT("http://example.com/hr/resource/employee/", ?EmployeeID)) AS ?employeeURI)
+  
+  BIND(IF(BOUND(?ApprovedBy) && ?ApprovedBy != "" && ?ApprovedBy != "NULL",
+          URI(CONCAT("http://example.com/hr/resource/employee/", ?ApprovedBy)),
+          ?UNDEF) AS ?approverURI)
+  
+  # Label with formatting
+  BIND(CONCAT("Salary Record #", ?SalaryID, 
+              " - Employee ", ?EmployeeID,
+              ": $", STR(?SalaryAmount), " ", ?SalaryType,
+              " (effective ", STR(?effectiveDate), ")") AS ?salaryLabel)
+  
+  # Determine if this is current (no end date or end date in future)
+  # For current salary shortcuts, we'll need to filter
+  # Note: In TARQL we can't easily get current date, so we check for NULL EndDate
+  FILTER(!BOUND(?EndDate) || ?EndDate = "" || ?EndDate = "NULL")
+}

@@ -1,0 +1,131 @@
+# ============================================================
+# TARQL Transformation: Benefits
+# ============================================================
+# Input: benefits.csv
+# Output: RDF triples conforming to hr:Benefit SHACL shape
+# ============================================================
+
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX hr: <http://example.com/hr/>
+PREFIX hrres: <http://example.com/hr/resource/>
+
+CONSTRUCT {
+  # Benefit resource
+  ?benefitURI a hr:Benefit ;
+    hr:benefitID ?benefitID ;
+    hr:benefitName ?benefitName ;
+    hr:benefitType ?benefitType ;
+    hr:description ?description ;
+    hr:employerCost ?employerCost ;
+    hr:employeeCost ?employeeCost ;
+    hr:isActive ?isActive ;
+    hr:createdDate ?createdDateTime ;
+    rdfs:label ?benefitLabel .
+}
+WHERE {
+  BIND(URI(CONCAT("http://example.com/hr/resource/benefit/", ?BenefitID)) AS ?benefitURI)
+  
+  # Basic fields
+  BIND(xsd:integer(?BenefitID) AS ?benefitID)
+  BIND(xsd:string(?BenefitName) AS ?benefitName)
+  BIND(xsd:string(?BenefitType) AS ?benefitType)
+  
+  # Description (optional)
+  BIND(IF(BOUND(?Description) && ?Description != "" && ?Description != "NULL",
+          xsd:string(?Description),
+          ?UNDEF) AS ?description)
+  
+  # Costs (optional)
+  BIND(IF(BOUND(?EmployerCost) && ?EmployerCost != "" && ?EmployerCost != "NULL",
+          xsd:decimal(?EmployerCost),
+          ?UNDEF) AS ?employerCost)
+  BIND(IF(BOUND(?EmployeeCost) && ?EmployeeCost != "" && ?EmployeeCost != "NULL",
+          xsd:decimal(?EmployeeCost),
+          ?UNDEF) AS ?employeeCost)
+  
+  # Active flag
+  BIND(IF(?IsActive = "1" || ?IsActive = "true" || ?IsActive = "True",
+          true,
+          false) AS ?isActive)
+  
+  # Created date
+  BIND(xsd:dateTime(?CreatedDate) AS ?createdDateTime)
+  
+  # Label
+  BIND(CONCAT("Benefit: ", ?BenefitName, " (", ?BenefitType, ")") AS ?benefitLabel)
+}
+
+# ============================================================
+# TARQL Transformation: EmployeeBenefits
+# ============================================================
+# Input: employeebenefits.csv
+# Output: RDF triples conforming to hr:EmployeeBenefit SHACL shape
+# ============================================================
+
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX hr: <http://example.com/hr/>
+PREFIX hrres: <http://example.com/hr/resource/>
+
+CONSTRUCT {
+  # EmployeeBenefit resource
+  ?empBenefitURI a hr:EmployeeBenefit ;
+    hr:employeeBenefitID ?empBenefitID ;
+    hr:enrollmentDate ?enrollmentDate ;
+    hr:terminationDate ?terminationDate ;
+    hr:coverageLevel ?coverageLevel ;
+    hr:isActive ?isActive ;
+    hr:createdDate ?createdDateTime ;
+    rdfs:label ?empBenefitLabel .
+  
+  # Link to Employee
+  ?empBenefitURI hr:forEmployee ?employeeURI .
+  ?employeeURI hr:enrolledInBenefit ?empBenefitURI .
+  
+  # Link to Benefit
+  ?empBenefitURI hr:benefit ?benefitURI .
+  ?benefitURI hr:enrollee ?empBenefitURI .
+  
+  # Current benefit shortcut (if active)
+  ?employeeURI hr:currentBenefit ?benefitURI .
+}
+WHERE {
+  BIND(URI(CONCAT("http://example.com/hr/resource/employeebenefit/", ?EmployeeBenefitID)) AS ?empBenefitURI)
+  
+  # Basic fields
+  BIND(xsd:integer(?EmployeeBenefitID) AS ?empBenefitID)
+  BIND(xsd:date(?EnrollmentDate) AS ?enrollmentDate)
+  
+  # Termination date (optional)
+  BIND(IF(BOUND(?TerminationDate) && ?TerminationDate != "" && ?TerminationDate != "NULL",
+          xsd:date(?TerminationDate),
+          ?UNDEF) AS ?terminationDate)
+  
+  # Coverage level (optional)
+  BIND(IF(BOUND(?CoverageLevel) && ?CoverageLevel != "" && ?CoverageLevel != "NULL",
+          xsd:string(?CoverageLevel),
+          ?UNDEF) AS ?coverageLevel)
+  
+  # Active flag
+  BIND(IF(?IsActive = "1" || ?IsActive = "true" || ?IsActive = "True",
+          true,
+          false) AS ?isActive)
+  
+  # Created date
+  BIND(xsd:dateTime(?CreatedDate) AS ?createdDateTime)
+  
+  # Foreign key URIs
+  BIND(URI(CONCAT("http://example.com/hr/resource/employee/", ?EmployeeID)) AS ?employeeURI)
+  BIND(URI(CONCAT("http://example.com/hr/resource/benefit/", ?BenefitID)) AS ?benefitURI)
+  
+  # Label
+  BIND(CONCAT("Benefit Enrollment #", ?EmployeeBenefitID,
+              " - Employee ", ?EmployeeID,
+              IF(?isActive, " (Active)", " (Inactive)")) AS ?empBenefitLabel)
+  
+  # Only create current shortcuts if active
+  FILTER(?isActive)
+}

@@ -95,7 +95,7 @@ public class TarqlQueryExecution {
 		// That's why we skipped ?ROWNUM further up.
 		if (query.isSelectType() && query.isQueryResultStar()) {
 			// Force expansion of "SELECT *" to actual projection list
-			query.setResultVars();
+			query.ensureResultVars();
 			// Tell ARQ that it actually needs to pay attention to
 			// the projection list
 			query.setQueryResultStar(false);

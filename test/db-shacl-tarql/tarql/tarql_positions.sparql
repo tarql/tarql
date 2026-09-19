@@ -1,0 +1,53 @@
+# ============================================================
+# TARQL Transformation: Positions
+# ============================================================
+# Input: positions.csv
+# Output: RDF triples conforming to hr:Position SHACL shape
+# ============================================================
+
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX hr: <http://example.com/hr/>
+PREFIX hrres: <http://example.com/hr/resource/>
+
+CONSTRUCT {
+  # Position resource
+  ?positionURI a hr:Position ;
+    hr:positionID ?positionID ;
+    hr:positionTitle ?positionTitle ;
+    hr:positionCode ?positionCode ;
+    hr:jobLevel ?jobLevel ;
+    hr:minSalary ?minSalaryDecimal ;
+    hr:maxSalary ?maxSalaryDecimal ;
+    hr:description ?descriptionText ;
+    hr:createdDate ?createdDateTime ;
+    rdfs:label ?positionLabel ;
+    rdfs:comment ?positionComment .
+}
+WHERE {
+  BIND(URI(CONCAT("http://example.com/hr/resource/position/", ?PositionID)) AS ?positionURI)
+  
+  # Basic fields
+  BIND(xsd:integer(?PositionID) AS ?positionID)
+  BIND(xsd:string(?PositionTitle) AS ?positionTitle)
+  BIND(xsd:string(?PositionCode) AS ?positionCode)
+  BIND(xsd:integer(?JobLevel) AS ?jobLevel)
+  
+  # Salary range
+  BIND(xsd:decimal(?MinSalary) AS ?minSalaryDecimal)
+  BIND(xsd:decimal(?MaxSalary) AS ?maxSalaryDecimal)
+  
+  # Description (handle NULL)
+  BIND(IF(BOUND(?Description) && ?Description != "" && ?Description != "NULL",
+          xsd:string(?Description),
+          ?UNDEF) AS ?descriptionText)
+  
+  # Date
+  BIND(xsd:dateTime(?CreatedDate) AS ?createdDateTime)
+  
+  # Labels and comments
+  BIND(CONCAT("Position: ", ?PositionTitle, " (Level ", ?JobLevel, ")") AS ?positionLabel)
+  BIND(CONCAT("Job position ", ?PositionCode, " with salary range $", 
+              ?MinSalary, " - $", ?MaxSalary) AS ?positionComment)
+}

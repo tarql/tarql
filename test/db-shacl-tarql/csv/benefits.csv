@@ -1,0 +1,11 @@
+BenefitID,BenefitName,BenefitType,Description,EmployerCost,EmployeeCost,IsActive,CreatedDate
+1,Premium Health Insurance,Health,Comprehensive health coverage with low deductibles,450.00,150.00,1,2020-01-01T09:00:00
+2,Basic Health Insurance,Health,Standard health coverage with moderate deductibles,300.00,100.00,1,2020-01-01T09:00:00
+3,Dental Insurance,Dental,Full dental coverage including orthodontics,75.00,25.00,1,2020-01-01T09:00:00
+4,Vision Insurance,Vision,Vision care including eye exams and glasses,25.00,10.00,1,2020-01-01T09:00:00
+5,401(k) Matching,Retirement,Company matches up to 6% of salary,0.00,0.00,1,2020-01-01T09:00:00
+6,Life Insurance,Life,Basic life insurance coverage,50.00,0.00,1,2020-01-01T09:00:00
+7,Supplemental Life Insurance,Life,Additional life insurance coverage,0.00,35.00,1,2020-01-01T09:00:00
+8,Flexible Spending Account,Other,Pre-tax savings for medical expenses,0.00,0.00,1,2020-01-01T09:00:00
+9,Employee Assistance Program,Other,Counseling and support services,15.00,0.00,1,2020-01-01T09:00:00
+10,Gym Membership Subsidy,Other,Partial reimbursement for gym memberships,30.00,20.00,1,2021-01-01T09:00:00

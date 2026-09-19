@@ -1,0 +1,79 @@
+# ============================================================
+# TARQL Transformation: PerformanceReviews
+# ============================================================
+# Input: performancereviews.csv
+# Output: RDF triples conforming to hr:PerformanceReview SHACL shape
+# ============================================================
+
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX hr: <http://example.com/hr/>
+PREFIX hrres: <http://example.com/hr/resource/>
+
+CONSTRUCT {
+  # PerformanceReview resource
+  ?reviewURI a hr:PerformanceReview ;
+    hr:reviewID ?reviewID ;
+    hr:reviewDate ?reviewDate ;
+    hr:reviewPeriodStart ?reviewPeriodStart ;
+    hr:reviewPeriodEnd ?reviewPeriodEnd ;
+    hr:overallRating ?overallRating ;
+    hr:strengthsComments ?strengthsComments ;
+    hr:improvementComments ?improvementComments ;
+    hr:goals ?goals ;
+    hr:employeeAcknowledged ?employeeAcknowledged ;
+    hr:acknowledgedDate ?acknowledgedDate ;
+    hr:createdDate ?createdDateTime ;
+    rdfs:label ?reviewLabel .
+  
+  # Link to Employee (reviewee)
+  ?reviewURI hr:reviewOf ?employeeURI .
+  ?employeeURI hr:hasPerformanceReview ?reviewURI .
+  
+  # Link to Reviewer
+  ?reviewURI hr:reviewedBy ?reviewerURI .
+  ?reviewerURI hr:conducted ?reviewURI .
+}
+WHERE {
+  BIND(URI(CONCAT("http://example.com/hr/resource/performancereview/", ?ReviewID)) AS ?reviewURI)
+  
+  # Basic fields
+  BIND(xsd:integer(?ReviewID) AS ?reviewID)
+  BIND(xsd:date(?ReviewDate) AS ?reviewDate)
+  BIND(xsd:date(?ReviewPeriodStart) AS ?reviewPeriodStart)
+  BIND(xsd:date(?ReviewPeriodEnd) AS ?reviewPeriodEnd)
+  BIND(xsd:decimal(?OverallRating) AS ?overallRating)
+  
+  # Comments (optional)
+  BIND(IF(BOUND(?StrengthsComments) && ?StrengthsComments != "" && ?StrengthsComments != "NULL",
+          xsd:string(?StrengthsComments),
+          ?UNDEF) AS ?strengthsComments)
+  BIND(IF(BOUND(?ImprovementComments) && ?ImprovementComments != "" && ?ImprovementComments != "NULL",
+          xsd:string(?ImprovementComments),
+          ?UNDEF) AS ?improvementComments)
+  BIND(IF(BOUND(?Goals) && ?Goals != "" && ?Goals != "NULL",
+          xsd:string(?Goals),
+          ?UNDEF) AS ?goals)
+  
+  # Acknowledgment
+  BIND(IF(?EmployeeAcknowledged = "1" || ?EmployeeAcknowledged = "true" || ?EmployeeAcknowledged = "True",
+          true,
+          false) AS ?employeeAcknowledged)
+  BIND(IF(BOUND(?AcknowledgedDate) && ?AcknowledgedDate != "" && ?AcknowledgedDate != "NULL",
+          xsd:dateTime(?AcknowledgedDate),
+          ?UNDEF) AS ?acknowledgedDate)
+  
+  # Created date
+  BIND(xsd:dateTime(?CreatedDate) AS ?createdDateTime)
+  
+  # Foreign key URIs
+  BIND(URI(CONCAT("http://example.com/hr/resource/employee/", ?EmployeeID)) AS ?employeeURI)
+  BIND(URI(CONCAT("http://example.com/hr/resource/employee/", ?ReviewerID)) AS ?reviewerURI)
+  
+  # Label
+  BIND(CONCAT("Performance Review #", ?ReviewID,
+              " - Employee ", ?EmployeeID,
+              " (Rating: ", STR(?overallRating), "/5.00)",
+              " on ", STR(?reviewDate)) AS ?reviewLabel)
+}
