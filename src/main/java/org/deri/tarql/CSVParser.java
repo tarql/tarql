@@ -9,7 +9,8 @@ import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.binding.Binding;
-import org.apache.jena.sparql.engine.binding.BindingHashMap;
+
+import org.apache.jena.sparql.engine.binding.BindingBuilder;
 import org.apache.jena.util.iterator.ClosableIterator;
 
 import com.opencsv.CSVParserBuilder;
@@ -112,16 +113,29 @@ public class CSVParser implements ClosableIterator<Binding> {
 	}
 
 	private Binding toBinding(String[] row) {
-		BindingHashMap result = new BindingHashMap();
+		BindingBuilder builder = BindingBuilder.create();
+
 		for (int i = 0; i < row.length; i++) {
-			if (isUnboundValue(row[i]))
+			if (isUnboundValue(row[i])) {
 				continue;
-			result.add(getVar(i), NodeFactory.createLiteral(sanitizeString(row[i])));
+			}
+
+			builder.add(
+					getVar(i),
+					NodeFactory.createLiteralString(sanitizeString(row[i]))
+			);
 		}
+
 		// Add current row number as ?ROWNUM
-		result.add(TarqlQuery.ROWNUM, NodeFactory.createLiteral(
-				Integer.toString(rownum), XSDDatatype.XSDinteger));
-		return result;
+		builder.add(
+				TarqlQuery.ROWNUM,
+				NodeFactory.createLiteralDT(
+						Integer.toString(rownum),
+						XSDDatatype.XSDinteger
+				)
+		);
+
+		return builder.build();
 	}
 
 	/**

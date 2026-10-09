@@ -4,11 +4,17 @@ import static org.deri.tarql.Helpers.binding;
 import static org.deri.tarql.Helpers.vars;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+import org.apache.jena.graph.NodeFactory;
+import org.apache.jena.sparql.core.Quad;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.List;
+
 
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
@@ -73,7 +79,97 @@ public class TarqlTest {
 		List<Var> vars = vars("a", "b");
 		assertSelect(tq, binding(vars, "\"Alice\"", "\"Smith\""), binding(vars, "\"Bob\"", "\"Cook\""));
 	}
-	
+	@Test
+	public void testConstructWithGeneratedIRI() throws IOException {
+		options = new CSVOptions();
+		options.setColumnNamesInFirstRow(true);
+
+		csv =
+				"id,name,age\n" +
+						"1,Alice,25\n" +
+						"2,Bob,31";
+
+		String query =
+				"PREFIX ex: <http://example.com/>\n" +
+						"CONSTRUCT {\n" +
+						"  ?person a ex:Person ;\n" +
+						"          ex:name ?name ;\n" +
+						"          ex:age ?age .\n" +
+						"}\n" +
+						"{\n" +
+						"  BIND(IRI(CONCAT(\"http://example.com/person/\", ?id)) AS ?person)\n" +
+						"}";
+
+		TarqlQuery tq = new TarqlParser(new StringReader(query), null).getResult();
+
+		String ttl =
+				"@prefix ex: <http://example.com/>.\n" +
+						"<http://example.com/person/1> a ex:Person ; ex:name \"Alice\" ; ex:age \"25\".\n" +
+						"<http://example.com/person/2> a ex:Person ; ex:name \"Bob\" ; ex:age \"31\".\n";
+
+		assertConstruct(tq, ttl);
+	}
+
+	@Test
+	public void testConstructNamedGraphs() throws IOException {
+		options = new CSVOptions();
+		options.setColumnNamesInFirstRow(true);
+
+		csv =
+				"id,name\n" +
+						"1,Alice\n" +
+						"2,Bob";
+
+		String query =
+				"PREFIX ex: <http://example.com/>\n" +
+						"CONSTRUCT {\n" +
+						"  GRAPH ?graph {\n" +
+						"    ?person a ex:Person ;\n" +
+						"            ex:name ?name .\n" +
+						"  }\n" +
+						"}\n" +
+						"WHERE {\n" +
+						"  BIND(IRI(CONCAT(\"http://example.com/person/\", ?id)) AS ?person)\n" +
+						"  BIND(IRI(CONCAT(\"http://example.com/graph/\", ?id)) AS ?graph)\n" +
+						"}";
+
+		TarqlQuery tq = new TarqlParser(new StringReader(query), null).getResult();
+		TarqlQueryExecution ex = TarqlQueryExecutionFactory.create(
+				tq,
+				InputStreamSource.fromBytes(csv.getBytes("utf-8")),
+				options);
+
+		Set<Quad> actual = new HashSet<>();
+		ex.execQuads().forEachRemaining(actual::add);
+
+		Set<Quad> expected = new HashSet<>();
+
+		expected.add(new Quad(
+				NodeFactory.createURI("http://example.com/graph/1"),
+				NodeFactory.createURI("http://example.com/person/1"),
+				NodeFactory.createURI("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"),
+				NodeFactory.createURI("http://example.com/Person")));
+
+		expected.add(new Quad(
+				NodeFactory.createURI("http://example.com/graph/1"),
+				NodeFactory.createURI("http://example.com/person/1"),
+				NodeFactory.createURI("http://example.com/name"),
+				NodeFactory.createLiteralString("Alice")));
+
+		expected.add(new Quad(
+				NodeFactory.createURI("http://example.com/graph/2"),
+				NodeFactory.createURI("http://example.com/person/2"),
+				NodeFactory.createURI("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"),
+				NodeFactory.createURI("http://example.com/Person")));
+
+		expected.add(new Quad(
+				NodeFactory.createURI("http://example.com/graph/2"),
+				NodeFactory.createURI("http://example.com/person/2"),
+				NodeFactory.createURI("http://example.com/name"),
+				NodeFactory.createLiteralString("Bob")));
+
+		assertEquals(expected, actual);
+	}
 	@Test
 	public void testSkipFirstRows() throws IOException {
 		options = new CSVOptions();

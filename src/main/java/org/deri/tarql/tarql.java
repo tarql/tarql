@@ -7,6 +7,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.jar.Manifest;
 
+import java.util.Iterator;
+import org.apache.jena.sparql.core.Quad;
+
 import org.apache.jena.atlas.io.IndentedWriter;
 import org.apache.jena.atlas.lib.Lib;
 import org.apache.jena.graph.Triple;
@@ -20,15 +23,15 @@ import org.apache.jena.util.iterator.NullIterator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
-import jena.cmd.ArgDecl;
-import jena.cmd.CmdGeneral;
+import org.apache.jena.cmd.ArgDecl;
+import org.apache.jena.cmd.CmdMain;
 
 
 
 /**
  * The <code>tarql</code> CLI command.
  */
-public class tarql extends CmdGeneral {
+public class tarql extends CmdMain {
 
 	// This will be displayed by --version
 	public static final String VERSION;
@@ -82,7 +85,9 @@ public class tarql extends CmdGeneral {
 	private int dedupWindowSize = 0;
 	
 	private ExtendedIterator<Triple> resultTripleIterator = NullIterator.instance();
-	
+
+	private Iterator<Quad> resultQuadIterator = java.util.Collections.emptyIterator();
+
 	public tarql(String[] args) {
 		super(args);
 		
@@ -219,6 +224,14 @@ public class tarql extends CmdGeneral {
 							q.getPrologue().getPrefixMapping(), writeBase);
 				}
 			}
+			if (resultQuadIterator.hasNext()) {
+				StreamingRDFWriter writer = new StreamingRDFWriter(
+						System.out, resultQuadIterator, true);
+				writer.setDedupWindowSize(dedupWindowSize);
+				writer.writeTriG(
+						q.getPrologue().getBaseURI(),
+						q.getPrologue().getPrefixMapping());
+			}
 		} catch (NotFoundException ex) {
 			error("Not found", ex);
 		} catch (IOException ioe) {
@@ -262,12 +275,23 @@ public class tarql extends CmdGeneral {
 		} else if (ex.getFirstQuery().isAskType()) {
 			System.out.println(ResultSetFormatter.asText(ex.execSelect()));
 		} else if (ex.getFirstQuery().isConstructType()) {
-			resultTripleIterator = resultTripleIterator.andThen(ex.execTriples());
+			if (ex.getFirstQuery().isConstructQuad()) {
+				resultQuadIterator = concatIterators(resultQuadIterator, ex.execQuads());
+			} else {
+				resultTripleIterator = resultTripleIterator.andThen(ex.execTriples());
+			}
 		} else {
 			cmdError("Only query forms CONSTRUCT, SELECT and ASK are supported");
 		}
 	}
-	
+	private static <T> Iterator<T> concatIterators(Iterator<T> first, Iterator<T> second) {
+		return java.util.stream.Stream.concat(
+						java.util.stream.StreamSupport.stream(
+								java.util.Spliterators.spliteratorUnknownSize(first, 0), false),
+						java.util.stream.StreamSupport.stream(
+								java.util.Spliterators.spliteratorUnknownSize(second, 0), false))
+				.iterator();
+	}
 	// Not sure if this really works...
 	private void initLogging() {
 		if (isQuiet()) {

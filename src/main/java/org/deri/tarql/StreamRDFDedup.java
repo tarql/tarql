@@ -75,6 +75,10 @@ public class StreamRDFDedup implements StreamRDF {
 		}
 		return false;
 	}
+	@Override
+	public void version(String version) {
+		wrapped.version(version);
+	}
 	
 	private void forgetOldest() {
 		tripleAndQuadCache.remove(tripleAndQuadList.removeFirst());

@@ -60,9 +60,11 @@ public class ExpandPrefixedNameFunction implements Function {
 	}
 
 	@Override
-	public void build(String uri, ExprList args) {
+	public void build(String uri, ExprList args, Context context) {
 		if (args.size() != 1) {
-			throw new QueryBuildException("Function '" + Lib.className(this) + "' takes one argument");
+			throw new QueryBuildException(
+					"Function '" + Lib.className(this) + "' takes one argument"
+			);
 		}
 	}
 }

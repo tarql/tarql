@@ -115,7 +115,110 @@ public class LargeInputTest {
 		}
 		assertEquals(lines, readLines);
 	}
-	
+	@Test
+	public void testVALUESWithFILTERStreaming() {
+		final int lines = 1000000;
+		String query = "SELECT * { VALUES ?choice { 1 2 } FILTER(?choice = 1) }";
+
+		ResultSet rs = prepare(query, new DummyContentSource(lines)).execSelect();
+
+		assertEquals(lines - 1, consume(rs));
+	}
+	@Test
+	public void testVALUESWithCSVFilter() {
+		final int lines = 1000000;
+
+		String query =
+				"SELECT * { " +
+						"VALUES ?choice { 1 2 } " +
+						"FILTER(?line = \"Line 2\") " +
+						"}";
+
+		ResultSet rs = prepare(
+				query,
+				new DummyContentSource(lines)
+		).execSelect();
+
+		assertEquals(2, consume(rs));
+	}
+	@Test
+	public void testVALUESWithCSVBind() {
+		final int lines = 1000000;
+
+		String query =
+				"SELECT * { " +
+						"VALUES ?choice { 1 } " +
+						"BIND(CONCAT(?line, \" test\") AS ?result) " +
+						"}";
+
+		ResultSet rs = prepare(
+				query,
+				new DummyContentSource(lines)
+		).execSelect();
+
+		assertTrue(rs.hasNext());
+		assertEquals(
+				"Line 2 test",
+				rs.next().getLiteral("result").getString()
+		);
+
+		assertEquals(lines - 2, consume(rs));
+	}
+
+	@Test
+	public void testVALUESWithCSVBindSmall() {
+		String query =
+				"SELECT * { " +
+						"VALUES ?choice { 1 2 } " +
+						"BIND(?line AS ?selected) " +
+						"}";
+
+		ResultSet rs = prepare(
+				query,
+				new DummyContentSource(5)
+		).execSelect();
+
+		int total = 0;
+		int selected = 0;
+
+		while (rs.hasNext()) {
+			org.apache.jena.query.QuerySolution row = rs.next();
+			total++;
+
+			if (row.contains("selected")) {
+				selected++;
+			}
+		}
+
+		assertEquals(8, total);
+		assertEquals(8, selected);
+	}
+	@Test
+	public void testVALUESWithSharedCSVVariableAndBIND() {
+		String query =
+				"SELECT * { " +
+						"VALUES ?line { \"Line 2\" } " +
+						"BIND(CONCAT(?line, \" test\") AS ?result) " +
+						"}";
+
+		ResultSet rs = prepare(
+				query,
+				new DummyContentSource(5)
+		).execSelect();
+
+		int total = 0;
+
+		while (rs.hasNext()) {
+			org.apache.jena.query.QuerySolution row = rs.next();
+
+			assertEquals("Line 2", row.getLiteral("line").getString());
+			assertEquals("Line 2 test", row.getLiteral("result").getString());
+
+			total++;
+		}
+
+		assertEquals(1, total);
+	}
 	@Test public void testSmallInput() {
 		final int lines = 5;
 		String query = "SELECT * {}";
@@ -184,6 +287,31 @@ public class LargeInputTest {
 		int results = consume(rs);
 		assertEquals(lines - 1, results);
 	}
+
+        @Test public void testMultipleVALUESStreaming() {
+                final int lines = 100000;
+                String query = "SELECT * { VALUES ?choice { 1 2 } }";
+                ResultSet rs = prepare(query, new DummyContentSource(lines)).execSelect();
+                assertEquals((lines - 1) * 2, consume(rs));
+        }
+        @Test public void testVALUESWithSharedCSVVariable() {
+                final int lines = 100000;
+                String query = "SELECT * { VALUES ?line { \"Line 2\" \"Line 3\" } }";
+                ResultSet rs = prepare(query, new DummyContentSource(lines)).execSelect();
+                assertEquals(2, consume(rs));
+        }
+        @Test public void testVALUESWithBINDStreaming() {
+                final int lines = 1000000;
+                String query = "SELECT * { VALUES ?choice { 1 } BIND(?choice AS ?result) }";
+                ResultSet rs = prepare(query, new DummyContentSource(lines)).execSelect();
+                assertEquals(lines - 1, consume(rs));
+        }
+        @Test public void testDodgyVALUESRegression() {
+                final int lines = 1000000;
+                String query = "SELECT * { VALUES ?undef { UNDEF } }";
+                ResultSet rs = prepare(query, new DummyContentSource(lines)).execSelect();
+                assertEquals(lines - 1, consume(rs));
+        }
 
 	@Ignore("This broke streaming in v1.1 but fixed by Jena upgrade in v1.2")
 	@Test public void testDodgyVALUES() {

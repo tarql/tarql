@@ -3,6 +3,9 @@ package org.deri.tarql;
 import java.io.IOException;
 import java.util.Iterator;
 
+import org.apache.jena.sparql.syntax.ElementFilter;
+import org.apache.jena.sparql.syntax.ElementBind;
+import org.apache.jena.sparql.core.Quad;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
@@ -80,7 +83,7 @@ public class TarqlQueryExecution {
 			tableElement.add(var);
 		}
 		ElementGroup groupElement = new ElementGroup();
-		groupElement.addElement(tableElement);
+		
 		if (query.getQueryPattern() instanceof ElementGroup) {
 			for (Element element: ((ElementGroup) query.getQueryPattern()).getElements()) {
 				groupElement.addElement(element);
@@ -88,6 +91,37 @@ public class TarqlQueryExecution {
 		} else {
 			groupElement.addElement(query.getQueryPattern());
 		}
+		// Put VALUES before the CSV table when it is safe to do so.
+		boolean valuesFirst = false;
+
+		if (query.getQueryPattern() instanceof ElementData) {
+			valuesFirst = true;
+		} else if (query.getQueryPattern() instanceof ElementGroup) {
+			java.util.List<Element> elements =
+					((ElementGroup) query.getQueryPattern()).getElements();
+
+			valuesFirst = elements.size() == 1
+					&& elements.get(0) instanceof ElementData;
+
+			if (elements.size() == 2
+					&& elements.get(0) instanceof ElementData
+					&& (elements.get(1) instanceof ElementBind
+					|| elements.get(1) instanceof ElementFilter)) {
+				valuesFirst = true;
+			}
+		}
+
+		if (valuesFirst) {
+			if (groupElement.getElements().size() > 1
+					&& groupElement.getElements().get(0) instanceof ElementData) {
+				groupElement.getElements().add(1, tableElement);
+			} else {
+				groupElement.addElement(tableElement);
+			}
+		} else {
+			groupElement.getElements().add(0, tableElement);
+		}
+
 		query.setQueryPattern(groupElement);
 		
 		// For SELECT * queries, we don't want to include pseudo
@@ -95,7 +129,7 @@ public class TarqlQueryExecution {
 		// That's why we skipped ?ROWNUM further up.
 		if (query.isSelectType() && query.isQueryResultStar()) {
 			// Force expansion of "SELECT *" to actual projection list
-			query.setResultVars();
+			query.ensureResultVars();
 			// Tell ARQ that it actually needs to pay attention to
 			// the projection list
 			query.setQueryResultStar(false);
@@ -139,6 +173,21 @@ public class TarqlQueryExecution {
 			result = result.andThen(ex.execConstructTriples());
 		}
 		return result;
+	}
+	public Iterator<Quad> execQuads() throws IOException {
+		Model model = ModelFactory.createDefaultModel();
+		java.util.List<Iterator<Quad>> iterators = new java.util.ArrayList<>();
+
+		for (Query q: tq.getQueries()) {
+			modifyQuery(q, table);
+			QueryExecution ex = createQueryExecution(q, model);
+			iterators.add(ex.execConstructQuads());
+		}
+
+		return iterators.stream()
+				.flatMap(it -> java.util.stream.StreamSupport.stream(
+						java.util.Spliterators.spliteratorUnknownSize(it, 0), false))
+				.iterator();
 	}
 	
 	public ResultSet execSelect() {

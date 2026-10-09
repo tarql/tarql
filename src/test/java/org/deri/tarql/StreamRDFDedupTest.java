@@ -59,5 +59,8 @@ public class StreamRDFDedupTest {
 		@Override public void base(String base) {}
 		@Override public void prefix(String prefix, String iri) {}
 		@Override public void finish() {}
+		@Override
+		public void version(String version) {
+		}
 	}
 }

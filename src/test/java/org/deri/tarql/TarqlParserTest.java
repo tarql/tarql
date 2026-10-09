@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+
 import java.io.StringReader;
 
 import org.apache.jena.query.QueryParseException;
@@ -70,5 +71,19 @@ public class TarqlParserTest {
 		TarqlParser p = new TarqlParser(new StringReader(s));
 		assertEquals(3, p.getResult().getQueries().size());
 		assertEquals(3, p.getResult().getPrologue().getPrefixMapping().getNsPrefixMap().size());
+	}
+
+	@Test
+	public void testNamedGraphCONSTRUCT() throws Exception {
+		String s =
+				"PREFIX ex: <http://example.com/> " +
+						"CONSTRUCT { GRAPH ?g { ?s a ex:Person } } " +
+						"WHERE { BIND(<http://example.com/g> AS ?g) " +
+						"BIND(<http://example.com/person/1> AS ?s) }";
+
+		TarqlParser parser = new TarqlParser(new StringReader(s));
+
+		assertEquals(1, parser.getResult().getQueries().size());
+		assertTrue(parser.getResult().getQueries().get(0).isConstructType());
 	}
 }
